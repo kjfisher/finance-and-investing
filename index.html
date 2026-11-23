@@ -1,27 +1,64 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Finance &amp; Investing Games</title>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style></head><body>
+<title>F&amp;I Arcade</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
 <style>
-  body { font-family: system-ui, sans-serif; margin: 0; background: #f4f7f5; color: #1d2b24; }
-  main { max-width: 640px; margin: 0 auto; padding: 48px 16px; text-align: center; }
-  h1 { color: #1f6f4a; }
-  .card { background: #fff; border-radius: 12px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,.08); }
-  button { font-size: 1.1rem; padding: 10px 20px; border: 0; border-radius: 8px; background: #1f6f4a; color: #fff; cursor: pointer; }
-  #result { margin-top: 16px; font-size: 1.2rem; min-height: 1.5em; }
+/* Layout: placeholder Arcade Hub. Header with the two links students need most, then every game grouped by unit in course order, each with a stable #anchor the Daily Agenda links to. */
+:root{
+  --bg:#F1F4F8; --panel:#FFFFFF; --ink:#131C2B; --muted:#5A6577; --line:#D7DEE8; --accent:#1D4E89; --chip:#E6ECF4;
+  --u1:#2F7D46; --u2:#0E7490; --u3:#5A6A1E; --u4:#6B2E5E; --mid:#1E2B45; --u5:#B8572F; --u6:#6B4FB0; --ev:#9A6A0C; --u7:#9C3420; --u8:#2E6B5E; --fp:#1D4E89; --fin:#14213D;
+  --display:"Bricolage Grotesque", "Avenir Next", system-ui, sans-serif; --body:"Inter", system-ui, sans-serif; --mono:"JetBrains Mono", ui-monospace, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#0E131B; --panel:#161D28; --ink:#E7ECF3; --muted:#98A3B4; --line:#2A3442; --accent:#7FB0F0; --chip:#1F2938;
+  --u1:#6CCB8A; --u2:#5FC6DE; --u3:#C2D27A; --u4:#D98BC9; --mid:#9DB0D6; --u5:#F09A72; --u6:#B9A2F0; --ev:#E6B062; --u7:#F08A73; --u8:#7FD1BD; --fp:#7FB0F0; --fin:#A9B9DD; color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0E131B; --panel:#161D28; --ink:#E7ECF3; --muted:#98A3B4; --line:#2A3442; --accent:#7FB0F0; --chip:#1F2938;
+  --u1:#6CCB8A; --u2:#5FC6DE; --u3:#C2D27A; --u4:#D98BC9; --mid:#9DB0D6; --u5:#F09A72; --u6:#B9A2F0; --ev:#E6B062; --u7:#F08A73; --u8:#7FD1BD; --fp:#7FB0F0; --fin:#A9B9DD; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5;margin:0}
+.wrap{max-width:1100px;margin:0 auto;padding-block:28px 48px;padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));display:grid;gap:28px}
+.brand{font-family:var(--mono);font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+h1{font-family:var(--display);font-weight:800;font-size:clamp(34px,5vw,60px);line-height:1.02;margin:6px 0 10px;text-wrap:balance}
+.lede{margin:0;max-width:62ch;color:var(--muted);font-size:18px}
+.links{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+.links a{font:600 16px var(--body);text-decoration:none;color:var(--ink);background:var(--panel);border:1px solid var(--line);padding:11px 16px;border-radius:12px}
+.links a.primary{background:var(--accent);color:var(--bg);border-color:var(--accent)}
+.links a:hover{border-color:var(--accent)}
+a:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+section{display:grid;gap:10px}
+h2{font-family:var(--display);font-weight:700;font-size:22px;margin:0;display:flex;align-items:center;gap:10px}
+h2::before{content:"";width:12px;height:12px;border-radius:3px;background:var(--c)}
+.games{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px}
+.game{background:var(--panel);border:1px solid var(--line);border-left:6px solid var(--c);border-radius:12px;padding:12px 14px;display:grid;gap:2px;scroll-margin-top:16px;min-width:0}
+.game:target{outline:3px solid var(--c);outline-offset:2px}
+.day{font:500 12px var(--mono);color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+.nm{font-weight:600;font-size:18px}
+.ls{font-size:14px;color:var(--muted)}
+.st{justify-self:start;margin-top:6px;font:500 12px var(--mono);background:var(--chip);border-radius:999px;padding:3px 10px;color:var(--muted)}
+.foot{font-size:13px;color:var(--muted)}
 </style>
-</head>
-<body>
-<main>
-  <h1>Finance &amp; Investing Games</h1>
-  <p>Games are coming soon. If you can see this page, the site is working!</p>
-  <div class="card">
-    <p>Quick test: $1,000 invested at 7% a year. What's it worth after 10 years?</p>
-    <button onclick="document.getElementById('result').textContent = '$' + (1000 * Math.pow(1.07, 10)).toFixed(2) + ' — that\'s compound interest!'">Show me</button>
-    <div id="result"></div>
-  </div>
-</main>
-</body>
-</html>
+<div class="wrap">
+  <header>
+    <div class="brand">Finance &amp; Investing · Semester 2 · 2026–27</div>
+    <h1>The F&amp;I Arcade</h1>
+    <p class="lede">Practice games for every unit, built for iPad. 23 games are on the way and open here as they're finished. Today's class is on the Daily Agenda.</p>
+    <div class="links">
+      <a class="primary" href="/daily-agenda/">📅 Daily Agenda</a>
+      <a href="https://d214-stock-sim.vercel.app/" target="_blank" rel="noopener">📈 D214 Investing Competition ↗</a>
+      <a href="https://stock-simulator-teal.vercel.app/sign-in" target="_blank" rel="noopener">🕰️ Stock Simulator (historical rounds) ↗</a>
+    </div>
+  </header>
+<section style="--c:var(--u1)"><h2>Unit 1: Financial Markets Overview</h2><ul class="games"><li class="game" id="compound-race-warm-up"><span class="day">Day 2</span><span class="nm">Compound race warm-up</span><span class="ls">Money that grows</span><span class="st">Coming soon</span></li><li class="game" id="risk-ladder-card-sort"><span class="day">Day 3</span><span class="nm">Risk ladder card sort</span><span class="ls">The financial system and asset classes</span><span class="st">Coming soon</span></li></ul></section>
+<section style="--c:var(--u2)"><h2>Unit 2: The Markets</h2><ul class="games"><li class="game" id="order-type-scenarios"><span class="day">Day 5</span><span class="nm">Order-type scenarios</span><span class="ls">How stocks trade</span><span class="st">Coming soon</span></li><li class="game" id="quote-scavenger-hunt"><span class="day">Day 6</span><span class="nm">Quote scavenger hunt</span><span class="ls">Quotes, indexes and market cap</span><span class="st">Coming soon</span></li></ul></section>
+<section style="--c:var(--u3)"><h2>Unit 3: Analyzing Companies</h2><ul class="games"><li class="game" id="company-detective"><span class="day">Day 9</span><span class="nm">Company detective</span><span class="ls">What makes a great company?</span><span class="st">Coming soon</span></li><li class="game" id="statement-scavenger-hunt"><span class="day">Day 10</span><span class="nm">Statement scavenger hunt</span><span class="ls">The income statement</span><span class="st">Coming soon</span></li><li class="game" id="annual-report-tour"><span class="day">Day 11</span><span class="nm">Annual-report tour</span><span class="ls">Balance sheet and cash flow</span><span class="st">Coming soon</span></li><li class="game" id="valuation-showdown"><span class="day">Day 12</span><span class="nm">Valuation showdown</span><span class="ls">Is it a good price?</span><span class="st">Coming soon</span></li></ul></section>
+<section style="--c:var(--u4)"><h2>Unit 4: Investing in Funds</h2><ul class="games"><li class="game" id="fund-fee-calculator"><span class="day">Day 14</span><span class="nm">Fund fee calculator</span><span class="ls">Mutual funds</span><span class="st">Coming soon</span></li><li class="game" id="account-match-up"><span class="day">Day 16</span><span class="nm">Account match-up</span><span class="ls">Accounts and taxes</span><span class="st">Coming soon</span></li></ul></section>
+<section style="--c:var(--mid)"><h2>Midterm (Units 1–4)</h2><ul class="games"><li class="game" id="midterm-review-games"><span class="day">Day 18</span><span class="nm">Midterm review games</span><span class="ls">Midterm review</span><span class="st">Coming soon</span></li></ul></section>
+<section style="--c:var(--u5)"><h2>Unit 5: Bonds</h2><ul class="games"><li class="game" id="bond-decoder"><span class="day">Day 20</span><span class="nm">Bond decoder</span><span class="ls">Bond basics</span><span class="st">Coming soon</span></li></ul></section>
+<section style="--c:var(--u6)"><h2>Unit 6: Investment Theory &amp; Portfolio Building</h2><ul class="games"><li class="game" id="beta-hunt-on-competition-holdings"><span class="day">Day 23</span><span class="nm">Beta hunt on competition holdings</span><span class="ls">Risk, return and beta</span><span class="st">Coming soon</span></li><li class="game" id="bias-case-files"><span class="day">Day 25</span><span class="nm">Bias case files</span><span class="ls">Your brain on money</span><span class="st">Coming soon</span></li></ul></section>
+<section style="--c:var(--u7)"><h2>Unit 7: Derivatives</h2><ul class="games"><li class="game" id="options-vocabulary-match"><span class="day">Day 30</span><span class="nm">Options vocabulary match</span><span class="ls">Options basics</span><span class="st">Coming soon</span></li><li class="game" id="options-payoff-game"><span class="day">Day 31</span><span class="nm">Options payoff game</span><span class="ls">Option payoffs and strategies</span><span class="st">Coming soon</span></li><li class="game" id="hedge-or-not-scenarios"><span class="day">Day 32</span><span class="nm">Hedge-or-not scenarios</span><span class="ls">Futures and hedging</span><span class="st">Coming soon</span></li><li class="game" id="derivatives-review-games"><span class="day">Day 34</span><span class="nm">Derivatives review games</span><span class="ls">Derivatives practice lab</span><span class="st">Coming soon</span></li></ul></section>
+<section style="--c:var(--u8)"><h2>Unit 8: Crypto &amp; Alternative Investments</h2><ul class="games"><li class="game" id="build-a-block-activity"><span class="day">Day 35</span><span class="nm">Build-a-block activity</span><span class="ls">Blockchain and Bitcoin</span><span class="st">Coming soon</span></li><li class="game" id="red-flag-detector"><span class="day">Day 36</span><span class="nm">Red-flag detector</span><span class="ls">Crypto as an investment</span><span class="st">Coming soon</span></li><li class="game" id="reit-vs-rental-showdown"><span class="day">Day 37</span><span class="nm">REIT vs. rental showdown</span><span class="ls">Real estate and REITs</span><span class="st">Coming soon</span></li><li class="game" id="alternative-asset-auction"><span class="day">Day 38</span><span class="nm">Alternative-asset auction</span><span class="ls">Commodities, collectibles and startups</span><span class="st">Coming soon</span></li></ul></section>
+<section style="--c:var(--fin)"><h2>Final Review</h2><ul class="games"><li class="game" id="final-review-games"><span class="day">Day 45</span><span class="nm">Final review games</span><span class="ls">Final exam review</span><span class="st">Coming soon</span></li></ul></section>
+  <div class="foot">Original games for Finance &amp; Investing, Elk Grove High School (D214). Historical simulation rounds run on Days 4, 8, 21 and 24 in the Stock Simulator.</div>
+</div>
+
+</body></html>
