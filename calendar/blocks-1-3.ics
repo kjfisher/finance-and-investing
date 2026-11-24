@@ -1,0 +1,364 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//D214 Finance and Investing//Due dates//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:F&I due dates · Blocks 1 & 3
+X-WR-TIMEZONE:America/Chicago
+BEGIN:VEVENT
+UID:62ee291f80b104e1fe24f317101100b2@214-finance-and-investing
+DTSTAMP:20261124T000000Z
+DTSTART;VALUE=DATE:20270111
+DTEND;VALUE=DATE:20270112
+SUMMARY:F&I due: Reading guide: financial goals
+DESCRIPTION:Day 3 · Unit 1: Financial Markets Overview\nDue: Reading guid
+ e: financial goals\nLesson page: https://214-finance-and-investing.vercel.
+ app/lessons/day-3/
+URL:https://214-finance-and-investing.vercel.app/lessons/day-3/
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:F&I due: Reading guide: financial goals
+TRIGGER:-PT15H
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:65b9dfee3155088f25c7dfb4e96ce812@214-finance-and-investing
+DTSTAMP:20261124T000000Z
+DTSTART;VALUE=DATE:20270113
+DTEND;VALUE=DATE:20270114
+SUMMARY:F&I due: Unit 1 Quiz · Investor Profile
+DESCRIPTION:Day 4 · Unit 1: Financial Markets Overview\nDue: Unit 1 Quiz\
+ ; Investor Profile\nLesson page: https://214-finance-and-investing.vercel.
+ app/lessons/day-4/
+URL:https://214-finance-and-investing.vercel.app/lessons/day-4/
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:F&I due: Unit 1 Quiz · Investor Profile
+TRIGGER:-PT15H
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:087b1375cbf16e654fcdae2d67ba19ea@214-finance-and-investing
+DTSTAMP:20261124T000000Z
+DTSTART;VALUE=DATE:20270126
+DTEND;VALUE=DATE:20270127
+SUMMARY:F&I due: Unit 2 Quiz · Trading Journal · Reading guide: Schwab t
+ iming study
+DESCRIPTION:Day 8 · Unit 2: The Markets\nDue: Unit 2 Quiz\; Trading Journ
+ al\; Reading guide: Schwab timing study\nLesson page: https://214-finance-
+ and-investing.vercel.app/lessons/day-8/
+URL:https://214-finance-and-investing.vercel.app/lessons/day-8/
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:F&I due: Unit 2 Quiz · Trading Journal · Reading guide: Schw
+ ab timing study
+TRIGGER:-PT15H
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:78d5e892905ae8855421819c17eb6036@214-finance-and-investing
+DTSTAMP:20261124T000000Z
+DTSTART;VALUE=DATE:20270205
+DTEND;VALUE=DATE:20270206
+SUMMARY:F&I due: Reading guide: balance sheets + 10-K
+DESCRIPTION:Day 12 · Unit 3: Analyzing Companies\nDue: Reading guide: bal
+ ance sheets + 10-K\nLesson page: https://214-finance-and-investing.vercel.
+ app/lessons/day-12/
+URL:https://214-finance-and-investing.vercel.app/lessons/day-12/
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:F&I due: Reading guide: balance sheets + 10-K
+TRIGGER:-PT15H
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:368350fedc84a83975ebb173a1d2d5cf@214-finance-and-investing
+DTSTAMP:20261124T000000Z
+DTSTART;VALUE=DATE:20270209
+DTEND;VALUE=DATE:20270210
+SUMMARY:F&I due: Unit 3 Quiz · Stock Pitch
+DESCRIPTION:Day 13 · Unit 3: Analyzing Companies\nDue: Unit 3 Quiz\; Stoc
+ k Pitch\nLesson page: https://214-finance-and-investing.vercel.app/lessons
+ /day-13/
+URL:https://214-finance-and-investing.vercel.app/lessons/day-13/
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:F&I due: Unit 3 Quiz · Stock Pitch
+TRIGGER:-PT15H
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:2f6dfa983d74bf5722b36d8edc62976d@214-finance-and-investing
+DTSTAMP:20261124T000000Z
+DTSTART;VALUE=DATE:20270223
+DTEND;VALUE=DATE:20270224
+SUMMARY:F&I due: Unit 4 Quiz · Core Fund Build · Reading guide: Mind the
+  Gap
+DESCRIPTION:Day 17 · Unit 4: Investing in Funds\nDue: Unit 4 Quiz\; Core 
+ Fund Build\; Reading guide: Mind the Gap\nLesson page: https://214-finance
+ -and-investing.vercel.app/lessons/day-17/
+URL:https://214-finance-and-investing.vercel.app/lessons/day-17/
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:F&I due: Unit 4 Quiz · Core Fund Build · Reading guide: Mind
+  the Gap
+TRIGGER:-PT15H
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:2c92787e77b0f520f28318b2dfeeb280@214-finance-and-investing
+DTSTAMP:20261124T000000Z
+DTSTART;VALUE=DATE:20270225
+DTEND;VALUE=DATE:20270226
+SUMMARY:F&I due: Midterm study guide due
+DESCRIPTION:Day 18 · Midterm (Units 1–4)\nDue: Midterm study guide due\
+ nLesson page: https://214-finance-and-investing.vercel.app/lessons/day-18/
+URL:https://214-finance-and-investing.vercel.app/lessons/day-18/
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:F&I due: Midterm study guide due
+TRIGGER:-PT15H
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:eda3cb4005e177de13407627473cc0dd@214-finance-and-investing
+DTSTAMP:20261124T000000Z
+DTSTART;VALUE=DATE:20270301
+DTEND;VALUE=DATE:20270302
+SUMMARY:F&I due: Midterm Exam
+DESCRIPTION:Day 19 · Midterm (Units 1–4)\nDue: Midterm Exam\nLesson pag
+ e: https://214-finance-and-investing.vercel.app/lessons/day-19/
+URL:https://214-finance-and-investing.vercel.app/lessons/day-19/
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:F&I due: Midterm Exam
+TRIGGER:-PT15H
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:7c1149373826d9cffd8834c2fc71b91f@214-finance-and-investing
+DTSTAMP:20261124T000000Z
+DTSTART;VALUE=DATE:20270309
+DTEND;VALUE=DATE:20270310
+SUMMARY:F&I due: Unit 5 Quiz · Bond Decision · Reading guide: life cycle
+DESCRIPTION:Day 22 · Unit 5: Bonds\nDue: Unit 5 Quiz\; Bond Decision\; Re
+ ading guide: life cycle\nLesson page: https://214-finance-and-investing.ve
+ rcel.app/lessons/day-22/
+URL:https://214-finance-and-investing.vercel.app/lessons/day-22/
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:F&I due: Unit 5 Quiz · Bond Decision · Reading guide: life c
+ ycle
+TRIGGER:-PT15H
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:b225bf63eab651058ff6fc52b1e2aee3@214-finance-and-investing
+DTSTAMP:20261124T000000Z
+DTSTART;VALUE=DATE:20270319
+DTEND;VALUE=DATE:20270320
+SUMMARY:F&I due: Unit 6 Quiz · Investment Policy Statement · Reading gui
+ de: market timing
+DESCRIPTION:Day 26 · Unit 6: Investment Theory & Portfolio Building\nDue:
+  Unit 6 Quiz\; Investment Policy Statement\; Reading guide: market timing\
+ nLesson page: https://214-finance-and-investing.vercel.app/lessons/day-26/
+URL:https://214-finance-and-investing.vercel.app/lessons/day-26/
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:F&I due: Unit 6 Quiz · Investment Policy Statement · Reading
+  guide: market timing
+TRIGGER:-PT15H
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:02445a89397dfcf00590c96c3ff549e7@214-finance-and-investing
+DTSTAMP:20261124T000000Z
+DTSTART;VALUE=DATE:20270401
+DTEND;VALUE=DATE:20270402
+SUMMARY:F&I due: Notes sheet 1–3
+DESCRIPTION:Day 28 · Portfolio Defense\nDue: Notes sheet 1–3\nLesson pa
+ ge: https://214-finance-and-investing.vercel.app/lessons/day-28/
+URL:https://214-finance-and-investing.vercel.app/lessons/day-28/
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:F&I due: Notes sheet 1–3
+TRIGGER:-PT15H
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:89a93c5533d536fa7d2fc74f38cbc47c@214-finance-and-investing
+DTSTAMP:20261124T000000Z
+DTSTART;VALUE=DATE:20270405
+DTEND;VALUE=DATE:20270406
+SUMMARY:F&I due: Portfolio defense
+DESCRIPTION:Day 29 · Portfolio Defense\nDue: Portfolio defense\nLesson pa
+ ge: https://214-finance-and-investing.vercel.app/lessons/day-29/
+URL:https://214-finance-and-investing.vercel.app/lessons/day-29/
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:F&I due: Portfolio defense
+TRIGGER:-PT15H
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:8683e115c249422825ff0324ab749668@214-finance-and-investing
+DTSTAMP:20261124T000000Z
+DTSTART;VALUE=DATE:20270413
+DTEND;VALUE=DATE:20270414
+SUMMARY:F&I due: Reading guide: options
+DESCRIPTION:Day 31 · Unit 7: Derivatives\nDue: Reading guide: options\nLe
+ sson page: https://214-finance-and-investing.vercel.app/lessons/day-31/
+URL:https://214-finance-and-investing.vercel.app/lessons/day-31/
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:F&I due: Reading guide: options
+TRIGGER:-PT15H
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:37fc3783350c554cebaa56a134fdaa18@214-finance-and-investing
+DTSTAMP:20261124T000000Z
+DTSTART;VALUE=DATE:20270421
+DTEND;VALUE=DATE:20270422
+SUMMARY:F&I due: Unit 7 Quiz · Hedge-or-Not Memo
+DESCRIPTION:Day 34 · Unit 7: Derivatives\nDue: Unit 7 Quiz\; Hedge-or-Not
+  Memo\nLesson page: https://214-finance-and-investing.vercel.app/lessons/d
+ ay-34/
+URL:https://214-finance-and-investing.vercel.app/lessons/day-34/
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:F&I due: Unit 7 Quiz · Hedge-or-Not Memo
+TRIGGER:-PT15H
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:efa79c52a2498641f28f197030856141@214-finance-and-investing
+DTSTAMP:20261124T000000Z
+DTSTART;VALUE=DATE:20270427
+DTEND;VALUE=DATE:20270428
+SUMMARY:F&I due: Reading guide: crypto scams
+DESCRIPTION:Day 36 · Unit 8: Crypto & Alternative Investments\nDue: Readi
+ ng guide: crypto scams\nLesson page: https://214-finance-and-investing.ver
+ cel.app/lessons/day-36/
+URL:https://214-finance-and-investing.vercel.app/lessons/day-36/
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:F&I due: Reading guide: crypto scams
+TRIGGER:-PT15H
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:4bce6eb9539462a743200c0c04db739b@214-finance-and-investing
+DTSTAMP:20261124T000000Z
+DTSTART;VALUE=DATE:20270503
+DTEND;VALUE=DATE:20270504
+SUMMARY:F&I due: Unit 8 Quiz · Alternatives Verdict
+DESCRIPTION:Day 38 · Unit 8: Crypto & Alternative Investments\nDue: Unit 
+ 8 Quiz\; Alternatives Verdict\nLesson page: https://214-finance-and-invest
+ ing.vercel.app/lessons/day-38/
+URL:https://214-finance-and-investing.vercel.app/lessons/day-38/
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:F&I due: Unit 8 Quiz · Alternatives Verdict
+TRIGGER:-PT15H
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:101cc30cbfd34abb403bc50e6ce50d67@214-finance-and-investing
+DTSTAMP:20261124T000000Z
+DTSTART;VALUE=DATE:20270513
+DTEND;VALUE=DATE:20270514
+SUMMARY:F&I due: Project draft check
+DESCRIPTION:Day 42 · Final Project: My Portfolio Story\nDue: Project draf
+ t check\nLesson page: https://214-finance-and-investing.vercel.app/lessons
+ /day-42/
+URL:https://214-finance-and-investing.vercel.app/lessons/day-42/
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:F&I due: Project draft check
+TRIGGER:-PT15H
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:58295507a0cfdac3da4dcd861283356d@214-finance-and-investing
+DTSTAMP:20261124T000000Z
+DTSTART;VALUE=DATE:20270517
+DTEND;VALUE=DATE:20270518
+SUMMARY:F&I due: Final project
+DESCRIPTION:Day 43 · Final Project: My Portfolio Story\nDue: Final projec
+ t\nLesson page: https://214-finance-and-investing.vercel.app/lessons/day-4
+ 3/
+URL:https://214-finance-and-investing.vercel.app/lessons/day-43/
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:F&I due: Final project
+TRIGGER:-PT15H
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:fb01560e36a288bfd1c312f04f2694d7@214-finance-and-investing
+DTSTAMP:20261124T000000Z
+DTSTART;VALUE=DATE:20270519
+DTEND;VALUE=DATE:20270520
+SUMMARY:F&I due: Final project
+DESCRIPTION:Day 44 · Final Project: My Portfolio Story\nDue: Final projec
+ t\nLesson page: https://214-finance-and-investing.vercel.app/lessons/day-4
+ 4/
+URL:https://214-finance-and-investing.vercel.app/lessons/day-44/
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:F&I due: Final project
+TRIGGER:-PT15H
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:29a24a82dd86b8839f020b455cc0ed4d@214-finance-and-investing
+DTSTAMP:20261124T000000Z
+DTSTART;VALUE=DATE:20270521
+DTEND;VALUE=DATE:20270522
+SUMMARY:F&I due: Final study guide
+DESCRIPTION:Day 45 · Final Review\nDue: Final study guide\nLesson page: h
+ ttps://214-finance-and-investing.vercel.app/lessons/day-45/
+URL:https://214-finance-and-investing.vercel.app/lessons/day-45/
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:F&I due: Final study guide
+TRIGGER:-PT15H
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:14fcbde33cd3d25219ea2f38057d7384@214-finance-and-investing
+DTSTAMP:20261124T000000Z
+DTSTART;VALUE=DATE:20270525
+DTEND;VALUE=DATE:20270526
+SUMMARY:F&I Final Exam (Units 1–8)
+DESCRIPTION:Bring a calculator. Study guide due Day 45.
+URL:https://214-finance-and-investing.vercel.app/units/unit-fin/
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:F&I Final Exam (Units 1–8)
+TRIGGER:-PT15H
+END:VALARM
+END:VEVENT
+END:VCALENDAR

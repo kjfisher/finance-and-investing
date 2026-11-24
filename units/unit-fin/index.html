@@ -1,4 +1,4 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!doctype html><html lang="en"><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
 <title>Final: Final Review (Units 1–8)</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 
@@ -6,7 +6,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Mono:wght@500;600&display=swap">
 <style>
 /* Layout: course pages for the Finance & Investing site. Navy bar with breadcrumbs, unit-colored header, cards on a pale ground. */
-:root{--bg:#F2F4F1;--surface:#FFFFFF;--ink:#14213D;--muted:#5A6478;--line:#D3D9D0;--bar:#14213D;--barInk:#F3F5F8;--gold:#E0A800;--money:#0F8B6C;--money-ink:#FFFFFF;--uc:#1E2B45;--chip:#E9EEF4;
+:root{--bg:#F2F4F1;--surface:#FFFFFF;--ink:#14213D;--muted:#5A6478;--line:#D3D9D0;--bar:#14213D;--barInk:#F3F5F8;--gold:#E0A800;--money:#0B7A5E;--money-ink:#FFFFFF;--uc:#1E2B45;--chip:#E9EEF4;
  --display:"Bricolage Grotesque","Arial Black",system-ui,sans-serif;--body:"Atkinson Hyperlegible","Segoe UI",system-ui,sans-serif;--mono:"IBM Plex Mono",ui-monospace,Menlo,monospace}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0B111D;--surface:#151E33;--ink:#E8EDF5;--muted:#97A3B9;--line:#26334F;--bar:#070C17;--gold:#F5C542;--money:#3CCB9F;--money-ink:#06261D;--uc:#9DB0D6;--chip:#1C2742;color-scheme:dark}}
 :root[data-theme="dark"]{--bg:#0B111D;--surface:#151E33;--ink:#E8EDF5;--muted:#97A3B9;--line:#26334F;--bar:#070C17;--gold:#F5C542;--money:#3CCB9F;--money-ink:#06261D;--uc:#9DB0D6;--chip:#1C2742;color-scheme:dark}
@@ -43,6 +43,7 @@ ul,ol{margin:0;padding-left:1.3em;display:grid;gap:4px}
 .btn:focus-visible,a:focus-visible,button:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
 .timeline{display:flex;height:34px;border-radius:10px;overflow:hidden;border:1px solid var(--line)}
 .timeline div{display:flex;align-items:center;justify-content:center;font:600 12px var(--mono);color:#fff;overflow:hidden;white-space:nowrap;border-right:2px solid var(--surface)}
+.timeline div.uc{color:var(--surface)}
 .seg{display:grid;grid-template-columns:84px 1fr;gap:16px;padding:16px 0;border-top:1px solid var(--line)}
 .seg:first-of-type{border-top:0}
 .seg .t{font-family:var(--display);font-weight:800;font-size:28px;line-height:1;color:var(--uc)}
@@ -80,7 +81,21 @@ ul,ol{margin:0;padding-left:1.3em;display:grid;gap:4px}
 #proj .pgames{display:flex;gap:10px;flex-wrap:wrap}
 #proj .pgames a{background:var(--money);color:var(--money-ink);text-decoration:none;font-weight:700;padding:10px 16px;border-radius:10px}
 </style>
-<div class="bar"><div class="in"><nav class="crumbs" aria-label="Breadcrumb"><a href="/">Arcade</a> <span>/</span> <a href="/daily-agenda/">Daily Agenda</a> <span>/</span> <b>Final</b></nav><div class="blocks" role="group" aria-label="Which blocks"><button id="bA" aria-pressed="true">Blocks 1 &amp; 3</button><button id="bB" aria-pressed="false">Blocks 5 &amp; 7</button></div></div></div><div class="wrap">
+<style>
+.snav{--sn-bg:#131C2B;--sn-ink:#E7ECF3;--sn-hi:#F2C14E;background:var(--sn-bg);color:var(--sn-ink);position:relative;z-index:5}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .snav{--sn-bg:#05080D}}
+:root[data-theme="dark"] .snav{--sn-bg:#05080D}
+.snav ul{list-style:none;margin:0 auto;padding:0 max(10px,env(safe-area-inset-left,0px));max-width:1120px;display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.snav ul::-webkit-scrollbar{display:none}
+.snav li{flex:0 0 auto}
+@media (max-width:860px){.snav ul{padding-right:48px;-webkit-mask-image:linear-gradient(to right,#000 82%,transparent);mask-image:linear-gradient(to right,#000 82%,transparent)}}
+.snav a{display:block;padding:11px 10px;color:inherit;text-decoration:none;font:600 14px "Inter",system-ui,sans-serif;white-space:nowrap;border-bottom:3px solid transparent;opacity:.85}
+.snav a:hover{opacity:1;border-bottom-color:rgba(255,255,255,.35)}
+.snav a[aria-current="page"]{opacity:1;border-bottom-color:var(--sn-hi);color:#fff}
+.snav a:focus-visible{outline:3px solid var(--sn-hi);outline-offset:-3px}
+.snav .skip{position:absolute;left:-999px;top:0;background:var(--sn-hi);color:#131C2B;padding:8px 12px;border-radius:0 0 8px 0}
+.snav .skip:focus{left:0}
+</style><nav class="snav" aria-label="Course menu"><a class="skip" href="#main">Skip to content</a><ul><li><a href="/daily-agenda/">Daily Agenda</a></li><li><a href="/start/">Start Here</a></li><li><a href="/readings/">Readings</a></li><li><a href="/glossary/">Glossary</a></li><li><a href="/targets/">My Targets</a></li><li><a href="/warm-ups/">Warm-Ups</a></li><li><a href="/exit-tickets/">Exit Tickets</a></li><li><a href="/">Arcade</a></li></ul></nav><script>(function(){var a=document.querySelector(".snav [aria-current]");if(a)a.parentNode.parentNode.scrollLeft=Math.max(0,a.offsetLeft-60)})()</script><div class="bar"><div class="in"><nav class="crumbs" aria-label="Breadcrumb"><a href="/">Arcade</a> <span>/</span> <a href="/daily-agenda/">Daily Agenda</a> <span>/</span> <b>Final</b></nav><div class="blocks" role="group" aria-label="Which blocks"><button id="bA" aria-pressed="true">Blocks 1 &amp; 3</button><button id="bB" aria-pressed="false">Blocks 5 &amp; 7</button></div></div></div><div class="wrap" id="main">
 <header class="head"><div class="eyebrow">Final · 1 class day · May 20 – 21, 2027 (Blocks 5/7 also Mon May 24) · Final: Blocks 1/3 Tue May 25, Blocks 5/7 Wed May 26</div><h1>Final Review (Units 1–8)</h1>
 <p class="sub"><b>Essential question:</b> What do I know across all eight units, and what do I still need to study?</p></header>
 <section class="card"><h2>Lessons</h2><div class="scroll"><table class="tbl"><thead><tr><th>Day</th><th>Lesson &amp; learning target</th><th>Targets</th><th>Due</th></tr></thead><tbody><tr><td><b>Day 45</b><br><span class="note" data-a="Fri, May 21" data-b="Thu, May 20">Fri, May 21</span></td><td><a href="/lessons/day-45/"><b>Final Review</b></a><br><span class="note">I can review Units 1–8 and plan for the final exam.</span></td><td>1.1–8.5</td><td>Final study guide</td></tr></tbody></table></div>

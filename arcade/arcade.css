@@ -101,3 +101,7 @@ body.show .opt{font-size:clamp(22px,2.6vw,32px);padding:18px 22px}
 .corner .tally .btn{min-height:36px;padding:4px 14px;text-align:center}
 .corner.ok{background:var(--okbg);border-width:5px}
 .corner.dim{opacity:.4}
+.ct{color:var(--c)}
+/* dark mode: unit color as TEXT needs a lighter tint to stay readable */
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .kick,:root:not([data-theme="light"]) .q b,:root:not([data-theme="light"]) .q strong,:root:not([data-theme="light"]) .board b,:root:not([data-theme="light"]) .ct{color:color-mix(in srgb,var(--c) 45%,#fff)}}
+:root[data-theme="dark"] .kick,:root[data-theme="dark"] .q b,:root[data-theme="dark"] .q strong,:root[data-theme="dark"] .board b,:root[data-theme="dark"] .ct{color:color-mix(in srgb,var(--c) 45%,#fff)}

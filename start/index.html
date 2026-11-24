@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Start Here · F&amp;I</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* One check at a time when opened from a QR code (#d12); otherwise the semester list with unit filters. Nothing is saved or sent. */
+:root{--bg:#F1F4F8;--panel:#FFFFFF;--ink:#131C2B;--muted:#5A6577;--line:#D7DEE8;--chip:#E6ECF4;--accent:#1D4E89;
+ --ok:#0F7A5C;--okbg:#E3F4EE;--no:#B3261E;--nobg:#FBE9E7;
+ --u1:#2F7D46;--u2:#0E7490;--u3:#5A6A1E;--u4:#6B2E5E;--mid:#1E2B45;--u5:#A64B24;--u6:#6B4FB0;--ev:#9A6A0C;--u7:#9C3420;--u8:#2E6B5E;--fp:#1D4E89;--fin:#14213D;
+ --display:"Bricolage Grotesque","Avenir Next",system-ui,sans-serif;--body:"Inter",system-ui,sans-serif;--mono:"JetBrains Mono",ui-monospace,monospace}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0E131B;--panel:#161D28;--ink:#E7ECF3;--muted:#98A3B4;--line:#2A3442;--chip:#1F2938;--accent:#7FB0F0;--ok:#5FD3AE;--okbg:#12302A;--no:#F08A80;--nobg:#3A1E1C;
+ --u1:#6CCB8A;--u2:#5FC6DE;--u3:#C2D27A;--u4:#D98BC9;--mid:#9DB0D6;--u5:#F09A72;--u6:#B9A2F0;--ev:#E6B062;--u7:#F08A73;--u8:#7FD1BD;--fp:#7FB0F0;--fin:#A9B9DD;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0E131B;--panel:#161D28;--ink:#E7ECF3;--muted:#98A3B4;--line:#2A3442;--chip:#1F2938;--accent:#7FB0F0;--ok:#5FD3AE;--okbg:#12302A;--no:#F08A80;--nobg:#3A1E1C;
+ --u1:#6CCB8A;--u2:#5FC6DE;--u3:#C2D27A;--u4:#D98BC9;--mid:#9DB0D6;--u5:#F09A72;--u6:#B9A2F0;--ev:#E6B062;--u7:#F08A73;--u8:#7FD1BD;--fp:#7FB0F0;--fin:#A9B9DD;color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.5}
+.wrap{max-width:820px;margin:0 auto;padding:20px max(16px,env(safe-area-inset-left,0px)) 60px max(16px,env(safe-area-inset-right,0px));display:grid;gap:18px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;font:500 13px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.top nav{display:flex;gap:6px;flex-wrap:wrap}.top a{color:var(--muted);display:inline-block;padding:10px 6px}
+h1{font-family:var(--display);font-weight:800;font-size:clamp(32px,5.5vw,52px);line-height:1.03;margin:0}
+.intro{margin:0;color:var(--muted)}
+.filters{display:flex;gap:6px;flex-wrap:wrap}
+.filters button{font:600 14px var(--body);padding:7px 12px;border-radius:999px;border:1px solid var(--line);background:var(--panel);color:var(--ink);cursor:pointer}
+.filters button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.card{background:var(--panel);border:1px solid var(--line);border-left:8px solid var(--uc,var(--accent));border-radius:16px;padding:18px 20px;display:grid;gap:14px;min-width:0}
+.meta{font:500 13px var(--mono);color:var(--muted);display:flex;gap:8px;flex-wrap:wrap}.meta b{color:var(--uc);font-weight:700}
+.card h2{font-family:var(--display);font-size:clamp(22px,3vw,28px);margin:0;line-height:1.15}
+.tg{margin:0;color:var(--muted);font-size:15px}
+.part{display:grid;gap:10px;border-top:1px solid var(--line);padding-top:14px}
+.part .q{margin:0;font-weight:600;font-size:clamp(18px,2.4vw,21px);line-height:1.35}
+.tag{font:700 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--uc)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.box{display:inline-flex;align-items:center;gap:6px;border:2px solid var(--line);border-radius:12px;padding:0 12px;background:var(--panel);font:600 20px var(--mono)}
+.box input{border:0;background:transparent;color:var(--ink);font:600 20px var(--mono);padding:11px 0;width:min(200px,50vw);outline:none}
+.box:focus-within{border-color:var(--uc)}
+.btn,.opt,.check{font:600 16px var(--body);padding:11px 16px;border-radius:12px;border:1px solid var(--line);background:var(--chip);color:var(--ink);cursor:pointer;min-height:46px;text-align:left;text-decoration:none}
+.check{background:var(--uc);border-color:var(--uc);color:#fff}
+.opts{display:grid;gap:8px}
+.opt{background:var(--panel);border-width:2px}
+.opt.ok{border-color:var(--ok);background:var(--okbg)}.opt.no{border-color:var(--no);background:var(--nobg)}
+.opt[disabled]{cursor:default}
+textarea{font:16px var(--body);padding:12px;border-radius:12px;border:2px solid var(--line);background:var(--panel);color:var(--ink);min-height:90px;width:100%;resize:vertical}
+.fb{border-radius:12px;padding:10px 14px;font-size:16px}
+.fb.ok{background:var(--okbg);border-left:6px solid var(--ok)}.fb.no{background:var(--nobg);border-left:6px solid var(--no)}.fb.info{background:var(--chip);border-left:6px solid var(--uc)}
+.fb:empty{display:none}
+.conf{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
+.result{border:3px solid var(--uc);border-radius:16px;padding:18px;display:grid;gap:6px;text-align:center}
+.result .big{font:800 clamp(40px,8vw,64px) var(--display);margin:0;line-height:1}
+.result .c{font:700 20px var(--body)}
+.pager{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.steps{margin:0;padding-left:20px}
+button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.list{display:grid;gap:10px}
+.li{display:flex;gap:12px;align-items:baseline;justify-content:space-between;text-decoration:none;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-left:6px solid var(--uc);border-radius:12px;padding:12px 16px}
+.li b{font-weight:600}.li span{font:500 13px var(--mono);color:var(--muted);white-space:nowrap}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+@media (max-width:520px){.li{flex-direction:column;gap:2px}}
+
+.tabs{display:flex;gap:8px;flex-wrap:wrap}
+.tabs a{font:600 15px var(--body);padding:9px 14px;border-radius:999px;border:1px solid var(--line);background:var(--panel);color:var(--ink);text-decoration:none}
+.sec{background:var(--panel);border:1px solid var(--line);border-left:8px solid var(--uc);border-radius:16px;padding:18px 20px;display:grid;gap:12px;scroll-margin-top:12px}
+.sec h2{margin:0;font-family:var(--display);font-size:clamp(24px,3.4vw,30px)}
+.sec h3{margin:6px 0 0;font-size:17px}
+.sec p,.sec ul,.sec ol{margin:0}.sec li{margin:3px 0}
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:8px}
+.steps div{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:15px}
+.steps b{display:block;font-family:var(--display);font-size:18px}
+table{border-collapse:collapse;width:100%;font-size:15px}th,td{border:1px solid var(--line);padding:7px 10px;text-align:left}th{background:var(--chip)}
+.btns{display:flex;gap:8px;flex-wrap:wrap}.btn{font:600 15px var(--body);padding:10px 14px;border-radius:10px;border:1px solid var(--line);background:var(--chip);color:var(--ink);text-decoration:none}
+.btn.go{background:var(--accent);border-color:var(--accent);color:var(--bg)}
+.small{font-size:14px;color:var(--muted)}
+a{color:var(--accent)}
+</style></head>
+<body><style>
+.snav{--sn-bg:#131C2B;--sn-ink:#E7ECF3;--sn-hi:#F2C14E;background:var(--sn-bg);color:var(--sn-ink);position:relative;z-index:5}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .snav{--sn-bg:#05080D}}
+:root[data-theme="dark"] .snav{--sn-bg:#05080D}
+.snav ul{list-style:none;margin:0 auto;padding:0 max(10px,env(safe-area-inset-left,0px));max-width:1120px;display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.snav ul::-webkit-scrollbar{display:none}
+.snav li{flex:0 0 auto}
+@media (max-width:860px){.snav ul{padding-right:48px;-webkit-mask-image:linear-gradient(to right,#000 82%,transparent);mask-image:linear-gradient(to right,#000 82%,transparent)}}
+.snav a{display:block;padding:11px 10px;color:inherit;text-decoration:none;font:600 14px "Inter",system-ui,sans-serif;white-space:nowrap;border-bottom:3px solid transparent;opacity:.85}
+.snav a:hover{opacity:1;border-bottom-color:rgba(255,255,255,.35)}
+.snav a[aria-current="page"]{opacity:1;border-bottom-color:var(--sn-hi);color:#fff}
+.snav a:focus-visible{outline:3px solid var(--sn-hi);outline-offset:-3px}
+.snav .skip{position:absolute;left:-999px;top:0;background:var(--sn-hi);color:#131C2B;padding:8px 12px;border-radius:0 0 8px 0}
+.snav .skip:focus{left:0}
+</style><nav class="snav" aria-label="Course menu"><a class="skip" href="#main">Skip to content</a><ul><li><a href="/daily-agenda/">Daily Agenda</a></li><li><a href="/start/" aria-current="page">Start Here</a></li><li><a href="/readings/">Readings</a></li><li><a href="/glossary/">Glossary</a></li><li><a href="/targets/">My Targets</a></li><li><a href="/warm-ups/">Warm-Ups</a></li><li><a href="/exit-tickets/">Exit Tickets</a></li><li><a href="/">Arcade</a></li></ul></nav><script>(function(){var a=document.querySelector(".snav [aria-current]");if(a)a.parentNode.parentNode.scrollLeft=Math.max(0,a.offsetLeft-60)})()</script><div class="wrap">
+<div class="top"><span>F&amp;I · Start Here</span></div>
+<div><h1>Start Here</h1><p class="intro">Finance &amp; Investing, Semester 2, 2026–27. How the course works and where everything lives on this site.</p></div>
+<nav class="tabs" aria-label="On this page"><a href="#students">Students</a><a href="#grading">Grading</a><a href="#calendar">Calendar</a><a href="#families">Families</a><a href="#subs">Substitutes</a></nav>
+<main id="main" style="display:grid;gap:18px">
+
+<section class="sec" id="students" style="--uc:var(--u2)"><h2>Students: how a class day works</h2>
+<div class="steps"><div><b>1 · Warm-up</b>Scan the QR code on the board (or open Warm-Ups) and answer.</div><div><b>2 · Notes</b>Open today's guided notes in Notability, or grab a printed copy.</div>
+<div><b>3 · Practice</b>Slides, a case study, a game in the Arcade or the D214 Investing Competition.</div><div><b>4 · Exit ticket</b>Scan the second QR code, answer, and show your result screen on the way out.</div></div>
+<h3>Where things live</h3>
+<ul><li><a href="/daily-agenda/">Daily Agenda</a>: today's plan. Tap <b>Today</b>, and pick your blocks (1 &amp; 3 or 5 &amp; 7) so the dates match.</li>
+<li>Unit pages (from the agenda or any lesson): slides, notes, case studies, portfolio pieces and practice games.</li>
+<li><a href="/readings/">Readings</a>: one reading per unit, with a guide (regular or Supported) and a 5-question check.</li>
+<li><a href="/glossary/">Glossary</a>: every key word, with flashcards. <a href="/targets/">My Targets</a>: rate yourself on each learning target and get relearn links.</li></ul>
+<h3>Every paper you turn in</h3>
+<p>Write <b>Name (first name + last initial) · Block · Caddy #</b> at the top of every page. Everything comes as a PDF for Notability and as a printed copy.</p></section>
+
+<section class="sec" id="grading" style="--uc:var(--u6)"><h2>Grading and reassessment</h2>
+<p>Each unit quiz is 2 pages and scored out of 20 (17 one-point questions + a 3-point claim-evidence-reasoning answer). Scores convert to a standards-based score:</p>
+<div style="overflow-x:auto"><table><thead><tr><th>Score</th><th>Unit quiz (of 20)</th><th>Final exam (of 50)</th></tr></thead><tbody>
+<tr><td>1.0</td><td>18–20</td><td>45–50</td></tr><tr><td>0.85</td><td>16–17.5</td><td>40–44.5</td></tr><tr><td>0.70</td><td>14–15.5</td><td>35–39.5</td></tr><tr><td>0.55</td><td>13.5 or less</td><td>34.5 or less</td></tr></tbody></table></div>
+<ol><li><b>Below 1.0?</b> Complete the unit's Reassessment Ticket (fix your errors, relearn, practice).</li><li>Get it signed by your teacher.</li><li>Take Version B. <b>Your higher score counts.</b></li></ol>
+<p class="small">Tip: use <a href="/targets/">My Targets</a> to find which targets to relearn before you start the ticket. Supported versions of every quiz and reading guide have larger print and extra scaffolds.</p></section>
+
+<section class="sec" id="calendar" style="--uc:var(--u4)"><h2>Put every due date in your calendar</h2>
+<p>Tap your blocks on your iPad, then <b>Add All</b>. You'll get every quiz, portfolio piece, reading guide and the final exam, each with a reminder the day before.</p>
+<div class="btns"><a class="btn go" href="/calendar/blocks-1-3.ics">📅 Blocks 1 &amp; 3</a><a class="btn go" href="/calendar/blocks-5-7.ics">📅 Blocks 5 &amp; 7</a></div>
+<p class="small">If dates change, your teacher will announce it. You can tap the file again to update.</p></section>
+
+<section class="sec" id="families" style="--uc:var(--u8)"><h2>Families</h2>
+<p>This course follows the investment process professionals use: set goals, learn how markets work, analyze companies and funds, build a diversified portfolio, manage risk, and avoid scams and bad decisions. Students trade in the <b>D214 Investing Competition</b> with simulated money only. <b>No real money is invested.</b></p>
+<h3>Easy ways to help at home</h3>
+<ul><li>Ask which stock or fund your student picked in the competition, and why.</li><li>Read one of the unit <a href="/readings/">readings</a> together. Each one takes about 10 minutes.</li>
+<li>Share a money goal from your own life and how you planned for it (Unit 1 is all about goals).</li><li>Ask your student to teach you one word from the <a href="/glossary/">glossary</a>.</li></ul>
+<p class="small">Questions about grades or progress: please contact the teacher through the school's usual channels.</p></section>
+
+<section class="sec" id="subs" style="--uc:var(--u7)"><h2>Substitute teachers</h2>
+<ol><li>Open the <a href="/daily-agenda/">Daily Agenda</a>, pick the class's blocks, and tap <b>Today</b>.</li>
+<li>Open that day's <b>lesson page</b> (link on the agenda card). It has the learning target and a timed plan: what students do in each part of the block.</li>
+<li>Project the slides with <b>▶ Today's slides</b>. Arrow keys move slides. Students follow along in their guided notes.</li>
+<li>Start with the <b>Warm-up</b> QR code on the agenda card and end with the <b>Exit ticket</b> QR code (students show their result screen).</li>
+<li>Need a backup plan? Use the unit's practice games in the <a href="/">Arcade</a> (Team Showdown works for the whole class), or have students do that unit's reading guide from <a href="/readings/">Readings</a>.</li></ol>
+<p class="small">Assessments and answer keys are not on this site. Leave quizzes for the teacher unless you were given them directly.</p></section>
+</main></div></body></html>

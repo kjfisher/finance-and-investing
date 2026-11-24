@@ -7,7 +7,7 @@
 /* One check at a time when opened from a QR code (#d12); otherwise the semester list with unit filters. Nothing is saved or sent. */
 :root{--bg:#F1F4F8;--panel:#FFFFFF;--ink:#131C2B;--muted:#5A6577;--line:#D7DEE8;--chip:#E6ECF4;--accent:#1D4E89;
  --ok:#0F7A5C;--okbg:#E3F4EE;--no:#B3261E;--nobg:#FBE9E7;
- --u1:#2F7D46;--u2:#0E7490;--u3:#5A6A1E;--u4:#6B2E5E;--mid:#1E2B45;--u5:#B8572F;--u6:#6B4FB0;--ev:#9A6A0C;--u7:#9C3420;--u8:#2E6B5E;--fp:#1D4E89;--fin:#14213D;
+ --u1:#2F7D46;--u2:#0E7490;--u3:#5A6A1E;--u4:#6B2E5E;--mid:#1E2B45;--u5:#A64B24;--u6:#6B4FB0;--ev:#9A6A0C;--u7:#9C3420;--u8:#2E6B5E;--fp:#1D4E89;--fin:#14213D;
  --display:"Bricolage Grotesque","Avenir Next",system-ui,sans-serif;--body:"Inter",system-ui,sans-serif;--mono:"JetBrains Mono",ui-monospace,monospace}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0E131B;--panel:#161D28;--ink:#E7ECF3;--muted:#98A3B4;--line:#2A3442;--chip:#1F2938;--accent:#7FB0F0;--ok:#5FD3AE;--okbg:#12302A;--no:#F08A80;--nobg:#3A1E1C;
  --u1:#6CCB8A;--u2:#5FC6DE;--u3:#C2D27A;--u4:#D98BC9;--mid:#9DB0D6;--u5:#F09A72;--u6:#B9A2F0;--ev:#E6B062;--u7:#F08A73;--u8:#7FD1BD;--fp:#7FB0F0;--fin:#A9B9DD;color-scheme:dark}}
@@ -64,65 +64,79 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{
 .btn.go{background:var(--uc);border-color:var(--uc);color:var(--bg)}
 .tip{background:var(--panel);border:1px dashed var(--line);border-radius:14px;padding:12px 16px;color:var(--muted);font-size:15px}
 </style></head>
-<body><div class="wrap">
-<div class="top"><span>F&amp;I · Readings</span><nav><a href="/daily-agenda/">Daily Agenda</a><a href="/reading-checks/">Reading Checks</a><a href="/">Arcade</a></nav></div>
+<body><style>
+.snav{--sn-bg:#131C2B;--sn-ink:#E7ECF3;--sn-hi:#F2C14E;background:var(--sn-bg);color:var(--sn-ink);position:relative;z-index:5}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .snav{--sn-bg:#05080D}}
+:root[data-theme="dark"] .snav{--sn-bg:#05080D}
+.snav ul{list-style:none;margin:0 auto;padding:0 max(10px,env(safe-area-inset-left,0px));max-width:1120px;display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.snav ul::-webkit-scrollbar{display:none}
+.snav li{flex:0 0 auto}
+@media (max-width:860px){.snav ul{padding-right:48px;-webkit-mask-image:linear-gradient(to right,#000 82%,transparent);mask-image:linear-gradient(to right,#000 82%,transparent)}}
+.snav a{display:block;padding:11px 10px;color:inherit;text-decoration:none;font:600 14px "Inter",system-ui,sans-serif;white-space:nowrap;border-bottom:3px solid transparent;opacity:.85}
+.snav a:hover{opacity:1;border-bottom-color:rgba(255,255,255,.35)}
+.snav a[aria-current="page"]{opacity:1;border-bottom-color:var(--sn-hi);color:#fff}
+.snav a:focus-visible{outline:3px solid var(--sn-hi);outline-offset:-3px}
+.snav .skip{position:absolute;left:-999px;top:0;background:var(--sn-hi);color:#131C2B;padding:8px 12px;border-radius:0 0 8px 0}
+.snav .skip:focus{left:0}
+</style><nav class="snav" aria-label="Course menu"><a class="skip" href="#main">Skip to content</a><ul><li><a href="/daily-agenda/">Daily Agenda</a></li><li><a href="/start/">Start Here</a></li><li><a href="/readings/" aria-current="page">Readings</a></li><li><a href="/glossary/">Glossary</a></li><li><a href="/targets/">My Targets</a></li><li><a href="/warm-ups/">Warm-Ups</a></li><li><a href="/exit-tickets/">Exit Tickets</a></li><li><a href="/">Arcade</a></li></ul></nav><script>(function(){var a=document.querySelector(".snav [aria-current]");if(a)a.parentNode.parentNode.scrollLeft=Math.max(0,a.offsetLeft-60)})()</script><div class="wrap">
+<div class="top"><span>F&amp;I · Readings</span><nav><a href="/reading-checks/">All reading checks →</a></nav></div>
 <div><h1>Readings</h1><p class="intro">One article (or two) per unit, from the same kinds of sources finance pros read. Open the guide, read the article, then take the 5-question check.</p></div>
 <div class="tip"><b>Skip the ads:</b> in Safari tap <b>AA</b> → <b>Show Reader</b>. To mark up a guide, open the PDF and send it to Notability.</div>
-<main class="list"><section class="card" style="--uc:var(--u1)" id="u1">
+<main class="list" id="main"><section class="card" style="--uc:var(--u1)" id="u1">
 <div class="meta"><b>Unit 1</b><span>Financial Markets Overview</span></div>
 <h2>Setting money goals</h2>
 <div class="when">Assigned Day 2 · due Day 3 — Blocks 1 &amp; 3: Jan 11 · Blocks 5 &amp; 7: Jan 12</div>
 <ul class="arts"><li><a href="https://ownyourfuture.vanguard.com/content/en/learn/financial-planning/why-should-i-set-financial-goals.html" target="_blank" rel="noopener">Vanguard, “Why should I set financial goals?” (Own Your Future)</a> ↗</li></ul>
-<div class="btns"><a class="btn go" href="/units/unit-1/reading-guide.pdf">Reading guide (PDF)</a><a class="btn" href="/reading-checks/#d3">📖 Reading check</a><a class="btn" href="/units/unit-1/">Unit 1 page</a></div>
+<div class="btns"><a class="btn go" href="/units/unit-1/reading-guide.pdf">Reading guide (PDF)</a><a class="btn" href="/units/unit-1/reading-guide-supported.pdf">Supported guide</a><a class="btn" href="/reading-checks/#d3">📖 Reading check</a><a class="btn" href="/units/unit-1/">Unit 1 page</a></div>
 </section>
 <section class="card" style="--uc:var(--u2)" id="u2">
 <div class="meta"><b>Unit 2</b><span>The Markets</span></div>
 <h2>Can you time the market?</h2>
 <div class="when">Assigned Day 7 · due Day 8 — Blocks 1 &amp; 3: Jan 26 · Blocks 5 &amp; 7: Jan 27</div>
 <ul class="arts"><li><a href="https://www.schwab.com/learn/story/does-market-timing-work" target="_blank" rel="noopener">Schwab Center for Financial Research, “Does Market Timing Work?” (July 18, 2025)</a> ↗</li></ul>
-<div class="btns"><a class="btn go" href="/units/unit-2/reading-guide.pdf">Reading guide (PDF)</a><a class="btn" href="/reading-checks/#d8">📖 Reading check</a><a class="btn" href="/units/unit-2/">Unit 2 page</a></div>
+<div class="btns"><a class="btn go" href="/units/unit-2/reading-guide.pdf">Reading guide (PDF)</a><a class="btn" href="/units/unit-2/reading-guide-supported.pdf">Supported guide</a><a class="btn" href="/reading-checks/#d8">📖 Reading check</a><a class="btn" href="/units/unit-2/">Unit 2 page</a></div>
 </section>
 <section class="card" style="--uc:var(--u3)" id="u3">
 <div class="meta"><b>Unit 3</b><span>Analyzing Companies</span></div>
 <h2>Balance sheets and the 10-K</h2>
 <div class="when">Assigned Day 11 · due Day 12 — Blocks 1 &amp; 3: Feb 5 · Blocks 5 &amp; 7: Feb 8</div>
 <ul class="arts"><li><a href="https://www.fidelity.com/learning-center/trading-investing/what-is-a-balance-sheet" target="_blank" rel="noopener">Fidelity, “What is a balance sheet and how do you read one?” (2025)</a> ↗</li><li><a href="https://www.investor.gov/introduction-investing/getting-started/researching-investments/how-read-10-k" target="_blank" rel="noopener">Investor.gov (SEC), “How to Read a 10-K”</a> ↗</li></ul>
-<div class="btns"><a class="btn go" href="/units/unit-3/reading-guide.pdf">Reading guide (PDF)</a><a class="btn" href="/reading-checks/#d12">📖 Reading check</a><a class="btn" href="/units/unit-3/">Unit 3 page</a></div>
+<div class="btns"><a class="btn go" href="/units/unit-3/reading-guide.pdf">Reading guide (PDF)</a><a class="btn" href="/units/unit-3/reading-guide-supported.pdf">Supported guide</a><a class="btn" href="/reading-checks/#d12">📖 Reading check</a><a class="btn" href="/units/unit-3/">Unit 3 page</a></div>
 </section>
 <section class="card" style="--uc:var(--u4)" id="u4">
 <div class="meta"><b>Unit 4</b><span>Investing in Funds</span></div>
 <h2>The investor return gap</h2>
 <div class="when">Assigned Day 16 · due Day 17 — Blocks 1 &amp; 3: Feb 23 · Blocks 5 &amp; 7: Feb 24</div>
 <ul class="arts"><li><a href="https://www.morningstar.com/funds/winning-formula-fund-investors-why-others-left-money-table" target="_blank" rel="noopener">Jeffrey Ptak, Morningstar, “The Winning Formula for Fund Investors, and Why Others Left Money on the Table” (Aug. 6, 2026)</a> ↗</li></ul>
-<div class="btns"><a class="btn go" href="/units/unit-4/reading-guide.pdf">Reading guide (PDF)</a><a class="btn" href="/reading-checks/#d17">📖 Reading check</a><a class="btn" href="/units/unit-4/">Unit 4 page</a></div>
+<div class="btns"><a class="btn go" href="/units/unit-4/reading-guide.pdf">Reading guide (PDF)</a><a class="btn" href="/units/unit-4/reading-guide-supported.pdf">Supported guide</a><a class="btn" href="/reading-checks/#d17">📖 Reading check</a><a class="btn" href="/units/unit-4/">Unit 4 page</a></div>
 </section>
 <section class="card" style="--uc:var(--u5)" id="u5">
 <div class="meta"><b>Unit 5</b><span>Bonds</span></div>
 <h2>The life cycle of saving</h2>
 <div class="when">Assigned Day 21 · due Day 22 — Blocks 1 &amp; 3: Mar 9 · Blocks 5 &amp; 7: Mar 10</div>
 <ul class="arts"><li><a href="https://www.richmondfed.org/publications/research/econ_focus/2016/q3-4/jargon_alert" target="_blank" rel="noopener">Tim Sablik, “Life Cycle Hypothesis,” Econ Focus, Federal Reserve Bank of Richmond (2016)</a> ↗</li></ul>
-<div class="btns"><a class="btn go" href="/units/unit-5/reading-guide.pdf">Reading guide (PDF)</a><a class="btn" href="/reading-checks/#d22">📖 Reading check</a><a class="btn" href="/units/unit-5/">Unit 5 page</a></div>
+<div class="btns"><a class="btn go" href="/units/unit-5/reading-guide.pdf">Reading guide (PDF)</a><a class="btn" href="/units/unit-5/reading-guide-supported.pdf">Supported guide</a><a class="btn" href="/reading-checks/#d22">📖 Reading check</a><a class="btn" href="/units/unit-5/">Unit 5 page</a></div>
 </section>
 <section class="card" style="--uc:var(--u6)" id="u6">
 <div class="meta"><b>Unit 6</b><span>Investment Theory &amp; Portfolio Building</span></div>
 <h2>The myth of market timing</h2>
 <div class="when">Assigned Day 25 · due Day 26 — Blocks 1 &amp; 3: Mar 19 · Blocks 5 &amp; 7: Mar 29</div>
 <ul class="arts"><li><a href="https://www.forbes.com/sites/simonmoore/2016/03/07/the-myth-of-market-timing/" target="_blank" rel="noopener">Simon Moore, “Busting the Myth of Market Timing,” Forbes, March 7, 2016</a> ↗</li></ul>
-<div class="btns"><a class="btn go" href="/units/unit-6/reading-guide.pdf">Reading guide (PDF)</a><a class="btn" href="/reading-checks/#d26">📖 Reading check</a><a class="btn" href="/units/unit-6/">Unit 6 page</a></div>
+<div class="btns"><a class="btn go" href="/units/unit-6/reading-guide.pdf">Reading guide (PDF)</a><a class="btn" href="/units/unit-6/reading-guide-supported.pdf">Supported guide</a><a class="btn" href="/reading-checks/#d26">📖 Reading check</a><a class="btn" href="/units/unit-6/">Unit 6 page</a></div>
 </section>
 <section class="card" style="--uc:var(--u7)" id="u7">
 <div class="meta"><b>Unit 7</b><span>Derivatives</span></div>
 <h2>What are options?</h2>
 <div class="when">Assigned Day 30 · due Day 31 — Blocks 1 &amp; 3: Apr 13 · Blocks 5 &amp; 7: Apr 12</div>
 <ul class="arts"><li><a href="https://www.fidelity.com/learning-center/smart-money/what-are-options" target="_blank" rel="noopener">Fidelity, “What are options, and how do they work?” (2024)</a> ↗</li><li><a href="https://www.finra.org/investors/investing/investment-products/options" target="_blank" rel="noopener">FINRA, “Options” (read Essentials, Bottom Line, Options by Expiration)</a> ↗</li></ul>
-<div class="btns"><a class="btn go" href="/units/unit-7/reading-guide.pdf">Reading guide (PDF)</a><a class="btn" href="/reading-checks/#d31">📖 Reading check</a><a class="btn" href="/units/unit-7/">Unit 7 page</a></div>
+<div class="btns"><a class="btn go" href="/units/unit-7/reading-guide.pdf">Reading guide (PDF)</a><a class="btn" href="/units/unit-7/reading-guide-supported.pdf">Supported guide</a><a class="btn" href="/reading-checks/#d31">📖 Reading check</a><a class="btn" href="/units/unit-7/">Unit 7 page</a></div>
 </section>
 <section class="card" style="--uc:var(--u8)" id="u8">
 <div class="meta"><b>Unit 8</b><span>Crypto &amp; Alternative Investments</span></div>
 <h2>Spotting crypto scams</h2>
 <div class="when">Assigned Day 35 · due Day 36 — Blocks 1 &amp; 3: Apr 27 · Blocks 5 &amp; 7: Apr 26</div>
 <ul class="arts"><li><a href="https://www.fidelity.com/learning-center/trading-investing/crypto-scams" target="_blank" rel="noopener">Fidelity, “How to protect yourself from crypto scams” (2026)</a> ↗</li><li><a href="https://www.investor.gov/introduction-investing/general-resources/news-alerts/alerts-bulletins/investor-alerts/digital-asset-and-crypto-investment-scams-investor-alert" target="_blank" rel="noopener">Investor.gov (SEC), “Digital Asset and ‘Crypto’ Investment Scams” alert (2021)</a> ↗</li></ul>
-<div class="btns"><a class="btn go" href="/units/unit-8/reading-guide.pdf">Reading guide (PDF)</a><a class="btn" href="/reading-checks/#d36">📖 Reading check</a><a class="btn" href="/units/unit-8/">Unit 8 page</a></div>
+<div class="btns"><a class="btn go" href="/units/unit-8/reading-guide.pdf">Reading guide (PDF)</a><a class="btn" href="/units/unit-8/reading-guide-supported.pdf">Supported guide</a><a class="btn" href="/reading-checks/#d36">📖 Reading check</a><a class="btn" href="/units/unit-8/">Unit 8 page</a></div>
 </section>
 </main>
 </div></body></html>

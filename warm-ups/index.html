@@ -7,7 +7,7 @@
 /* One check at a time when opened from a QR code (#d12); otherwise the semester list with unit filters. Nothing is saved or sent. */
 :root{--bg:#F1F4F8;--panel:#FFFFFF;--ink:#131C2B;--muted:#5A6577;--line:#D7DEE8;--chip:#E6ECF4;--accent:#1D4E89;
  --ok:#0F7A5C;--okbg:#E3F4EE;--no:#B3261E;--nobg:#FBE9E7;
- --u1:#2F7D46;--u2:#0E7490;--u3:#5A6A1E;--u4:#6B2E5E;--mid:#1E2B45;--u5:#B8572F;--u6:#6B4FB0;--ev:#9A6A0C;--u7:#9C3420;--u8:#2E6B5E;--fp:#1D4E89;--fin:#14213D;
+ --u1:#2F7D46;--u2:#0E7490;--u3:#5A6A1E;--u4:#6B2E5E;--mid:#1E2B45;--u5:#A64B24;--u6:#6B4FB0;--ev:#9A6A0C;--u7:#9C3420;--u8:#2E6B5E;--fp:#1D4E89;--fin:#14213D;
  --display:"Bricolage Grotesque","Avenir Next",system-ui,sans-serif;--body:"Inter",system-ui,sans-serif;--mono:"JetBrains Mono",ui-monospace,monospace}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0E131B;--panel:#161D28;--ink:#E7ECF3;--muted:#98A3B4;--line:#2A3442;--chip:#1F2938;--accent:#7FB0F0;--ok:#5FD3AE;--okbg:#12302A;--no:#F08A80;--nobg:#3A1E1C;
  --u1:#6CCB8A;--u2:#5FC6DE;--u3:#C2D27A;--u4:#D98BC9;--mid:#9DB0D6;--u5:#F09A72;--u6:#B9A2F0;--ev:#E6B062;--u7:#F08A73;--u8:#7FD1BD;--fp:#7FB0F0;--fin:#A9B9DD;color-scheme:dark}}
@@ -57,8 +57,22 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 @media (max-width:520px){.li{flex-direction:column;gap:2px}}
 </style></head>
-<body><div class="wrap">
-<div class="top"><span>F&amp;I · Daily Warm-Ups</span><nav><a href="/daily-agenda/">Daily Agenda</a><a href="/exit-tickets/">Exit Tickets</a><a href="/readings/">Readings</a><a href="/">Arcade</a></nav></div>
+<body><style>
+.snav{--sn-bg:#131C2B;--sn-ink:#E7ECF3;--sn-hi:#F2C14E;background:var(--sn-bg);color:var(--sn-ink);position:relative;z-index:5}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .snav{--sn-bg:#05080D}}
+:root[data-theme="dark"] .snav{--sn-bg:#05080D}
+.snav ul{list-style:none;margin:0 auto;padding:0 max(10px,env(safe-area-inset-left,0px));max-width:1120px;display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.snav ul::-webkit-scrollbar{display:none}
+.snav li{flex:0 0 auto}
+@media (max-width:860px){.snav ul{padding-right:48px;-webkit-mask-image:linear-gradient(to right,#000 82%,transparent);mask-image:linear-gradient(to right,#000 82%,transparent)}}
+.snav a{display:block;padding:11px 10px;color:inherit;text-decoration:none;font:600 14px "Inter",system-ui,sans-serif;white-space:nowrap;border-bottom:3px solid transparent;opacity:.85}
+.snav a:hover{opacity:1;border-bottom-color:rgba(255,255,255,.35)}
+.snav a[aria-current="page"]{opacity:1;border-bottom-color:var(--sn-hi);color:#fff}
+.snav a:focus-visible{outline:3px solid var(--sn-hi);outline-offset:-3px}
+.snav .skip{position:absolute;left:-999px;top:0;background:var(--sn-hi);color:#131C2B;padding:8px 12px;border-radius:0 0 8px 0}
+.snav .skip:focus{left:0}
+</style><nav class="snav" aria-label="Course menu"><a class="skip" href="#main">Skip to content</a><ul><li><a href="/daily-agenda/">Daily Agenda</a></li><li><a href="/start/">Start Here</a></li><li><a href="/readings/">Readings</a></li><li><a href="/glossary/">Glossary</a></li><li><a href="/targets/">My Targets</a></li><li><a href="/warm-ups/" aria-current="page">Warm-Ups</a></li><li><a href="/exit-tickets/">Exit Tickets</a></li><li><a href="/">Arcade</a></li></ul></nav><script>(function(){var a=document.querySelector(".snav [aria-current]");if(a)a.parentNode.parentNode.scrollLeft=Math.max(0,a.offsetLeft-60)})()</script><div class="wrap">
+<div class="top"><span>F&amp;I · Daily Warm-Ups</span><nav><a href="/exit-tickets/">Exit Tickets →</a></nav></div>
 <div id="intro"><h1>Daily Warm-Ups</h1><p class="intro">Scan the QR code on the board or pick a day. Try it, check it, then read the steps. Most days end with a spiral review question from an earlier unit. Nothing is graded or saved.</p></div>
 <div class="filters" id="filters" role="group" aria-label="Filter by unit"></div>
 <main id="main"></main>
