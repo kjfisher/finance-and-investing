@@ -81,3 +81,9 @@ body.show .opt{font-size:clamp(22px,2.6vw,32px);padding:18px 22px}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 @media (max-width:520px){.btn,.opt{font-size:16px}}
 @media (prefers-reduced-motion:reduce){.toast{transition:none}}
+
+.story{border-left:6px solid var(--c)}
+.kick{font:600 12px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--c)}
+.board{display:flex;flex-wrap:wrap;gap:8px 18px;font:600 16px var(--body)}
+.board b{font:800 20px var(--mono);color:var(--c);margin-left:6px}
+.shape{font-size:1.25em;line-height:1}

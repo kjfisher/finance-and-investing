@@ -34,17 +34,20 @@
   }
   function start() {
     document.body.classList.remove('show');
-    var modes = G.modes || ['solo', 'duel', 'show'];
+    var modes = pool.length ? (G.modes || ['solo', 'duel', 'show', 'teams']) : [];
     var mb = { solo: '<button class="btn go" data-m="solo">Solo<small>' + Math.min(G.n || 10, pool.length) + ' questions · instant feedback</small></button>',
       duel: '<button class="btn" data-m="duel">Partner Duel<small>Two players, one device, take turns</small></button>',
-      show: '<button class="btn" data-m="show">Showdown<small>Projector mode: teacher reveals answers</small></button>' };
+      show: '<button class="btn" data-m="show">Showdown<small>Projector mode: teacher reveals answers</small></button>',
+      teams: '<button class="btn" data-m="teams">Team Showdown<small>Projector · teams hold up shape cards · speed points</small></button>' };
     root.innerHTML = head('<a href="/">All games</a>') +
+      (G.story ? '<div class="card story"><div class="kick">The story</div><h2>' + esc(G.story.title) + '</h2>' + G.story.text.map(function (p) { return '<p style="margin:0">' + md(p) + '</p>'; }).join('') + '</div>' : '') +
       '<div class="card"><p style="margin:0">' + md(G.blurb) + '</p><p class="muted" style="margin:0"><b>How to play:</b> ' + md(G.how) + '</p></div>' +
+      (G.desk ? '<div class="card"><h2>' + esc(G.desk.name) + '</h2><p style="margin:0">' + md(G.desk.intro) + '</p><div class="modes"><button class="btn go" data-m="desk">Open the desk<small>' + G.desk.rounds.length + ' rounds · decisions + reasoning points</small></button></div></div>' : '') +
       (G.lab ? '<div class="card lab" id="lab"></div>' : '') +
-      '<div class="card"><h2>' + (G.lab ? 'Then test yourself' : 'Pick a mode') + '</h2><div class="modes">' + modes.map(function (m) { return mb[m]; }).join('') + '</div></div>' +
+      (modes.length ? '<div class="card"><h2>' + (G.lab || G.desk ? 'Then test yourself' : 'Pick a mode') + '</h2><div class="modes">' + modes.map(function (m) { return mb[m]; }).join('') + '</div></div>' : '') +
       '<p class="muted" style="font-size:14px;margin:0">Names in this game are made up. Your best score is saved only on this device.</p>';
     if (G.lab && LABS[G.lab]) LABS[G.lab](document.getElementById('lab'));
-    root.querySelectorAll('[data-m]').forEach(function (b) { b.onclick = function () { var m = b.getAttribute('data-m'); m === 'duel' ? duelSetup() : begin(m); }; });
+    root.querySelectorAll('[data-m]').forEach(function (b) { b.onclick = function () { var m = b.getAttribute('data-m'); m === 'duel' ? duelSetup() : m === 'teams' ? teamSetup() : m === 'desk' ? deskStart() : begin(m); }; });
   }
   function duelSetup() {
     root.innerHTML = head('Partner Duel') + '<div class="card"><h2>Who is playing?</h2><div class="lab"><div class="grid">' +
@@ -53,16 +56,26 @@
     document.getElementById('back').onclick = start;
     document.getElementById('go').onclick = function () { begin('duel', [document.getElementById('p1').value.trim() || 'Player 1', document.getElementById('p2').value.trim() || 'Player 2']); };
   }
+  var SH = [['▲', '#D64545'], ['◆', '#2F6FDE'], ['●', '#C98F00'], ['■', '#1E9E6A'], ['★', '#8A4FD1'], ['♥', '#D1468F']];
+  function teamSetup() {
+    root.innerHTML = head('Team Showdown') + '<div class="card"><h2>Set up teams</h2><p style="margin:0">Each team holds up a shape card (▲ ◆ ● ■) for its answer. After you reveal, tap each team that got it right <b>in the order they held up their card</b>: first correct team +3, every other correct team +2. Number questions: teams write the answer on a whiteboard.</p>' +
+      '<p style="margin:0"><a href="/arcade/answer-cards.pdf" target="_blank" rel="noopener">Print the shape answer cards (PDF) ↗</a></p><div class="lab"><div class="grid">' +
+      [1, 2, 3, 4, 5, 6].map(function (i) { return '<label>Team ' + i + (i > 2 ? ' (optional)' : '') + '<input id="t' + i + '" value="' + (i <= 4 ? 'Team ' + i : '') + '" maxlength="18"></label>'; }).join('') + '</div></div>' +
+      '<div class="row"><button class="btn go" id="go">Start</button><button class="btn" id="back">Back</button></div></div>';
+    document.getElementById('back').onclick = start;
+    document.getElementById('go').onclick = function () { var t = []; for (var i = 1; i <= 6; i++) { var x = document.getElementById('t' + i).value.trim(); if (x) t.push(x); } if (t.length < 2) t = ['Team 1', 'Team 2']; begin('teams', t); };
+  }
   function begin(mode, names) {
-    var n = mode === 'duel' ? Math.min(12, pool.length - pool.length % 2) : mode === 'show' ? pool.length : Math.min(G.n || 10, pool.length);
-    state = { mode: mode, qs: shuffle(pool).slice(0, n), i: 0, score: [0, 0], names: names || ['You'], missed: [] };
-    if (mode === 'show') document.body.classList.add('show');
+    var n = mode === 'duel' ? Math.min(12, pool.length - pool.length % 2) : mode === 'show' ? pool.length : mode === 'teams' ? Math.min(15, pool.length) : Math.min(G.n || 10, pool.length);
+    state = { mode: mode, qs: shuffle(pool).slice(0, n), i: 0, score: (names || [0, 0]).map(function () { return 0; }).concat([0, 0]).slice(0, Math.max(2, (names || []).length)), names: names || ['You'], missed: [] };
+    if (mode === 'show' || mode === 'teams') document.body.classList.add('show');
     ask();
   }
   function hud() {
     var s = state, t = 'Question ' + (s.i + 1) + ' of ' + s.qs.length;
     if (s.mode === 'solo') return '<div class="hud"><span>' + t + '</span><span>Score ' + s.score[0] + '</span></div>';
     if (s.mode === 'duel') return '<div class="hud"><span>' + t + ' · <span style="color:var(--c)">' + esc(s.names[s.i % 2]) + '’s turn</span></span><span>' + esc(s.names[0]) + ' ' + s.score[0] + ' · ' + esc(s.names[1]) + ' ' + s.score[1] + '</span></div>';
+    if (s.mode === 'teams') return '<div class="hud"><span>' + t + '</span><span class="timer" id="tm">20</span></div><div class="board">' + s.names.map(function (n, k) { return '<span>' + esc(n) + ' <b>' + s.score[k] + '</b></span>'; }).join('') + '</div>';
     return '<div class="hud"><span>' + t + '</span><span class="timer" id="tm">30</span></div>';
   }
   function ask() {
@@ -70,17 +83,18 @@
     var body = '<p class="q">' + md(q.q) + '</p>' + (q.card ? '<div class="qcard">' + q.card + '</div>' : '');
     if (q.k === 'mc') {
       var order = q.keep ? q.o.map(function (_, i) { return i; }) : shuffle(q.o.map(function (_, i) { return i; }));
-      body += '<div class="opts" role="group" aria-label="Answer choices">' + order.map(function (i, j) { return '<button class="opt" data-i="' + i + '"><b>' + 'ABCDEF'[j] + '.</b> ' + md(q.o[i]) + '</button>'; }).join('') + '</div>';
+      body += '<div class="opts" role="group" aria-label="Answer choices">' + order.map(function (i, j) { return '<button class="opt" data-i="' + i + '">' + (s.mode === 'teams' && SH[j] ? '<b class="shape" style="color:' + SH[j][1] + '" aria-label="' + 'ABCDEF'[j] + '">' + SH[j][0] + '</b> ' : '<b>' + 'ABCDEF'[j] + '.</b> ') + md(q.o[i]) + '</button>'; }).join('') + '</div>';
     } else if (q.k === 'num') {
-      body += s.mode === 'show' ? '' : '<div class="numrow"><label class="sr" for="na">Your answer</label><input id="na" inputmode="decimal" autocomplete="off" placeholder="Your answer' + (q.u === '$' ? ' ($)' : q.u === '%' ? ' (%)' : '') + '"><button class="btn go" id="chk">Check</button></div>';
+      body += (s.mode === 'show' || s.mode === 'teams') ? '<p class="muted" style="margin:0">Teams: write your answer on a whiteboard.</p>' : '<div class="numrow"><label class="sr" for="na">Your answer</label><input id="na" inputmode="decimal" autocomplete="off" placeholder="Your answer' + (q.u === '$' ? ' ($)' : q.u === '%' ? ' (%)' : '') + '"><button class="btn go" id="chk">Check</button></div>';
     } else if (q.k === 'order') {
       q.mix = shuffle(q.items);
       body += '<p class="muted" style="margin:0">Tap the items in order, first to last.</p><div class="chips" id="pool">' + q.mix.map(function (t, i) { return '<button class="chip" data-i="' + i + '">' + esc(t) + '</button>'; }).join('') + '</div>' +
-        '<ol class="order" id="ord">' + q.items.map(function () { return '<li></li>'; }).join('') + '</ol>' + (s.mode === 'show' ? '' : '<div class="row"><button class="btn" id="undo">Undo</button></div>');
+        '<ol class="order" id="ord">' + q.items.map(function () { return '<li></li>'; }).join('') + '</ol>' + ((s.mode === 'show' || s.mode === 'teams') ? '' : '<div class="row"><button class="btn" id="undo">Undo</button></div>');
     }
-    var ctl = s.mode === 'show' ? '<div class="row"><button class="btn go" id="rev">Reveal answer</button></div>' : '';
-    root.innerHTML = head(s.mode === 'show' ? 'Showdown' : s.mode === 'duel' ? 'Partner Duel' : 'Solo') + '<div class="card">' + hud() + body + ctl + '<div id="fb" aria-live="polite"></div></div>';
-    if (s.mode === 'show') { var left = 30, tm = document.getElementById('tm'); clearInterval(s.tick); s.tick = setInterval(function () { left--; if (!tm.isConnected) return clearInterval(s.tick); tm.textContent = Math.max(left, 0); tm.classList.toggle('low', left <= 5); if (left <= 0) clearInterval(s.tick); }, 1000);
+    var proj = s.mode === 'show' || s.mode === 'teams';
+    var ctl = proj ? '<div class="row"><button class="btn go" id="rev">Reveal answer</button></div>' : '';
+    root.innerHTML = head(s.mode === 'show' ? 'Showdown' : s.mode === 'teams' ? 'Team Showdown' : s.mode === 'duel' ? 'Partner Duel' : 'Solo') + '<div class="card">' + hud() + body + ctl + '<div id="fb" aria-live="polite"></div></div>';
+    if (proj) { var left = s.mode === 'teams' ? 20 : 30, tm = document.getElementById('tm'); clearInterval(s.tick); s.tick = setInterval(function () { left--; if (!tm.isConnected) return clearInterval(s.tick); tm.textContent = Math.max(left, 0); tm.classList.toggle('low', left <= 5); if (left <= 0) clearInterval(s.tick); }, 1000);
       document.getElementById('rev').onclick = function () { clearInterval(s.tick); reveal(q, null); };
       if (q.k === 'order') wireOrder(q, true);
       return; }
@@ -101,7 +115,11 @@
   function reveal(q) {
     if (q.k === 'mc') root.querySelectorAll('.opt').forEach(function (b) { if (+b.getAttribute('data-i') === q.a) b.classList.add('ok'); b.disabled = true; });
     if (q.k === 'order') { var lis = root.querySelectorAll('#ord li'); q.items.forEach(function (t, k) { lis[k].textContent = t; lis[k].className = 'ok'; }); }
-    document.getElementById('fb').innerHTML = '<div class="fb ok"><b>Answer: ' + md(ansText(q)) + '</b>' + (q.why ? '<br>' + md(q.why) : '') + '</div>' + nextBtn();
+    var tb = state.mode === 'teams' ? '<p style="margin:10px 0 4px"><b>Tap each correct team, fastest first:</b></p><div class="row" id="tms">' + state.names.map(function (n, k) { return '<button class="btn" data-t="' + k + '">' + esc(n) + '</button>'; }).join('') + '</div>' : '';
+    var shp = ''; if (state.mode === 'teams' && q.k === 'mc') root.querySelectorAll('.opt').forEach(function (b) { if (+b.getAttribute('data-i') === q.a && b.querySelector('.shape')) shp = b.querySelector('.shape').outerHTML + ' '; });
+    document.getElementById('fb').innerHTML = '<div class="fb ok"><b>Answer: ' + shp + md(ansText(q)) + '</b>' + (q.why ? '<br>' + md(q.why) : '') + '</div>' + tb + nextBtn();
+    if (tb) { var first = true; root.querySelectorAll('[data-t]').forEach(function (b) { b.onclick = function () { var k = +b.getAttribute('data-t'); state.score[k] += first ? 3 : 2; b.disabled = true; b.textContent = state.names[k] + (first ? ' +3 ⚡' : ' +2'); first = false;
+      root.querySelectorAll('.board b')[k].textContent = state.score[k]; }; }); }
     wireNext();
   }
   function grade(q, ok, btn, val) {
@@ -120,6 +138,8 @@
   function end() {
     var s = state, n = s.qs.length, h;
     if (s.mode === 'show') { h = '<div class="card"><h2>Showdown complete</h2><p>' + n + ' questions reviewed.</p></div>'; }
+    else if (s.mode === 'teams') { var rk = s.names.map(function (nm, k) { return [nm, s.score[k]]; }).sort(function (a, b) { return b[1] - a[1]; });
+      h = '<div class="card"><p class="big">' + esc(rk[0][0]) + (rk[1] && rk[1][1] === rk[0][1] ? ' ties!' : ' wins!') + '</p><ol class="miss">' + rk.map(function (r) { return '<li><b>' + esc(r[0]) + '</b>: ' + r[1] + ' points</li>'; }).join('') + '</ol></div>'; }
     else if (s.mode === 'duel') { var a = s.score[0], b = s.score[1]; var w = a === b ? 'It’s a tie!' : esc(s.names[a > b ? 0 : 1]) + ' wins!';
       h = '<div class="card"><p class="big">' + w + '</p><p>' + esc(s.names[0]) + ': ' + a + ' of ' + n / 2 + ' · ' + esc(s.names[1]) + ': ' + b + ' of ' + n / 2 + '</p></div>'; }
     else { var sc = s.score[0], pct = sc / n, st = pct >= 0.9 ? 3 : pct >= 0.7 ? 2 : 1; stamp(sc, n);
@@ -129,6 +149,41 @@
       toast('Passport stamp saved: ' + G.name); }
     root.innerHTML = head('Results') + h + '<div class="row"><button class="btn go" id="again">Play again</button><a class="btn" href="/">All games</a></div>';
     document.getElementById('again').onclick = start;
+  }
+
+  /* ---------- desks: multi-round decisions ---------- */
+  function deskStart() {
+    var D = G.desk; state = { mode: 'desk', r: 0, v: D.start, st: { yearly: 0, fee: 0 }, pts: 0, log: [] };
+    document.body.classList.remove('show'); deskRound();
+  }
+  function applyChoice(v, st, rd, c) {
+    var w = c.w || rd.w || { main: 1 }, ret = 0; if (rd.rets) Object.keys(w).forEach(function (k) { ret += w[k] * (rd.rets[k] || 0); });
+    if (c.set) Object.keys(c.set).forEach(function (k) { st[k] = c.set[k]; });
+    v = Math.max(0, v + (c.add || 0) + (st.yearly || 0));
+    if (rd.rets) v *= 1 + (ret - (st.fee || 0)) / 100;
+    return Math.round(v * 100) / 100;
+  }
+  function bench() { var D = G.desk, v = D.start, st = { yearly: 0, fee: 0 }; D.rounds.forEach(function (rd) { v = applyChoice(v, st, rd, rd.choices[rd.best]); }); return v; }
+  function deskRound() {
+    var D = G.desk, s = state, rd = D.rounds[s.r];
+    root.innerHTML = head(D.name) + '<div class="card"><div class="hud"><span>' + esc(rd.when || ('Round ' + (s.r + 1))) + ' · ' + (s.r + 1) + ' of ' + D.rounds.length + '</span><span>' + esc(D.unitLabel || 'Balance') + ': ' + money(Math.round(s.v)) + '</span></div>' +
+      '<p class="q">' + md(rd.title) + '</p><p style="margin:0">' + md(rd.story) + '</p>' + (rd.card ? '<div class="qcard">' + rd.card + '</div>' : '') +
+      '<div class="opts">' + rd.choices.map(function (c, i) { return '<button class="opt" data-c="' + i + '">' + md(c.t) + '</button>'; }).join('') + '</div><div id="fb" aria-live="polite"></div></div>';
+    root.querySelectorAll('[data-c]').forEach(function (b) { b.onclick = function () {
+      var c = rd.choices[+b.getAttribute('data-c')], before = s.v; s.v = applyChoice(s.v, s.st, rd, c); s.pts += c.pts; s.log.push([rd.when || 'Round ' + (s.r + 1), c.t, c.pts]);
+      root.querySelectorAll('[data-c]').forEach(function (x) { x.disabled = true; }); b.classList.add(c.pts === 2 ? 'ok' : c.pts === 0 ? 'no' : 'ok');
+      var ch = s.v - before;
+      document.getElementById('fb').innerHTML = '<div class="fb ' + (c.pts ? 'ok' : 'no') + '"><b>What happened:</b> ' + md(c.out || rd.out || '') + '<br><b>' + esc(D.unitLabel || 'Balance') + ':</b> ' + money(Math.round(before)) + ' → ' + money(Math.round(s.v)) + ' (' + (ch >= 0 ? '+' : '−') + money(Math.abs(Math.round(ch))).replace('−', '') + ')' +
+        '<br><b>Reasoning points: ' + c.pts + ' of 2.</b> ' + md(rd.lesson) + '</div><div class="row" style="margin-top:10px"><button class="btn go" id="nx">' + (s.r + 1 < D.rounds.length ? 'Next round' : 'See my report') + '</button></div>';
+      var nb = document.getElementById('nx'); nb.focus(); nb.onclick = function () { s.r++; s.r < D.rounds.length ? deskRound() : deskEnd(); }; }; });
+  }
+  function deskEnd() {
+    var D = G.desk, s = state, max = D.rounds.length * 2, bv = bench(); stamp(s.pts, max);
+    root.innerHTML = head(D.name + ': report') + '<div class="card"><div class="out">' + '<div class="stat"><b>' + money(Math.round(s.v)) + '</b><span>Your final ' + esc((D.unitLabel || 'balance').toLowerCase()) + '</span></div>' +
+      '<div class="stat"><b>' + s.pts + ' / ' + max + '</b><span>Reasoning points</span></div><div class="stat"><b>' + money(Math.round(bv)) + '</b><span>' + esc(D.benchLabel || 'Following the plan every round') + '</span></div></div>' +
+      '<p style="margin:0">' + md(D.wrap) + '</p></div><div class="card"><h2>Your decisions</h2><ol class="miss">' + s.log.map(function (l) { return '<li><b>' + esc(l[0]) + ':</b> ' + md(l[1]) + ' · ' + l[2] + '/2</li>'; }).join('') + '</ol></div>' +
+      '<div class="row"><button class="btn go" id="again">Back to the start</button><a class="btn" href="/">All games</a></div>';
+    document.getElementById('again').onclick = start; toast('Passport stamp saved: ' + G.name);
   }
 
   /* ---------- labs ---------- */
