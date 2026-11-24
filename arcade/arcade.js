@@ -1,5 +1,6 @@
 /* F&I Arcade engine. Each game page sets window.GAME (JSON) and loads this file.
-   Modes: Solo (feedback + score + passport stamp), Duel (two players, one device), Showdown (projector: reveal, no scoring).
+   Modes: Solo (feedback + score + passport stamp), Duel (two players, one device), Vault Escape (small group, timed locks + code),
+   Showdown (projector: reveal), Team Showdown (projector: shape cards, speed points), Four Corners (projector: walk to an answer). Desks: multi-round decisions.
    Item kinds: mc, num, order. Sort and match sets become mc items. Labs are interactive tools shown on the start screen.
    Saves only a play count and best score in this browser (localStorage "fi-passport"). Nothing is sent anywhere. */
 (function () {
@@ -26,6 +27,7 @@
       pool.push({ k: 'mc', q: (G.match.prompt || 'Which term fits?') + ' ' + p[1], o: o, a: o.indexOf(p[0]), why: p[0] + ': ' + p[1] }); }); }
   if (G.order) G.order.forEach(function (r) { pool.push({ k: 'order', q: r.prompt, items: r.items, why: r.why }); });
 
+  var CP = pool.filter(function (q) { return q.k === 'mc' && q.o.length <= 4; });
   /* ---------- screens ---------- */
   var state = {};
   function head(extra) {
@@ -34,11 +36,15 @@
   }
   function start() {
     document.body.classList.remove('show');
-    var modes = pool.length ? (G.modes || ['solo', 'duel', 'show', 'teams']) : [];
+    var cpool = pool.filter(function (q) { return q.k === 'mc' && q.o.length <= 4; });
+    var modes = pool.length ? (G.modes || ['solo', 'duel', 'vault', 'show', 'teams', 'corners']) : [];
+    modes = modes.filter(function (m) { return m === 'vault' ? pool.length >= 6 : m === 'corners' ? cpool.length >= 4 : true; });
     var mb = { solo: '<button class="btn go" data-m="solo">Solo<small>' + Math.min(G.n || 10, pool.length) + ' questions · instant feedback</small></button>',
       duel: '<button class="btn" data-m="duel">Partner Duel<small>Two players, one device, take turns</small></button>',
       show: '<button class="btn" data-m="show">Showdown<small>Projector mode: teacher reveals answers</small></button>',
-      teams: '<button class="btn" data-m="teams">Team Showdown<small>Projector · teams hold up shape cards · speed points</small></button>' };
+      teams: '<button class="btn" data-m="teams">Team Showdown<small>Projector · teams hold up shape cards · speed points</small></button>',
+      vault: '<button class="btn" data-m="vault">Vault Escape<small>Small group · crack ' + Math.min(4, Math.floor(pool.length / 3)) + ' locks, then the code · beat the clock</small></button>',
+      corners: '<button class="btn" data-m="corners">Four Corners<small>Projector · walk to the corner with your answer, then defend it</small></button>' };
     root.innerHTML = head('<a href="/">All games</a>') +
       (G.story ? '<div class="card story"><div class="kick">The story</div><h2>' + esc(G.story.title) + '</h2>' + G.story.text.map(function (p) { return '<p style="margin:0">' + md(p) + '</p>'; }).join('') + '</div>' : '') +
       '<div class="card"><p style="margin:0">' + md(G.blurb) + '</p><p class="muted" style="margin:0"><b>How to play:</b> ' + md(G.how) + '</p></div>' +
@@ -47,7 +53,7 @@
       (modes.length ? '<div class="card"><h2>' + (G.lab || G.desk ? 'Then test yourself' : 'Pick a mode') + '</h2><div class="modes">' + modes.map(function (m) { return mb[m]; }).join('') + '</div></div>' : '') +
       '<p class="muted" style="font-size:14px;margin:0">Names in this game are made up. Your best score is saved only on this device.</p>';
     if (G.lab && LABS[G.lab]) LABS[G.lab](document.getElementById('lab'));
-    root.querySelectorAll('[data-m]').forEach(function (b) { b.onclick = function () { var m = b.getAttribute('data-m'); m === 'duel' ? duelSetup() : m === 'teams' ? teamSetup() : m === 'desk' ? deskStart() : begin(m); }; });
+    root.querySelectorAll('[data-m]').forEach(function (b) { b.onclick = function () { var m = b.getAttribute('data-m'); m === 'duel' ? duelSetup() : m === 'teams' ? teamSetup() : m === 'desk' ? deskStart() : m === 'vault' ? vaultStart() : m === 'corners' ? cornersStart() : begin(m); }; });
   }
   function duelSetup() {
     root.innerHTML = head('Partner Duel') + '<div class="card"><h2>Who is playing?</h2><div class="lab"><div class="grid">' +
@@ -149,6 +155,85 @@
       toast('Passport stamp saved: ' + G.name); }
     root.innerHTML = head('Results') + h + '<div class="row"><button class="btn go" id="again">Play again</button><a class="btn" href="/">All games</a></div>';
     document.getElementById('again').onclick = start;
+  }
+
+  /* ---------- Vault Escape: locks of 3 questions; each lock gives a code digit ---------- */
+  function clock(sec) { var m = Math.floor(sec / 60), x = sec % 60; return m + ':' + (x < 10 ? '0' : '') + x; }
+  function vaultStart() {
+    document.body.classList.remove('show');
+    var L = Math.min(4, Math.floor(pool.length / 3)), qs = shuffle(pool).slice(0, L * 3);
+    state = { mode: 'vault', qs: qs, i: 0, L: L, code: qs.slice(0, L).map(function () { return Math.floor(Math.random() * 10); }), t0: Date.now(), pen: 0, hints: 0, wrong: 0 };
+    clearInterval(state.tick);
+    root.innerHTML = head('Vault Escape') + '<div class="card"><h2>The vault</h2><p style="margin:0">The vault has <b>' + L + ' locks</b>. Each lock opens after your group answers its 3 questions correctly. Every open lock shows one digit of the vault code: <b>write each digit down</b>. Wrong answers add 30 seconds; a hint adds 15. Enter the full code at the end to escape.</p>' +
+      '<div class="row"><button class="btn go" id="go">Start the clock</button><button class="btn" id="back">Back</button></div></div>';
+    document.getElementById('back').onclick = start;
+    document.getElementById('go').onclick = function () { state.t0 = Date.now(); state.tick = setInterval(function () { var el = document.getElementById('vclock'); if (el) el.textContent = clock(vsec()); else clearInterval(state.tick); }, 1000); vaultAsk(); };
+  }
+  function vsec() { return Math.round((Date.now() - state.t0) / 1000) + state.pen; }
+  function locks() { var s = state, h = ''; for (var k = 0; k < s.L; k++) { var done = s.i >= (k + 1) * 3; h += '<span class="lock' + (done ? ' open' : k === Math.floor(s.i / 3) ? ' now' : '') + '">' + (done ? '🔓 ' + s.code[k] : '🔒') + '</span>'; } return '<div class="locks">' + h + '</div>'; }
+  function vaultAsk() {
+    var s = state, q = s.qs[s.i], k = Math.floor(s.i / 3);
+    var body = '<div class="hud"><span>Lock ' + (k + 1) + ' of ' + s.L + ' · question ' + (s.i % 3 + 1) + ' of 3</span><span class="timer" id="vclock">' + clock(vsec()) + '</span></div>' + locks() +
+      '<p class="q">' + md(q.q) + '</p>' + (q.card ? '<div class="qcard">' + q.card + '</div>' : '');
+    if (q.k === 'mc') body += '<div class="opts">' + shuffle(q.o.map(function (_, i) { return i; })).map(function (i, j) { return '<button class="opt" data-i="' + i + '"><b>' + 'ABCDEF'[j] + '.</b> ' + md(q.o[i]) + '</button>'; }).join('') + '</div>' + (q.o.length > 2 ? '<div class="row"><button class="btn" id="hint">Hint: remove a wrong answer (+15 s)</button></div>' : '');
+    if (q.k === 'num') body += '<div class="numrow"><label class="sr" for="na">Your answer</label><input id="na" inputmode="decimal" autocomplete="off" placeholder="Your answer' + (q.u === '$' ? ' ($)' : q.u === '%' ? ' (%)' : '') + '"><button class="btn go" id="chk">Try it</button></div>';
+    if (q.k === 'order') { q.mix = shuffle(q.items); body += '<p class="muted" style="margin:0">Tap the items in order, first to last.</p><div class="chips" id="pool">' + q.mix.map(function (t, i) { return '<button class="chip" data-i="' + i + '">' + esc(t) + '</button>'; }).join('') + '</div><ol class="order" id="ord">' + q.items.map(function () { return '<li></li>'; }).join('') + '</ol>'; }
+    root.innerHTML = head('Vault Escape') + '<div class="card">' + body + '<div id="fb" aria-live="polite"></div></div>';
+    var miss = function (msg) { s.pen += 30; s.wrong++; document.getElementById('fb').innerHTML = '<div class="fb no"><b>Locked. +30 seconds.</b> ' + (msg || 'Try again.') + '</div>'; };
+    if (q.k === 'mc') { root.querySelectorAll('.opt').forEach(function (b) { b.onclick = function () { if (+b.getAttribute('data-i') === q.a) { b.classList.add('ok'); vaultOk(q); } else { b.classList.add('no'); b.disabled = true; miss(); } }; });
+      var hb = document.getElementById('hint'); if (hb) hb.onclick = function () { var w = [].filter.call(root.querySelectorAll('.opt:not([disabled])'), function (b) { return +b.getAttribute('data-i') !== q.a; }); if (w.length > 1) { w[0].disabled = true; w[0].style.opacity = '.3'; s.pen += 15; s.hints++; } if (w.length <= 2) hb.disabled = true; }; }
+    if (q.k === 'num') { var inp = document.getElementById('na'); inp.focus(); var go = function () { var v = parseNum(inp.value); if (v === null) return; if (Math.abs(v - q.a) <= tol(q)) vaultOk(q); else { miss('Check your math and try again.'); inp.select(); } };
+      document.getElementById('chk').onclick = go; inp.onkeydown = function (e) { if (e.key === 'Enter') go(); }; }
+    if (q.k === 'order') { var picked = [], lis = root.querySelectorAll('#ord li');
+      root.querySelectorAll('#pool .chip').forEach(function (c) { c.onclick = function () { if (c.classList.contains('picked')) return; c.classList.add('picked'); picked.push(+c.getAttribute('data-i')); lis[picked.length - 1].textContent = q.mix[+c.getAttribute('data-i')];
+        if (picked.length === q.items.length) { if (picked.every(function (p, k) { return q.mix[p] === q.items[k]; })) { lis.forEach(function (li) { li.className = 'ok'; }); vaultOk(q); }
+          else { miss('The order is off. Start over.'); setTimeout(function () { picked = []; lis.forEach(function (li) { li.textContent = ''; }); root.querySelectorAll('#pool .chip').forEach(function (x) { x.classList.remove('picked'); }); }, 700); } } }; }); }
+  }
+  function vaultOk(q) {
+    var s = state; root.querySelectorAll('.opt,.chip,#chk,#hint').forEach(function (b) { b.disabled = true; }); s.i++;
+    var opened = s.i % 3 === 0, k = s.i / 3 - 1;
+    document.getElementById('fb').innerHTML = '<div class="fb ok"><b>' + (opened ? '🔓 Lock ' + (k + 1) + ' is open! Code digit: <span class="digit">' + s.code[k] + '</span> (write it down)' : 'Correct.') + '</b>' + (q.why ? '<br>' + md(q.why) : '') + '</div><div class="row" style="margin-top:10px"><button class="btn go" id="nx">' + (s.i < s.qs.length ? 'Next' : 'Go to the vault door') + '</button></div>';
+    var nb = document.getElementById('nx'); nb.focus(); nb.onclick = function () { s.i < s.qs.length ? vaultAsk() : vaultDoor(); };
+  }
+  function vaultDoor() {
+    var s = state;
+    root.innerHTML = head('Vault Escape') + '<div class="card"><div class="hud"><span>The vault door</span><span class="timer" id="vclock">' + clock(vsec()) + '</span></div><p class="q">Enter the ' + s.L + '-digit code, in lock order.</p>' +
+      '<div class="numrow"><label class="sr" for="code">Vault code</label><input id="code" inputmode="numeric" maxlength="' + s.L + '" autocomplete="off" placeholder="' + Array(s.L + 1).join('•') + '" style="letter-spacing:.4em"><button class="btn go" id="open">Open the vault</button></div><div id="fb" aria-live="polite"></div></div>';
+    var inp = document.getElementById('code'); inp.focus();
+    var go = function () { if (inp.value.replace(/\D/g, '') === s.code.join('')) { clearInterval(s.tick); vaultEnd(); } else { s.pen += 30; document.getElementById('fb').innerHTML = '<div class="fb no"><b>Wrong code. +30 seconds.</b> Check the digits you wrote down, in order from Lock 1.</div>'; inp.select(); } };
+    document.getElementById('open').onclick = go; inp.onkeydown = function (e) { if (e.key === 'Enter') go(); };
+  }
+  function vaultEnd() {
+    var s = state, t = vsec(), per = t / s.qs.length, stars = per <= 30 ? 3 : per <= 50 ? 2 : 1;
+    stamp(Math.max(0, 1000 - t), 1000);
+    root.innerHTML = head('Vault Escape') + '<div class="card"><p class="big">🔓 Escaped!</p><div class="stars" aria-label="' + stars + ' of 3 stars">' + '★★★'.slice(0, stars) + '<span style="opacity:.25">' + '★★★'.slice(stars) + '</span></div>' +
+      '<div class="out"><div class="stat"><b>' + clock(t) + '</b><span>Final time (with penalties)</span></div><div class="stat"><b>' + s.wrong + '</b><span>Wrong tries (+30 s each)</span></div><div class="stat"><b>' + s.hints + '</b><span>Hints used (+15 s each)</span></div></div>' +
+      '<p class="muted" style="margin:0">Show this screen to your teacher. Fastest group time wins.</p></div><div class="row"><button class="btn go" id="again">Back to the start</button><a class="btn" href="/">All games</a></div>';
+    document.getElementById('again').onclick = start;
+  }
+
+  /* ---------- Four Corners: projector; shape cards posted in the corners ---------- */
+  function cornersStart() {
+    document.body.classList.add('show');
+    state = { mode: 'corners', qs: shuffle(CP).slice(0, Math.min(10, CP.length)), i: 0 };
+    root.innerHTML = head('Four Corners') + '<div class="card"><h2>Set up the room</h2><p style="margin:0">Post one shape card in each corner: <b style="color:' + SH[0][1] + '">▲</b> <b style="color:' + SH[1][1] + '">◆</b> <b style="color:' + SH[2][1] + '">●</b> <b style="color:' + SH[3][1] + '">■</b>. For each question, students walk to the corner with their answer before the timer ends. You can count each corner, then reveal. One student from the right corner explains why; one from another corner says what made their answer tempting.</p>' +
+      '<p style="margin:0"><a href="/arcade/answer-cards.pdf" target="_blank" rel="noopener">Print the shape cards (PDF) ↗</a></p><div class="row"><button class="btn go" id="go">Start (' + state.qs.length + ' questions)</button><button class="btn" id="back">Back</button></div></div>';
+    document.getElementById('back').onclick = start; document.getElementById('go').onclick = cornerAsk;
+  }
+  function cornerAsk() {
+    var s = state, q = s.qs[s.i], order = q.keep ? q.o.map(function (_, i) { return i; }) : shuffle(q.o.map(function (_, i) { return i; }));
+    s.cnt = order.map(function () { return 0; });
+    root.innerHTML = head('Four Corners') + '<div class="card"><div class="hud"><span>Question ' + (s.i + 1) + ' of ' + s.qs.length + '</span><span class="timer" id="tm">20</span></div><p class="q">' + md(q.q) + '</p>' + (q.card ? '<div class="qcard">' + q.card + '</div>' : '') +
+      '<div class="corners">' + order.map(function (i, j) { return '<div class="corner" data-i="' + i + '" style="--sc:' + SH[j][1] + '"><span class="shape" style="color:' + SH[j][1] + '">' + SH[j][0] + '</span><span class="ct">' + md(q.o[i]) + '</span><span class="tally"><button class="btn" data-j="' + j + '" data-d="-1" aria-label="One fewer">−</button><b id="c' + j + '">0</b><button class="btn" data-j="' + j + '" data-d="1" aria-label="One more">+</button></span></div>'; }).join('') + '</div>' +
+      '<div class="row"><button class="btn go" id="rev">Reveal answer</button></div><div id="fb" aria-live="polite"></div></div>';
+    root.querySelectorAll('[data-d]').forEach(function (b) { b.onclick = function () { var j = +b.getAttribute('data-j'); s.cnt[j] = Math.max(0, s.cnt[j] + +b.getAttribute('data-d')); document.getElementById('c' + j).textContent = s.cnt[j]; }; });
+    var left = 20, tm = document.getElementById('tm'); clearInterval(s.tick); s.tick = setInterval(function () { left--; if (!tm.isConnected) return clearInterval(s.tick); tm.textContent = Math.max(left, 0); tm.classList.toggle('low', left <= 5); if (left <= 0) { clearInterval(s.tick); tm.textContent = 'Stop!'; } }, 1000);
+    document.getElementById('rev').onclick = function () { clearInterval(s.tick); this.disabled = true;
+      var shp = ''; root.querySelectorAll('.corner').forEach(function (c) { var ok = +c.getAttribute('data-i') === q.a; c.classList.add(ok ? 'ok' : 'dim'); if (ok) shp = c.querySelector('.shape').outerHTML + ' '; });
+      var tot = s.cnt.reduce(function (a, b) { return a + b; }, 0), right = 0; root.querySelectorAll('.corner').forEach(function (c, j) { if (+c.getAttribute('data-i') === q.a) right = s.cnt[j]; });
+      document.getElementById('fb').innerHTML = '<div class="fb ok"><b>Answer: ' + shp + md(q.o[q.a]) + '</b>' + (q.why ? '<br>' + md(q.why) : '') + (tot ? '<br><b>' + right + ' of ' + tot + '</b> picked the right corner (' + Math.round(100 * right / tot) + '%).' : '') + '</div>' +
+        '<p style="margin:10px 0 0"><b>Corner talk:</b> Right corner, explain why. Another corner, what made your answer tempting?</p><div class="row" style="margin-top:10px"><button class="btn go" id="nx">' + (s.i + 1 < s.qs.length ? 'Next question' : 'Finish') + '</button></div>';
+      document.getElementById('nx').onclick = function () { s.i++; s.i < s.qs.length ? cornerAsk() : start(); }; };
   }
 
   /* ---------- desks: multi-round decisions ---------- */
