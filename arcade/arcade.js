@@ -1,0 +1,197 @@
+/* F&I Arcade engine. Each game page sets window.GAME (JSON) and loads this file.
+   Modes: Solo (feedback + score + passport stamp), Duel (two players, one device), Showdown (projector: reveal, no scoring).
+   Item kinds: mc, num, order. Sort and match sets become mc items. Labs are interactive tools shown on the start screen.
+   Saves only a play count and best score in this browser (localStorage "fi-passport"). Nothing is sent anywhere. */
+(function () {
+  var G = window.GAME, root = document.getElementById('game');
+  if (!G || !root) return;
+  document.documentElement.style.setProperty('--c', G.color || '#1D4E89');
+  var esc = function (s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
+  var md = function (s) { return esc(s).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>'); };
+  var shuffle = function (a) { a = a.slice(); for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; } return a; };
+  var money = function (v) { var neg = v < 0; v = Math.abs(v); var s = '$' + v.toLocaleString('en-US', { minimumFractionDigits: v % 1 ? 2 : 0, maximumFractionDigits: 2 }); return neg ? '−' + s : s; };
+  var KEY = 'fi-passport';
+  function stamp(score, total) {
+    try { var p = JSON.parse(localStorage.getItem(KEY)) || { s: {} }; var s = p.s[G.slug] || { n: 0, best: null, of: total };
+      s.n++; if (s.best == null || score > s.best) { s.best = score; s.of = total; } s.t = Date.now(); p.s[G.slug] = s; localStorage.setItem(KEY, JSON.stringify(p)); } catch (e) {}
+  }
+  function toast(t) { var el = document.getElementById('gaToast'); if (!el) { el = document.createElement('div'); el.id = 'gaToast'; el.className = 'toast'; el.setAttribute('role', 'status'); document.body.appendChild(el); }
+    el.textContent = t; el.classList.add('show'); clearTimeout(el._t); el._t = setTimeout(function () { el.classList.remove('show'); }, 3200); }
+
+  /* ---------- build the item pool ---------- */
+  var pool = (G.items || []).slice();
+  if (G.sort) G.sort.items.forEach(function (it) { pool.push({ k: 'mc', q: (G.sort.prompt ? G.sort.prompt + ' ' : '') + '“' + it.t + '”', o: G.sort.buckets.slice(), a: it.b, why: it.why, keep: true }); });
+  if (G.match) { var terms = G.match.pairs.map(function (p) { return p[0]; });
+    G.match.pairs.forEach(function (p, i) { var others = shuffle(terms.filter(function (t) { return t !== p[0]; })).slice(0, 3); var o = shuffle(others.concat([p[0]]));
+      pool.push({ k: 'mc', q: (G.match.prompt || 'Which term fits?') + ' ' + p[1], o: o, a: o.indexOf(p[0]), why: p[0] + ': ' + p[1] }); }); }
+  if (G.order) G.order.forEach(function (r) { pool.push({ k: 'order', q: r.prompt, items: r.items, why: r.why }); });
+
+  /* ---------- screens ---------- */
+  var state = {};
+  function head(extra) {
+    return '<div class="ga-top"><span>' + esc(G.unitName) + ' · Day ' + G.day + '</span><span>' + (extra || '') + '</span></div>' +
+      '<h1 class="ga-h">' + esc(G.name) + '</h1><div class="ga-bar" aria-hidden="true"></div>';
+  }
+  function start() {
+    document.body.classList.remove('show');
+    var modes = G.modes || ['solo', 'duel', 'show'];
+    var mb = { solo: '<button class="btn go" data-m="solo">Solo<small>' + Math.min(G.n || 10, pool.length) + ' questions · instant feedback</small></button>',
+      duel: '<button class="btn" data-m="duel">Partner Duel<small>Two players, one device, take turns</small></button>',
+      show: '<button class="btn" data-m="show">Showdown<small>Projector mode: teacher reveals answers</small></button>' };
+    root.innerHTML = head('<a href="/">All games</a>') +
+      '<div class="card"><p style="margin:0">' + md(G.blurb) + '</p><p class="muted" style="margin:0"><b>How to play:</b> ' + md(G.how) + '</p></div>' +
+      (G.lab ? '<div class="card lab" id="lab"></div>' : '') +
+      '<div class="card"><h2>' + (G.lab ? 'Then test yourself' : 'Pick a mode') + '</h2><div class="modes">' + modes.map(function (m) { return mb[m]; }).join('') + '</div></div>' +
+      '<p class="muted" style="font-size:14px;margin:0">Names in this game are made up. Your best score is saved only on this device.</p>';
+    if (G.lab && LABS[G.lab]) LABS[G.lab](document.getElementById('lab'));
+    root.querySelectorAll('[data-m]').forEach(function (b) { b.onclick = function () { var m = b.getAttribute('data-m'); m === 'duel' ? duelSetup() : begin(m); }; });
+  }
+  function duelSetup() {
+    root.innerHTML = head('Partner Duel') + '<div class="card"><h2>Who is playing?</h2><div class="lab"><div class="grid">' +
+      '<label>Player 1<input id="p1" value="Player 1" maxlength="20"></label><label>Player 2<input id="p2" value="Player 2" maxlength="20"></label></div></div>' +
+      '<div class="row"><button class="btn go" id="go">Start the duel</button><button class="btn" id="back">Back</button></div></div>';
+    document.getElementById('back').onclick = start;
+    document.getElementById('go').onclick = function () { begin('duel', [document.getElementById('p1').value.trim() || 'Player 1', document.getElementById('p2').value.trim() || 'Player 2']); };
+  }
+  function begin(mode, names) {
+    var n = mode === 'duel' ? Math.min(12, pool.length - pool.length % 2) : mode === 'show' ? pool.length : Math.min(G.n || 10, pool.length);
+    state = { mode: mode, qs: shuffle(pool).slice(0, n), i: 0, score: [0, 0], names: names || ['You'], missed: [] };
+    if (mode === 'show') document.body.classList.add('show');
+    ask();
+  }
+  function hud() {
+    var s = state, t = 'Question ' + (s.i + 1) + ' of ' + s.qs.length;
+    if (s.mode === 'solo') return '<div class="hud"><span>' + t + '</span><span>Score ' + s.score[0] + '</span></div>';
+    if (s.mode === 'duel') return '<div class="hud"><span>' + t + ' · <span style="color:var(--c)">' + esc(s.names[s.i % 2]) + '’s turn</span></span><span>' + esc(s.names[0]) + ' ' + s.score[0] + ' · ' + esc(s.names[1]) + ' ' + s.score[1] + '</span></div>';
+    return '<div class="hud"><span>' + t + '</span><span class="timer" id="tm">30</span></div>';
+  }
+  function ask() {
+    var s = state, q = s.qs[s.i];
+    var body = '<p class="q">' + md(q.q) + '</p>' + (q.card ? '<div class="qcard">' + q.card + '</div>' : '');
+    if (q.k === 'mc') {
+      var order = q.keep ? q.o.map(function (_, i) { return i; }) : shuffle(q.o.map(function (_, i) { return i; }));
+      body += '<div class="opts" role="group" aria-label="Answer choices">' + order.map(function (i, j) { return '<button class="opt" data-i="' + i + '"><b>' + 'ABCDEF'[j] + '.</b> ' + md(q.o[i]) + '</button>'; }).join('') + '</div>';
+    } else if (q.k === 'num') {
+      body += s.mode === 'show' ? '' : '<div class="numrow"><label class="sr" for="na">Your answer</label><input id="na" inputmode="decimal" autocomplete="off" placeholder="Your answer' + (q.u === '$' ? ' ($)' : q.u === '%' ? ' (%)' : '') + '"><button class="btn go" id="chk">Check</button></div>';
+    } else if (q.k === 'order') {
+      q.mix = shuffle(q.items);
+      body += '<p class="muted" style="margin:0">Tap the items in order, first to last.</p><div class="chips" id="pool">' + q.mix.map(function (t, i) { return '<button class="chip" data-i="' + i + '">' + esc(t) + '</button>'; }).join('') + '</div>' +
+        '<ol class="order" id="ord">' + q.items.map(function () { return '<li></li>'; }).join('') + '</ol>' + (s.mode === 'show' ? '' : '<div class="row"><button class="btn" id="undo">Undo</button></div>');
+    }
+    var ctl = s.mode === 'show' ? '<div class="row"><button class="btn go" id="rev">Reveal answer</button></div>' : '';
+    root.innerHTML = head(s.mode === 'show' ? 'Showdown' : s.mode === 'duel' ? 'Partner Duel' : 'Solo') + '<div class="card">' + hud() + body + ctl + '<div id="fb" aria-live="polite"></div></div>';
+    if (s.mode === 'show') { var left = 30, tm = document.getElementById('tm'); clearInterval(s.tick); s.tick = setInterval(function () { left--; if (!tm.isConnected) return clearInterval(s.tick); tm.textContent = Math.max(left, 0); tm.classList.toggle('low', left <= 5); if (left <= 0) clearInterval(s.tick); }, 1000);
+      document.getElementById('rev').onclick = function () { clearInterval(s.tick); reveal(q, null); };
+      if (q.k === 'order') wireOrder(q, true);
+      return; }
+    if (q.k === 'mc') root.querySelectorAll('.opt').forEach(function (b) { b.onclick = function () { grade(q, +b.getAttribute('data-i') === q.a, b); }; });
+    if (q.k === 'num') { var inp = document.getElementById('na'); inp.focus(); var go = function () { var v = parseNum(inp.value); if (v === null) { inp.setAttribute('aria-invalid', 'true'); return; } grade(q, Math.abs(v - q.a) <= tol(q), null, v); };
+      document.getElementById('chk').onclick = go; inp.onkeydown = function (e) { if (e.key === 'Enter') go(); }; }
+    if (q.k === 'order') wireOrder(q, false);
+  }
+  function wireOrder(q, show) {
+    var picked = [], lis = root.querySelectorAll('#ord li');
+    root.querySelectorAll('#pool .chip').forEach(function (c) { c.onclick = function () { if (c.classList.contains('picked')) return; c.classList.add('picked'); picked.push(+c.getAttribute('data-i')); lis[picked.length - 1].textContent = q.mix[+c.getAttribute('data-i')];
+      if (picked.length === q.items.length && !show) { var ok = picked.every(function (p, k) { return q.mix[p] === q.items[k]; }); lis.forEach(function (li, k) { li.classList.add(q.mix[picked[k]] === q.items[k] ? 'ok' : 'no'); }); grade(q, ok, null); } }; });
+    var u = document.getElementById('undo'); if (u) u.onclick = function () { if (!picked.length) return; var last = picked.pop(); root.querySelector('#pool .chip[data-i="' + last + '"]').classList.remove('picked'); lis[picked.length].textContent = ''; };
+  }
+  function tol(q) { return q.tol != null ? q.tol : Math.max(0.011, Math.abs(q.a) * 0.005); }
+  function parseNum(t) { t = String(t).replace(/[−–]/g, '-').replace(/[$,%\s]/g, ''); if (!/^-?\d*\.?\d+$/.test(t)) return null; return parseFloat(t); }
+  function ansText(q) { if (q.k === 'mc') return q.o[q.a]; if (q.k === 'num') return q.show || (q.u === '$' ? money(q.a) : q.u === '%' ? q.a + '%' : String(q.a)); if (q.k === 'order') return q.items.join(' → '); }
+  function reveal(q) {
+    if (q.k === 'mc') root.querySelectorAll('.opt').forEach(function (b) { if (+b.getAttribute('data-i') === q.a) b.classList.add('ok'); b.disabled = true; });
+    if (q.k === 'order') { var lis = root.querySelectorAll('#ord li'); q.items.forEach(function (t, k) { lis[k].textContent = t; lis[k].className = 'ok'; }); }
+    document.getElementById('fb').innerHTML = '<div class="fb ok"><b>Answer: ' + md(ansText(q)) + '</b>' + (q.why ? '<br>' + md(q.why) : '') + '</div>' + nextBtn();
+    wireNext();
+  }
+  function grade(q, ok, btn, val) {
+    var s = state, p = s.mode === 'duel' ? s.i % 2 : 0;
+    if (ok) s.score[p]++; else s.missed.push(q);
+    if (q.k === 'mc') root.querySelectorAll('.opt').forEach(function (b) { b.disabled = true; if (+b.getAttribute('data-i') === q.a) b.classList.add('ok'); });
+    if (btn && !ok) btn.classList.add('no');
+    if (q.k === 'num') { document.getElementById('na').disabled = true; document.getElementById('chk').disabled = true; }
+    var u = document.getElementById('undo'); if (u) u.disabled = true;
+    document.getElementById('fb').innerHTML = '<div class="fb ' + (ok ? 'ok' : 'no') + '"><b>' + (ok ? pick(['Nice!', 'Correct.', 'Yes!', 'Exactly.']) : 'Not quite. Answer: ' + md(ansText(q))) + '</b>' + (q.why ? '<br>' + md(q.why) : '') + '</div>' + nextBtn();
+    wireNext();
+  }
+  function pick(a) { return a[Math.floor(Math.random() * a.length)]; }
+  function nextBtn() { return '<div class="row" style="margin-top:10px"><button class="btn go" id="nx">' + (state.i + 1 < state.qs.length ? 'Next' : 'See results') + '</button></div>'; }
+  function wireNext() { var b = document.getElementById('nx'); b.focus(); b.onclick = function () { state.i++; state.i < state.qs.length ? ask() : end(); }; }
+  function end() {
+    var s = state, n = s.qs.length, h;
+    if (s.mode === 'show') { h = '<div class="card"><h2>Showdown complete</h2><p>' + n + ' questions reviewed.</p></div>'; }
+    else if (s.mode === 'duel') { var a = s.score[0], b = s.score[1]; var w = a === b ? 'It’s a tie!' : esc(s.names[a > b ? 0 : 1]) + ' wins!';
+      h = '<div class="card"><p class="big">' + w + '</p><p>' + esc(s.names[0]) + ': ' + a + ' of ' + n / 2 + ' · ' + esc(s.names[1]) + ': ' + b + ' of ' + n / 2 + '</p></div>'; }
+    else { var sc = s.score[0], pct = sc / n, st = pct >= 0.9 ? 3 : pct >= 0.7 ? 2 : 1; stamp(sc, n);
+      h = '<div class="card"><p class="big">' + sc + ' / ' + n + '</p><div class="stars" aria-label="' + st + ' of 3 stars">' + '★★★'.slice(0, st) + '<span class="muted">' + '★★★'.slice(st) + '</span></div><p style="margin:0">' +
+        (st === 3 ? 'Ready for the quiz.' : st === 2 ? 'Almost there. Review the misses below, then play again.' : 'Review your notes and the misses below, then try again.') + '</p></div>';
+      if (s.missed.length) h += '<div class="card"><h2>Review what you missed</h2><ul class="miss">' + s.missed.map(function (q) { return '<li>' + md(q.q.replace(/\s+/g, ' ')) + '<br><b>Answer:</b> ' + md(ansText(q)) + (q.why ? '. ' + md(q.why) : '') + '</li>'; }).join('') + '</ul></div>';
+      toast('Passport stamp saved: ' + G.name); }
+    root.innerHTML = head('Results') + h + '<div class="row"><button class="btn go" id="again">Play again</button><a class="btn" href="/">All games</a></div>';
+    document.getElementById('again').onclick = start;
+  }
+
+  /* ---------- labs ---------- */
+  function inputs(el, spec) { return '<div class="grid">' + spec.map(function (f) { return '<label>' + f[1] + '<input id="L-' + f[0] + '" inputmode="decimal" value="' + f[2] + '"></label>'; }).join('') + '</div>'; }
+  function v(id) { var x = parseNum(document.getElementById('L-' + id).value); return x === null ? 0 : x; }
+  function stat(label, val) { return '<div class="stat"><b>' + val + '</b><span>' + label + '</span></div>'; }
+  var LABS = {
+    fees: function (el) {
+      el.innerHTML = '<h2>Fee lab</h2><p class="muted" style="margin:0">Same investment, same market, two different fees. Change any number.</p>' +
+        inputs(el, [['P', 'Invest once ($)', 10000], ['r', 'Return before fees (% a year)', 7], ['n', 'Years', 40], ['fa', 'Fund A fee (%)', 0.05], ['fb', 'Fund B fee (%)', 1]]) + '<div class="out" id="fo"></div><div id="ft"></div>';
+      function go() { var P = v('P'), r = v('r') / 100, n = Math.min(v('n'), 80), a = P * Math.pow(1 + r - v('fa') / 100, n), b = P * Math.pow(1 + r - v('fb') / 100, n);
+        document.getElementById('fo').innerHTML = stat('Fund A after ' + n + ' years', money(Math.round(a))) + stat('Fund B after ' + n + ' years', money(Math.round(b))) + stat('Fees cost you (B vs. A)', money(Math.round(Math.abs(a - b))));
+        var rows = ''; for (var y = 10; y <= n; y += 10) rows += '<tr><td>' + y + '</td><td>' + money(Math.round(P * Math.pow(1 + r - v('fa') / 100, y))) + '</td><td>' + money(Math.round(P * Math.pow(1 + r - v('fb') / 100, y))) + '</td></tr>';
+        document.getElementById('ft').innerHTML = rows ? '<table><thead><tr><th>Year</th><th>Fund A</th><th>Fund B</th></tr></thead><tbody>' + rows + '</tbody></table>' : ''; }
+      el.oninput = go; go();
+    },
+    beta: function (el) {
+      var rows = [['Holding 1', 4000, 1.3], ['Holding 2', 3000, 0.9], ['Holding 3', 2000, 1.6], ['Bond fund', 1000, 0]];
+      el.innerHTML = '<h2>Beta lab: my portfolio</h2><p class="muted" style="margin:0">Type each holding, its dollar value and its beta (from any quote page). The lab weights each beta by its share of the portfolio.</p>' +
+        '<table><thead><tr><th>Holding</th><th>$ value</th><th>Beta</th></tr></thead><tbody id="bt">' + [0, 1, 2, 3, 4, 5].map(function (i) { var r = rows[i] || ['', '', ''];
+          return '<tr><td><input aria-label="Holding ' + (i + 1) + '" id="L-h' + i + '" value="' + r[0] + '"></td><td><input aria-label="Value ' + (i + 1) + '" id="L-d' + i + '" inputmode="decimal" value="' + r[1] + '"></td><td><input aria-label="Beta ' + (i + 1) + '" id="L-b' + i + '" inputmode="decimal" value="' + r[2] + '"></td></tr>'; }).join('') + '</tbody></table>' +
+        inputs(el, [['m', 'Market move (%)', -10]]) + '<div class="out" id="bo"></div>';
+      function go() { var tot = 0, wb = 0; for (var i = 0; i < 6; i++) { var d = v('d' + i), b = v('b' + i); tot += d; wb += d * b; } var beta = tot ? wb / tot : 0, mv = beta * v('m');
+        document.getElementById('bo').innerHTML = stat('Portfolio value', money(tot)) + stat('Portfolio beta', beta.toFixed(2)) + stat('Predicted move', (mv >= 0 ? '+' : '−') + Math.abs(mv).toFixed(1) + '% (' + money(Math.round(tot * mv / 100)) + ')'); }
+      el.oninput = go; go();
+    },
+    hash: function (el) {
+      var data = ['Ana pays Ben 5', 'Ben pays Cal 2', 'Cal pays Dee 1', 'Dee pays Ana 3'];
+      function h(s) { var x = 7; for (var i = 0; i < s.length; i++) x = (x * 31 + s.charCodeAt(i)) % 65521; return ('000' + x.toString(16)).slice(-4).toUpperCase(); }
+      var stored = [], redo = 0;
+      function chain() { var prev = '0000', out = []; for (var i = 0; i < 4; i++) { var hh = h(prev + '|' + data[i]); out.push({ prev: prev, hash: hh }); prev = hh; } return out; }
+      function mine(from) { var c = chain(); for (var i = from; i < 4; i++) stored[i] = c[i].hash; }
+      mine(0);
+      function draw() { var c = chain(), html = ''; for (var i = 0; i < 4; i++) { var bad = stored[i] !== c[i].hash;
+          html += '<div class="block' + (bad ? ' bad' : '') + '"><b>Block ' + (i + 1) + (bad ? ': broken' : ': valid') + '</b><label>Transactions<input id="L-t' + i + '" value="' + esc(data[i]) + '"></label>' +
+            '<span>Previous hash: <code>' + c[i].prev + '</code></span><span>Hash it should have: <code>' + c[i].hash + '</code></span><span>Hash on record: <code>' + stored[i] + '</code></span><button class="btn" data-mine="' + i + '">Re-mine from here</button></div>'; }
+        el.querySelector('.blocks').innerHTML = html; el.querySelector('#hr').textContent = 'Blocks you had to re-mine: ' + redo;
+        el.querySelectorAll('[data-mine]').forEach(function (b) { b.onclick = function () { var f = +b.getAttribute('data-mine'); redo += 4 - f; mine(f); draw(); }; });
+        el.querySelectorAll('.blocks input').forEach(function (inp, i) { inp.oninput = function () { data[i] = inp.value; var pos = inp.selectionStart; draw(); var n = document.getElementById('L-t' + i); n.focus(); n.setSelectionRange(pos, pos); }; }); }
+      el.innerHTML = '<h2>Build-a-block lab</h2><p class="muted" style="margin:0">Each block stores the previous block’s hash (a fingerprint). Change a transaction in Block 1 and watch every later link break. Then re-mine to fix it, and count the work.</p><div class="blocks"></div><p id="hr" class="muted" style="margin:0"></p>';
+      draw();
+    },
+    rental: function (el) {
+      el.innerHTML = '<h2>REIT vs. rental lab</h2><p class="muted" style="margin:0">A made-up rental and a made-up REIT with the same money invested. Change any number.</p>' +
+        '<h3 style="margin:4px 0 0">Rental house</h3>' + inputs(el, [['dp', 'Down payment ($)', 50000], ['rent', 'Rent ($ a month)', 1900], ['mort', 'Mortgage ($ a month)', 1150], ['tax', 'Taxes + insurance ($ a month)', 350], ['rep', 'Repairs ($ a month)', 150], ['vac', 'Months empty a year', 1]]) +
+        '<h3 style="margin:4px 0 0">REIT</h3>' + inputs(el, [['y', 'REIT dividend yield (%)', 4]]) + '<div class="out" id="ro"></div>';
+      function go() { var occ = Math.max(0, 12 - v('vac')), yr = v('rent') * occ - (v('mort') + v('tax') + v('rep')) * 12, reit = v('dp') * v('y') / 100;
+        document.getElementById('ro').innerHTML = stat('Rental cash flow per year', money(Math.round(yr))) + stat('Rental: cash flow ÷ down payment', (v('dp') ? (yr / v('dp') * 100).toFixed(1) : '0') + '%') + stat('REIT dividends per year', money(Math.round(reit))) + stat('Time to sell', 'Rental: months · REIT: seconds'); }
+      el.oninput = go; go();
+    },
+    auction: function (el) {
+      var A = [['Index fund', [18, -20, 22]], ['Bitcoin', [120, -65, 60]], ['REIT', [12, -15, 10]], ['Gold', [-2, 20, 3]], ['Sneaker collection', [30, -40, 0]], ['Startup stake', [0, 0, -100]]];
+      el.innerHTML = '<h2>Alternative-asset auction</h2><p class="muted" style="margin:0">Split <b>$100,000</b> across six assets, then play 3 made-up years. The returns are invented for this game, not predictions. Sneakers lose 10% to selling fees when you cash out.</p>' +
+        inputs(el, A.map(function (a, i) { return ['a' + i, a[0] + ' ($)', [40000, 10000, 15000, 10000, 5000, 20000][i]]; })) + '<div class="row"><span id="al" class="muted"></span><button class="btn go" id="play">Play the 3 years</button></div><div id="ao"></div>';
+      function tot() { var t = 0; A.forEach(function (_, i) { t += v('a' + i); }); return t; }
+      el.oninput = function () { var t = tot(); document.getElementById('al').textContent = 'Allocated: ' + money(t) + (t !== 100000 ? ' (must equal $100,000)' : ' ✓'); document.getElementById('play').disabled = t !== 100000; };
+      el.oninput();
+      document.getElementById('play').onclick = function () { var vals = A.map(function (_, i) { return v('a' + i); }), rows = '', worst = 0;
+        for (var y = 0; y < 3; y++) { vals = vals.map(function (x, i) { return x * (1 + A[i][1][y] / 100); }); var t = vals.reduce(function (a, b) { return a + b; }, 0); worst = Math.min(worst, t - 100000);
+          rows += '<tr><td>Year ' + (y + 1) + '</td><td>' + money(Math.round(t)) + '</td><td>' + A.map(function (a) { return a[0] + ' ' + (a[1][y] > 0 ? '+' : '') + a[1][y] + '%'; }).join(' · ') + '</td></tr>'; }
+        var end = vals.reduce(function (a, b, i) { return a + (i === 4 ? b * 0.9 : b); }, 0);
+        document.getElementById('ao').innerHTML = '<table><thead><tr><th>Year</th><th>Portfolio</th><th>What happened (made up)</th></tr></thead><tbody>' + rows + '</tbody></table><div class="out">' + stat('Final value (after sneaker fees)', money(Math.round(end))) + stat('Gain or loss', money(Math.round(end - 100000))) + '</div><p class="muted" style="margin:0">Compare with a classmate who put everything in the index fund: ' + money(Math.round(100000 * 1.18 * 0.8 * 1.22)) + '. Who had the scarier ride?</p>'; };
+    }
+  };
+  start();
+})();
