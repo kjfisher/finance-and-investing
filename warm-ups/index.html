@@ -86,7 +86,7 @@ function partHTML(p,key,tag){
 }
 function cardHTML(it){
   const parts=it.p.map((p,i)=>partHTML(p,`${it.d}-${i}`)).join("")+(it.sp?partHTML(it.sp,`${it.d}-s`,`Spiral review · from Day ${it.sp.fromDay}`):"");
-  const tail=MODE==="exit"?`<div class="part"><p class="q">How sure do you feel about today's target?</p><div class="conf">${CONF.map((c,i)=>`<button class="opt" data-conf="${i}">${c}</button>`).join("")}</div></div><div id="res-${it.d}"></div>`:"";
+  const tail=MODE==="exit"?`<div class="part"><p class="q">How sure do you feel about today's target?</p><div class="conf">${CONF.map((c,i)=>`<button class="opt" data-conf="${i}">${c}</button>`).join("")}</div></div><div id="res-${it.d}"></div>`:MODE==="read"?`<div id="res-${it.d}"></div>`:"";
   return `<article class="card" style="--uc:var(--${it.u})" id="card-${it.d}"><div class="meta"><b>Day ${it.d}</b><span>${esc(it.un)}</span></div><h2>${esc(it.l)}</h2>${it.tg?`<p class="tg">${esc(it.tg)}</p>`:""}${parts}${tail}</article>`;
 }
 function allParts(it){ return it.p.concat(it.sp?[it.sp]:[]); }
@@ -108,10 +108,10 @@ function wire(it){
   card.querySelectorAll("input[data-k]").forEach(inp=>inp.onkeydown=e=>{ if(e.key==="Enter") card.querySelector(`button.check[data-k="${inp.dataset.k}"]`).click(); });
 }
 function maybeResult(it){
-  if(MODE!=="exit") return; const s=st(it.d), ps=allParts(it), keys=ps.map((p,i)=>`${it.d}-${i}`);
-  if(!keys.every(k=>s.done[k])||s.conf==null) return;
+  if(MODE==="warm") return; const s=st(it.d), ps=allParts(it), keys=ps.map((p,i)=>`${it.d}-${i}`);
+  if(!keys.every(k=>s.done[k])||(MODE==="exit"&&s.conf==null)) return;
   const scored=keys.filter((k,i)=>ps[i].t!=="o"), right=scored.filter(k=>s.first[k]).length;
-  document.getElementById("res-"+it.d).innerHTML=`<div class="result"><div class="tag">Show your teacher on the way out · Day ${it.d}</div>${scored.length?`<p class="big">${right}/${scored.length}</p><div>right on the first try</div>`:`<p class="big">✓</p><div>Done</div>`}<div class="c">${esc(CONF[s.conf])}</div></div>`;
+  document.getElementById("res-"+it.d).innerHTML=`<div class="result"><div class="tag">${MODE==="read"?"Reading check":"Show your teacher on the way out"} · Day ${it.d}</div>${scored.length?`<p class="big">${right}/${scored.length}</p><div>right on the first try</div>`:`<p class="big">✓</p><div>Done</div>`}${MODE==="exit"?`<div class="c">${esc(CONF[s.conf])}</div>`:`<div class="c">${right>=4?"Ready for class":"Reread the parts you missed"}</div>`}</div>`;
 }
 function render(){
   const main=document.getElementById("main"), m=/^#d(\d+)$/.exec(location.hash), intro=document.getElementById("intro"), fl=document.getElementById("filters");

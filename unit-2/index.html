@@ -1,0 +1,101 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Unit 2: The Markets</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: course pages for the Finance & Investing site. Navy bar with breadcrumbs, unit-colored header, cards on a pale ground. */
+:root{--bg:#F2F4F1;--surface:#FFFFFF;--ink:#14213D;--muted:#5A6478;--line:#D3D9D0;--bar:#14213D;--barInk:#F3F5F8;--gold:#E0A800;--money:#0F8B6C;--money-ink:#FFFFFF;--uc:#0E7490;--chip:#E9EEF4;
+ --display:"Bricolage Grotesque","Arial Black",system-ui,sans-serif;--body:"Atkinson Hyperlegible","Segoe UI",system-ui,sans-serif;--mono:"IBM Plex Mono",ui-monospace,Menlo,monospace}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0B111D;--surface:#151E33;--ink:#E8EDF5;--muted:#97A3B9;--line:#26334F;--bar:#070C17;--gold:#F5C542;--money:#3CCB9F;--money-ink:#06261D;--uc:#5FC6DE;--chip:#1C2742;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0B111D;--surface:#151E33;--ink:#E8EDF5;--muted:#97A3B9;--line:#26334F;--bar:#070C17;--gold:#F5C542;--money:#3CCB9F;--money-ink:#06261D;--uc:#5FC6DE;--chip:#1C2742;color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.5}
+a{color:inherit}
+.bar{background:var(--bar);color:var(--barInk)}
+.bar .in,.wrap{max-width:1120px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.bar .in{display:flex;flex-wrap:wrap;gap:6px 18px;align-items:center;justify-content:space-between;padding-block:12px}
+.crumbs{display:flex;flex-wrap:wrap;gap:8px;font-family:var(--mono);font-size:13px;letter-spacing:.06em;text-transform:uppercase}
+.crumbs a{text-decoration:none;opacity:.8;display:inline-block;padding:10px 4px}.crumbs a:hover{opacity:1;color:var(--gold)}
+.crumbs span{opacity:.5}
+.blocks{display:inline-flex;border:1px solid rgba(255,255,255,.3);border-radius:999px;padding:3px}
+.blocks button{border:0;background:transparent;color:var(--barInk);font:700 14px var(--body);padding:10px 14px;border-radius:999px;cursor:pointer;opacity:.75}
+.blocks button[aria-pressed="true"]{background:var(--gold);color:#14213D;opacity:1}
+.head{border-left:10px solid var(--uc);padding:24px 0 6px 20px;margin-top:22px;display:grid;gap:6px}
+.eyebrow{font-family:var(--mono);font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--uc)}
+h1{font-family:var(--display);font-weight:800;font-size:clamp(32px,5vw,58px);line-height:1.02;margin:0;text-wrap:balance}
+h2{font-family:var(--display);font-weight:800;font-size:clamp(22px,2.6vw,30px);margin:0 0 10px}
+.sub{color:var(--muted);margin:0;max-width:70ch}
+.wrap{display:grid;gap:18px;padding-block:18px 48px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px 22px;min-width:0}
+.card.tgt{border:2px solid var(--uc)}
+.label{font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.tgt .big{font-family:var(--display);font-weight:700;font-size:clamp(22px,2.8vw,32px);line-height:1.2;margin:0 0 8px;text-wrap:balance}
+ul,ol{margin:0;padding-left:1.3em;display:grid;gap:4px}
+.chip{display:inline-flex;gap:8px;align-items:center;background:color-mix(in srgb,var(--uc) 14%,var(--surface));border-radius:999px;padding:5px 12px;font:600 13px var(--mono);margin-top:10px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media (max-width:820px){.two{grid-template-columns:1fr}}
+.btn{display:inline-flex;align-items:center;gap:8px;font:700 16px var(--body);text-decoration:none;padding:10px 16px;border-radius:10px;border:2px solid var(--ink);background:transparent;color:var(--ink);cursor:pointer}
+.btn.go{background:var(--gold);border-color:var(--gold);color:#14213D}
+.btn.play{background:var(--money);border-color:var(--money);color:var(--money-ink)}
+.row{display:flex;flex-wrap:wrap;gap:10px}
+.btn:focus-visible,a:focus-visible,button:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.timeline{display:flex;height:34px;border-radius:10px;overflow:hidden;border:1px solid var(--line)}
+.timeline div{display:flex;align-items:center;justify-content:center;font:600 12px var(--mono);color:#fff;overflow:hidden;white-space:nowrap;border-right:2px solid var(--surface)}
+.seg{display:grid;grid-template-columns:84px 1fr;gap:16px;padding:16px 0;border-top:1px solid var(--line)}
+.seg:first-of-type{border-top:0}
+.seg .t{font-family:var(--display);font-weight:800;font-size:28px;line-height:1;color:var(--uc)}
+.seg .t small{display:block;font:500 12px var(--mono);color:var(--muted);margin-top:4px}
+.seg h3{margin:0 0 4px;font-family:var(--display);font-size:22px}
+.seg .say{margin:0 0 8px;font-weight:700}
+.seg ul{color:var(--ink)}
+.seg .g{margin-top:8px}
+@media (max-width:560px){.seg{grid-template-columns:1fr;gap:6px}}
+.tbl{width:100%;border-collapse:collapse;font-size:16px}
+.tbl th,.tbl td{text-align:left;padding:10px 8px;border-top:1px solid var(--line);vertical-align:top}
+.tbl th{font:600 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);border-top:0}
+.scroll{overflow-x:auto}
+.vocab{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px}
+.vocab div{background:var(--chip);border-radius:10px;padding:10px 12px;font-size:15px}
+.vocab b{display:block}
+.targets{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px}
+.targets div{border:1px solid var(--line);border-left:6px solid var(--uc);border-radius:10px;padding:10px 12px}
+.targets b{font-family:var(--mono);font-size:13px;color:var(--uc)}
+.note{font-size:14px;color:var(--muted)}
+/* projector */
+#proj{position:fixed;inset:0;background:var(--bar);color:var(--barInk);z-index:50;display:grid;grid-template-rows:auto 1fr auto;padding:max(20px,env(safe-area-inset-top,0px)) max(24px,env(safe-area-inset-right,0px)) max(20px,env(safe-area-inset-bottom,0px)) max(24px,env(safe-area-inset-left,0px))}
+#proj .ptop{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;align-items:center;font-family:var(--mono);font-size:15px;opacity:.9}
+#proj .ptgt{font-family:var(--display);font-weight:600;font-size:clamp(16px,2vw,24px);color:var(--gold)}
+#proj .pmid{display:grid;align-content:center;gap:18px;max-width:1300px;margin:0 auto;width:100%}
+#proj .pname{font-family:var(--mono);font-size:clamp(14px,1.6vw,20px);letter-spacing:.14em;text-transform:uppercase;color:var(--gold)}
+#proj .psay{font-family:var(--display);font-weight:800;font-size:clamp(34px,5.4vw,80px);line-height:1.05;text-wrap:balance}
+#proj .pclock{font-family:var(--mono);font-weight:600;font-size:clamp(48px,9vw,140px);line-height:1;font-variant-numeric:tabular-nums}
+#proj .pclock.low{color:#FF8A73}
+#proj .pbar{height:10px;background:rgba(255,255,255,.15);border-radius:99px;overflow:hidden}
+#proj .pbar i{display:block;height:100%;background:var(--gold);width:0}
+#proj .pctl{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+#proj .pctl button{font:700 17px var(--body);padding:12px 20px;border-radius:12px;border:2px solid rgba(255,255,255,.4);background:transparent;color:var(--barInk);cursor:pointer}
+#proj .pctl button.go{background:var(--gold);border-color:var(--gold);color:#14213D}
+#proj .pgames{display:flex;gap:10px;flex-wrap:wrap}
+#proj .pgames a{background:var(--money);color:var(--money-ink);text-decoration:none;font-weight:700;padding:10px 16px;border-radius:10px}
+</style>
+<div class="bar"><div class="in"><nav class="crumbs" aria-label="Breadcrumb"><a href="/">Arcade</a> <span>/</span> <a href="/daily-agenda/">Daily Agenda</a> <span>/</span> <b>Unit 2</b></nav><div class="blocks" role="group" aria-label="Which blocks"><button id="bA" aria-pressed="true">Blocks 1 &amp; 3</button><button id="bB" aria-pressed="false">Blocks 5 &amp; 7</button></div></div></div><div class="wrap">
+<header class="head"><div class="eyebrow">Unit 2 · 4 class days · January 15 – 27, 2027</div><h1>The Markets</h1>
+<p class="sub"><b>Essential question:</b> How do stocks trade, how do we measure the market, and what does history teach about staying invested?</p></header>
+<section class="card"><h2>Lessons</h2><div class="scroll"><table class="tbl"><thead><tr><th>Day</th><th>Lesson &amp; learning target</th><th>Targets</th><th>Due</th></tr></thead><tbody><tr><td><b>Day 5</b><br><span class="note" data-a="Fri, Jan 15" data-b="Tue, Jan 19">Fri, Jan 15</span></td><td><a href="/lessons/day-5/"><b>How Stocks Trade</b></a><br><span class="note">I can explain how a stock trade happens and choose the right order type.</span></td><td>2.1 · 2.2</td><td>—</td></tr><tr><td><b>Day 6</b><br><span class="note" data-a="Wed, Jan 20" data-b="Thu, Jan 21">Wed, Jan 20</span></td><td><a href="/lessons/day-6/"><b>Quotes, Indexes and Market Cap</b></a><br><span class="note">I can read a stock quote and explain what an index and market cap tell me.</span></td><td>2.3 · 2.4</td><td>—</td></tr><tr><td><b>Day 7</b><br><span class="note" data-a="Fri, Jan 22" data-b="Mon, Jan 25">Fri, Jan 22</span></td><td><a href="/lessons/day-7/"><b>Competition Launch</b></a><br><span class="note">I can join the D214 Investing Competition and make first trades with a written reason.</span></td><td>2.1 · 2.2 · 2.3</td><td>—</td></tr><tr><td><b>Day 8</b><br><span class="note" data-a="Tue, Jan 26" data-b="Wed, Jan 27">Tue, Jan 26</span></td><td><a href="/lessons/day-8/"><b>Bulls, Bears and Bubbles + Unit 2 Quiz</b></a><br><span class="note">I can use market history to explain bulls, bears and bubbles and why staying invested matters.</span></td><td>2.5 · Unit 2 Quiz</td><td>Unit 2 Quiz · Trading Journal · Reading guide: Schwab timing study</td></tr></tbody></table></div>
+<p class="note" style="margin:10px 0 0">Click a day for its plan, slides and guided notes.</p></section>
+<section class="card"><h2>Learning targets in this unit</h2><div class="targets"><div><b>2.1</b><br><b style='font-family:var(--display);font-size:17px;color:var(--ink)'>How a trade happens</b><br>Explain exchanges, tickers, bid, ask and spread.</div><div><b>2.2</b><br><b style='font-family:var(--display);font-size:17px;color:var(--ink)'>Order types &amp; risk</b><br>Choose a market, limit or stop order and explain the risks of margin and short selling.</div><div><b>2.3</b><br><b style='font-family:var(--display);font-size:17px;color:var(--ink)'>Reading a quote</b><br>Read a stock quote, calculate market cap and sort companies by size and sector.</div><div><b>2.4</b><br><b style='font-family:var(--display);font-size:17px;color:var(--ink)'>Indexes</b><br>Explain what the Dow, S&amp;P 500 and Nasdaq measure.</div><div><b>2.5</b><br><b style='font-family:var(--display);font-size:17px;color:var(--ink)'>Market history</b><br>Use bulls, bears and bubbles to calculate losses and recoveries and explain staying invested.</div></div></section>
+<section class="card"><h2>Key vocabulary</h2><div class="vocab"><div><b>Exchange</b>A marketplace where shares trade, such as the NYSE or Nasdaq.</div><div><b>Ticker</b>A company&#x27;s short trading code, such as AAPL for Apple.</div><div><b>Bid / ask / spread</b>Bid: the most a buyer will pay. Ask: the least a seller will take. Spread: ask − bid.</div><div><b>Market order</b>Buy or sell right now at the best available price.</div><div><b>Limit order</b>Buy or sell only at your price or better. It may never fill.</div><div><b>Stop order</b>Becomes a market order when the price hits your stop. Used to limit losses.</div><div><b>Margin</b>Buying with borrowed money. Gains and losses both get bigger.</div><div><b>Short selling</b>Selling borrowed shares, hoping to buy them back cheaper. Losses have no upper limit.</div><div><b>Market cap</b>Price × shares outstanding. Large &gt; $10B, mid $2–$10B, small &lt; $2B.</div><div><b>Sector</b>A group of similar businesses. The S&amp;P 500 uses 11 sectors.</div><div><b>Index</b>A basket that tracks part of the market: the Dow (30 companies), S&amp;P 500 (about 500), Nasdaq Composite (tech-heavy).</div><div><b>Bull / bear market</b>Bull: a long rise. Bear: a drop of 20% or more.</div><div><b>Correction</b>A drop of 10% or more from a recent high.</div><div><b>Bubble</b>Prices pushed far above what businesses are worth by excitement and fear of missing out.</div></div></section>
+<div class="two">
+<section class="card"><h2>Practice games</h2><div class="row"><a class="btn play" href="/games/order-type-scenarios/" target="_blank" rel="noopener">Order-type scenarios ↗</a><a class="btn play" href="/games/quote-scavenger-hunt/" target="_blank" rel="noopener">Quote scavenger hunt ↗</a><a class="btn play" href="/games/market-desk/" target="_blank" rel="noopener">Market Desk ↗</a></div></section>
+<section class="card"><h2>Assessment</h2><p style="margin:0">Unit 2 Quiz on Day 8 (bid, ask and spread; order types, margin and short selling; reading a quote and market cap; indexes; bulls, bears and bubbles + CER). Scored out of 20 · SBG: 1.0 = 18–20 · 0.85 = 16–17.5 · 0.70 = 14–15.5 · 0.55 = 13.5 or less. Below 1.0? Complete the Reassessment Ticket, get it signed, then take Version B. Your higher score counts.</p></section>
+</div>
+<section class="card"><h2>Materials</h2><ul><li><a href="/units/unit-2/slides/day-5/"><b>Day 5 slides: How Stocks Trade</b></a></li><li><a href="/units/unit-2/slides/day-6/"><b>Day 6 slides: Quotes, Indexes and Market Cap</b></a></li><li><a href="/units/unit-2/slides/day-7/"><b>Day 7 slides: Competition Launch</b></a></li><li><a href="/units/unit-2/slides/day-8/"><b>Day 8 slides: Bulls, Bears and Bubbles</b></a></li><li><a href="/units/unit-2/notes/"><b>Unit 2 Guided Notes (PDF for Notability or print; one per day)</b></a></li><li><a href="/units/unit-2/case-study.pdf"><b>Case study: The Dot-com Bubble (PDF)</b></a></li><li><a href="/units/unit-2/trading-journal.pdf"><b>Portfolio Piece 2: My Trading Journal (PDF)</b></a></li><li><a href="/units/unit-2/reading-guide.pdf"><b>Reading guide: “Does Market Timing Work?” (PDF)</b></a></li><li><a href="https://www.schwab.com/learn/story/does-market-timing-work" target="_blank" rel="noopener">Article: Schwab Center for Financial Research, “Does Market Timing Work?” (July 18, 2025) ↗</a></li><li><a href="/reading-checks/#d8"><b>Reading check (5 questions)</b></a></li><li><a href="https://d214-stock-sim.vercel.app/" target="_blank" rel="noopener">D214 Investing Competition ↗</a></li><li><a href="https://stock-simulator-teal.vercel.app/sign-in" target="_blank" rel="noopener">Stock Simulator (historical rounds) ↗</a></li><li><a href="https://www.investor.gov/introduction-investing" target="_blank" rel="noopener">Investor.gov (SEC): investing basics ↗</a></li><li><a href="https://www.finra.org/investors" target="_blank" rel="noopener">FINRA: For Investors ↗</a></li><li><a href="https://www.marketplace.org/" target="_blank" rel="noopener">Marketplace: business and economy news ↗</a></li><li><a href="https://www.finra.org/investors/investing/investment-products/stocks" target="_blank" rel="noopener">Go deeper: FINRA, Stocks ↗</a></li></ul></section>
+</div><script>
+(function(){let blk="a";try{const s=localStorage.getItem("fi-agenda-blk");if(s==="a"||s==="b")blk=s}catch(e){}
+function set(b){blk=b;try{localStorage.setItem("fi-agenda-blk",b)}catch(e){}document.querySelectorAll("[data-a]").forEach(x=>x.textContent=x.dataset[b]);
+document.getElementById("bA").setAttribute("aria-pressed",b==="a");document.getElementById("bB").setAttribute("aria-pressed",b==="b");}
+document.getElementById("bA").onclick=()=>set("a");document.getElementById("bB").onclick=()=>set("b");set(blk);})();
+</script>
+</body></html>
