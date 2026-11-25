@@ -1,4 +1,3 @@
-json
 {
   "rewrites": [
     { "source": "/units/:u/cases/:f", "destination": "/:u/cases/:f" }
