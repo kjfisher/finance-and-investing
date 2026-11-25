@@ -135,6 +135,7 @@ function todayIndex(){const now=new Date(); now.setHours(0,0,0,0);
   for(let i=0;i<ROWS.length;i++){ if(toDate(ROWS[i][blk])>=now) return i; } return ROWS.length-1;}
 function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
 /* Market Monday: 5-minute competition check-in on each block's first class of the week, after launch (Day 7), skipping exam and event days. */
+function firstOfWeek(i){return i===0||monday(toDate(ROWS[i][blk]))!==monday(toDate(ROWS[i-1][blk]));}
 function isMarketMonday(i){const r=ROWS[i]; if(r.day<8||r.day>44||r.day===19||r.day===29) return false;
   const prev=ROWS[i-1]; return monday(toDate(r[blk]))!==monday(toDate(prev[blk]));}
 function gameHtml([n,u]){
@@ -150,6 +151,7 @@ function render(){
   const b=document.getElementById("board");
   b.innerHTML=`<div class="head"><div class="meta"><span>Day ${r.day} of 45</span><span>·</span><span>${fmt(dt)}</span><span>·</span><span class="unit">${esc(r.unitName)}</span></div>
     <h1>${esc(r.lesson)}</h1><div class="note">${when}${r.day===1?" · Shortened day: all blocks meet (about 45 minutes)":""}${r.day===29?" · Event day: all blocks attend":""}${blk==="b"&&r.bnote?" · "+esc(r.bnote):""}</div>${r.plan_url?`<div class="links"><a href="${r.plan_url}">📋 Today's lesson: slides + notes</a><a href="${r.slides_url}">▶ Slides</a>${r.unit_url?`<a href="${r.unit_url}">Unit page</a>`:""}</div>`:""}</div>
+    ${!mm&&firstOfWeek(cur)&&cwFor(dt)?(c=>`<div class="mm" style="margin-top:18px"><b>Case of the Week</b><span>🗂️ <a href="${c[1]}" target="_blank" rel="noopener">${esc(c[0])} ↗</a> (about 15–20 min, or homework) · <a href="${c[2]}" target="_blank" rel="noopener">Supported ↗</a></span></div>`)(cwFor(dt)):""}
     ${mm?`<div class="mm" style="margin-top:18px"><b>Market Monday</b><span>5-minute market check-in: skim today's <a href="https://www.investopedia.com/" target="_blank" rel="noopener">Investopedia “5 Things to Know Before the Stock Market Opens” ↗</a> (search the title), open the <a href="${COMP}" target="_blank" rel="noopener">D214 Investing Competition ↗</a>, and fill one row of your <a href="https://214-finance-and-investing.vercel.app/handouts/market-monday-log.pdf" target="_blank" rel="noopener">Market Monday Reading Log ↗</a>: one of the 5 things, the course idea it connects to, and your total return.${(c=>c?`<br><b style="display:inline">🗂️ Case of the Week:</b> <a href="${c[1]}" target="_blank" rel="noopener">${esc(c[0])} ↗</a> (about 15–20 min, or homework) · <a href="${c[2]}" target="_blank" rel="noopener">Supported ↗</a>`:"")(cwFor(dt))}</span></div>`:""}
     <div class="lt" style="margin-top:18px"><div class="label">Learning target</div><p class="tgt">${esc(r.target)}</p>
       <div class="label" style="margin-top:4px">Success criteria</div><ul>${r.criteria.map(c=>`<li>${esc(c)}</li>`).join("")}</ul>
