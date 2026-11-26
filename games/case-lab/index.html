@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Case Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,500..800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Layout: case-file header, a grid of 8 case folders (one per unit, in the site's unit colors), the open case below with its simulator. */
+:root{
+  --bg:#f4f4f2; --surface:#ffffff; --sunk:#ebebe7; --ink:#191a17; --muted:#5e605a; --line:#dadad4;
+  --accent:#23407e; --accent-ink:#ffffff; --accent-soft:#e1e7f5;
+  --gain:#0f7a55; --gain-soft:#dcf3ea; --loss:#b8352a; --loss-soft:#fbe5e2; --mid:#9a6a08; --mid-soft:#fbf0d6;
+  --u1:#2F7D46; --u2:#0E7490; --u3:#5A6A1E; --u4:#6B2E5E; --u5:#A64B24; --u6:#6B4FB0; --u7:#9C3420; --u8:#2E6B5E;
+  --display:"Archivo",system-ui,sans-serif; --body:"Source Sans 3",system-ui,sans-serif; --mono:"JetBrains Mono",ui-monospace,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#111210; --surface:#1a1b19; --sunk:#232521; --ink:#ecece6; --muted:#a3a59c; --line:#33352f;
+  --accent:#A9B9DD; --accent-ink:#111210; --accent-soft:#232c45;
+  --gain:#41cf97; --gain-soft:#12352a; --loss:#ff7b6e; --loss-soft:#3d1c1a; --mid:#f0be55; --mid-soft:#3a2e12;
+  --u1:#6CCB8A; --u2:#5FC6DE; --u3:#C2D27A; --u4:#D98BC9; --u5:#F09A72; --u6:#B9A2F0; --u7:#F08A73; --u8:#7FD1BD; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#111210; --surface:#1a1b19; --sunk:#232521; --ink:#ecece6; --muted:#a3a59c; --line:#33352f;
+  --accent:#A9B9DD; --accent-ink:#111210; --accent-soft:#232c45;
+  --gain:#41cf97; --gain-soft:#12352a; --loss:#ff7b6e; --loss-soft:#3d1c1a; --mid:#f0be55; --mid-soft:#3a2e12;
+  --u1:#6CCB8A; --u2:#5FC6DE; --u3:#C2D27A; --u4:#D98BC9; --u5:#F09A72; --u6:#B9A2F0; --u7:#F08A73; --u8:#7FD1BD; color-scheme:dark}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.5}
+[hidden]{display:none!important}
+.wrap{max-width:1040px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.1}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.back{display:inline-block;margin-bottom:10px;font-weight:600;color:var(--accent);text-decoration:none}
+.back:hover{text-decoration:underline}
+.file{border:2px solid var(--ink);border-radius:4px;background:var(--surface);padding:18px 20px;position:relative}
+.file::before{content:"CASE FILES";position:absolute;top:-12px;left:18px;background:var(--ink);color:var(--bg);font:700 11px var(--mono);letter-spacing:.16em;padding:4px 10px;border-radius:3px}
+.eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.file h1{font-size:clamp(34px,6vw,54px);font-stretch:120%;font-weight:800;letter-spacing:-.01em}
+.file p{margin:4px 0 0;color:var(--muted);max-width:64ch}
+.folders{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:20px 0}
+@media (max-width:820px){.folders{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.folder{text-align:left;font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px;cursor:pointer;display:grid;gap:4px;min-height:96px;align-content:start}
+.folder .u{font:700 12px var(--mono);color:var(--c);letter-spacing:.06em}
+.folder b{font:700 16px var(--display);line-height:1.2}
+.folder small{color:var(--muted);font-size:13px}
+.folder[aria-current="true"]{border:2px solid var(--c);background:var(--sunk);padding:11px}
+.folder:focus-visible,button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.case{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:20px;border-top:6px solid var(--c)}
+.case-head{display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px;align-items:start}
+.case-head h2{font-size:clamp(26px,4vw,34px);font-stretch:110%}
+.meta{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 0}
+.tagc{font:700 12px var(--mono);padding:3px 8px;border-radius:4px;background:var(--sunk);color:var(--muted)}
+.tagc.u{color:var(--c)}
+.lede{font-size:18px;max-width:66ch;margin:12px 0 0}
+.links{display:flex;flex-wrap:wrap;gap:8px}
+.lk{font:700 14px var(--body);color:var(--ink);text-decoration:none;border:1px solid var(--line);border-radius:8px;padding:8px 12px;min-height:40px;display:inline-flex;align-items:center;background:var(--surface)}
+.lk:hover{border-color:var(--c)}
+.sim{margin-top:18px;display:grid;grid-template-columns:minmax(0,320px) minmax(0,1fr);gap:16px}
+.sim.one{grid-template-columns:minmax(0,1fr)}
+@media (max-width:760px){.sim{grid-template-columns:minmax(0,1fr)}}
+.box{background:var(--sunk);border-radius:10px;padding:14px;min-width:0}
+.box.w{background:var(--surface);border:1px solid var(--line)}
+.lbl{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:700;margin:0 0 8px}
+.ctl{display:grid;gap:2px;margin-bottom:12px}
+.ctl label{display:flex;justify-content:space-between;gap:8px;font-weight:600}
+.ctl label .num{color:var(--c)}
+input[type=range]{width:100%;accent-color:var(--c);height:32px}
+.btn{font:700 15px var(--body);min-height:42px;padding:8px 14px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.btn.primary{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.btn[aria-pressed="true"]{border:2px solid var(--c);padding:7px 13px;background:var(--surface)}
+.btnrow{display:flex;flex-wrap:wrap;gap:8px}
+.readouts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.readouts.three{grid-template-columns:repeat(3,minmax(0,1fr))}
+@media (max-width:520px){.readouts.three{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.ro{background:var(--surface);border-radius:8px;padding:10px 12px;min-width:0;border:1px solid var(--line)}
+.ro span{display:block;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.ro b{font:700 21px var(--mono);overflow-wrap:anywhere}
+.ro.good b{color:var(--gain)} .ro.bad b{color:var(--loss)}
+.callout{margin-top:12px;padding:12px 14px;border-radius:8px;background:var(--sunk);font-size:16px}
+.callout.good{background:var(--gain-soft)} .callout.bad{background:var(--loss-soft)} .callout.mid{background:var(--mid-soft)}
+.note{font-size:14px;color:var(--muted);margin:8px 0 0}
+.hbars{display:grid;gap:10px;margin-top:6px}
+.hb{display:grid;grid-template-columns:110px 1fr;gap:10px;align-items:center;font-size:15px}
+.hb .tr{background:var(--sunk);border-radius:6px;height:30px;position:relative;overflow:hidden}
+.box .hb .tr{background:var(--surface)}
+.hb .tr i{position:absolute;left:0;top:0;bottom:0;border-radius:6px;transition:width .35s}
+.hb .tr em{position:absolute;right:8px;top:50%;transform:translateY(-50%);font:700 14px var(--mono);font-style:normal}
+table.data{width:100%;border-collapse:collapse;font-size:15px}
+table.data th,table.data td{padding:7px 8px;border-top:1px solid var(--line);text-align:right;font-variant-numeric:tabular-nums}
+table.data th:first-child,table.data td:first-child{text-align:left}
+table.data th{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);border-top:0}
+table.data td{font-family:var(--mono);font-size:14px}
+table.data td:first-child{font-family:var(--body);font-size:15px}
+table.data tr.on td{background:var(--sunk);font-weight:700}
+.scroll{overflow-x:auto}
+.dots{display:grid;grid-template-columns:repeat(20,minmax(0,1fr));gap:3px;max-width:420px}
+.dots i{aspect-ratio:1;border-radius:50%;background:var(--line);transition:background .3s}
+.dots i.t{background:var(--loss)}
+.dots i.b{background:var(--gain)}
+.steps{display:grid;gap:8px}
+.step{display:grid;grid-template-columns:auto 1fr;gap:12px;padding:10px 12px;border-radius:8px;background:var(--surface);border:1px solid var(--line);opacity:.45;transition:opacity .3s}
+.step.on{opacity:1;border-color:var(--c)}
+.step .d{font:700 13px var(--mono);color:var(--c);white-space:nowrap}
+.flags{display:grid;gap:8px}
+.flag{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:10px 12px;border-radius:8px;background:var(--surface);border:1px solid var(--line)}
+.flag.right{background:var(--gain-soft);border-color:var(--gain)} .flag.wrong{background:var(--loss-soft);border-color:var(--loss)}
+.flag .two{display:flex;gap:6px}
+.flag .why{grid-column:1/-1;font-size:14.5px;color:var(--muted)}
+.predict{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:8px}
+svg text{font-family:var(--body);fill:var(--muted);font-size:12px}
+svg .lbl2{fill:var(--ink);font-weight:700}
+.chart{width:100%;height:auto;display:block}
+.take{margin-top:18px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px}
+@media (max-width:760px){.take{grid-template-columns:minmax(0,1fr)}}
+.take .box p{margin:0}
+.src{font-size:13px;color:var(--muted);margin-top:14px}
+.foot{margin-top:28px;color:var(--muted);font-size:14px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="/">← F&amp;I Arcade</a>
+  <header class="file">
+    <div class="eyebrow">Finance &amp; Investing · D214 · Units 1–8</div>
+    <h1>Case Lab</h1>
+    <p>Step inside the eight unit case studies. Every simulator uses the real numbers from the case you read in class. Change one thing and watch what happens, then answer the "Your call" question with evidence.</p>
+  </header>
+
+  <nav class="folders" id="folders" aria-label="Choose a case"></nav>
+  <article class="case" id="case"></article>
+
+  <p class="foot">Built for Finance &amp; Investing at Elk Grove High School (D214). Case numbers come from the class case studies and their listed sources. Where a simulator needs an assumption, it says so on screen.</p>
+</div>
+
+<script>
+(function(){
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const money=(v,d)=>{const neg=v<0;v=Math.abs(v);const dec=d!=null?d:(Math.abs(v-Math.round(v))<1e-9?0:2);return (neg?"−":"")+"$"+v.toLocaleString("en-US",{minimumFractionDigits:dec,maximumFractionDigits:dec})};
+const pct=(v,d=1)=>{let s=(+v).toFixed(d);if(s.includes("."))s=s.replace(/\.?0+$/,"");return s.replace("-","−")+"%"};
+const bil=v=>"$"+(+v.toFixed(1)).toLocaleString("en-US")+"B";
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const store={get(k,d){try{const v=localStorage.getItem("caselab-"+k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem("caselab-"+k,JSON.stringify(v))}catch(e){}}};
+function bar(label,val,max,col,txt){const w=Math.max(0,Math.min(100,val/max*100));return `<div class="hb"><span>${label}</span><span class="tr"><i style="width:${w}%;background:${col}"></i><em>${txt}</em></span></div>`}
+function passport(){try{const P=JSON.parse(localStorage.getItem("fi-passport"))||{s:{}};const seen=store.get("seen",[]);const e={n:seen.length,best:seen.length,of:8,t:Date.now()};P.s["case-lab"]=e;localStorage.setItem("fi-passport",JSON.stringify(P))}catch(e){}}
+
+const CASES=[
+/* ---------------- UNIT 1 ---------------- */
+{id:"inflation",u:1,title:"Cash and the 2021–2023 Inflation Spike",yrs:"2020–2023",tg:"1.3 · 1.5",day:2,pdf:"/units/unit-1/case-study.pdf",
+ lede:"Sam saved $10,000 and parked it in an insured savings account. He never lost a dollar. Then prices rose 17.8% in three years.",
+ call:"Sam says: “From now on, I'll keep all of my money in savings.” Is that a good plan for all of his money? Use two numbers from this simulator.",
+ big:"A savings account protects your dollars, not your buying power. Money you won't need for years has to earn more than inflation.",
+ src:"Bureau of Labor Statistics (CPI); national average savings rates, as given in the class case.",
+ render(el){
+  el.innerHTML=`<div class="sim"><div class="box">
+   <div class="ctl"><label for="i-r">Sam's savings rate per year <span class="num" id="iv-r"></span></label><input type="range" id="i-r" min="0" max="8" step="0.1" value="0.2"></div>
+   <div class="btnrow"><button class="btn" id="i-real">Use the real rates (≈0.2%/yr)</button><button class="btn" id="i-even">Find the break-even rate</button></div>
+   <p class="note">The case's real savings rates were 0.06%, 0.30% and 0.46%, about $60 total on $10,000.</p></div>
+   <div class="box w"><div class="readouts three"><div class="ro"><span>Balance, Dec 2023</span><b id="i-bal"></b></div><div class="ro" id="i-bpbox"><span>Buying power (2020 $)</span><b id="i-bp"></b></div><div class="ro" id="i-rrbox"><span>Real return, 3 yrs</span><b id="i-rr"></b></div></div>
+   <div class="hbars" style="margin-top:12px" id="i-bars"></div>
+   <div class="scroll" style="margin-top:12px"><table class="data"><thead><tr><th>December</th><th>CPI change</th><th>Savings rate</th><th>$100 cart costs</th></tr></thead><tbody>
+   <tr><td>2020</td><td>—</td><td>—</td><td>$100.00</td></tr><tr><td>2021</td><td>7.0%</td><td>0.06%</td><td>$107.04</td></tr><tr><td>2022</td><td>6.5%</td><td>0.30%</td><td>$113.94</td></tr><tr class="on"><td>2023</td><td>3.4%</td><td>0.46%</td><td>$117.76</td></tr></tbody></table></div>
+   <div class="callout" id="i-msg"></div></div></div>`;
+  const r=$("#i-r");
+  const draw=()=>{const rate=+r.value,real=Math.abs(rate-0.2)<0.001;const bal=real?10060:10000*Math.pow(1+rate/100,3),bp=bal/1.1776,rr=(bal/10000-1)*100-17.8;
+   $("#iv-r").textContent=real?"≈0.2% (real)":pct(rate,1);$("#i-bal").textContent=money(bal,0);$("#i-bp").textContent=money(bp,0);$("#i-rr").textContent=(rr>0?"+":"")+pct(rr,1);
+   $("#i-bpbox").className="ro "+(bp<10000?"bad":"good");$("#i-rrbox").className="ro "+(rr<0?"bad":"good");
+   $("#i-bars").innerHTML=bar("Dollars",bal,13000,css("--muted"),money(bal,0))+bar("Buying power",bp,13000,`var(--c)`,money(bp,0));
+   $("#i-msg").className="callout "+(bp<10000?"bad":"good");
+   $("#i-msg").innerHTML=bp<10000?`Sam keeps every dollar but loses <b class="num">${money(10000-bp,0)}</b> of buying power. ${real?"That's the case's answer: about $1,457.":""}`:`At ${pct(rate,1)} a year Sam's money keeps up with prices. He'd need about <b>5.6%</b> a year just to break even, far above any savings account in 2021–2023.`};
+  r.oninput=draw;$("#i-real").onclick=()=>{r.value=0.2;draw()};$("#i-even").onclick=()=>{r.value=5.6;draw()};draw();
+ }},
+/* ---------------- UNIT 2 ---------------- */
+{id:"dotcom",u:2,title:"The Dot-com Bubble",yrs:"1995–2002",tg:"2.5",day:8,pdf:"/units/unit-2/case-study.pdf",
+ lede:"The Nasdaq hit a record 5,048.62 on March 10, 2000. By October 2002 it had fallen about 78%. It didn't beat that record until April 2015.",
+ call:"Your friend wants to sell everything after a 30% drop. Use one crash from the table and the recovery math to argue for or against.",
+ big:"Losses take bigger gains to recover. Every crash in the table recovered, but some took months and others took decades.",
+ src:"Index closing values as listed in the class case (Dow Jones, Nasdaq Composite, S&P 500).",
+ render(el){
+  const CR=[{k:"1929",n:"Dow Jones",pk:"381.17 (Sept 3, 1929)",bt:"41.22 (July 8, 1932)",d:89,rec:"Nov 23, 1954",yrs:"25 years"},{k:"2000",n:"Nasdaq Composite",pk:"5,048.62 (Mar 10, 2000)",bt:"about 1,110 (Oct 2002)",d:78,rec:"Apr 23, 2015",yrs:"15 years"},{k:"2007",n:"S&P 500",pk:"1,565.15 (Oct 9, 2007)",bt:"676.53 (Mar 9, 2009)",d:57,rec:"2013",yrs:"about 5½ years"},{k:"2020",n:"S&P 500",pk:"3,386.15 (Feb 19, 2020)",bt:"about 34% lower (Mar 23, 2020)",d:34,rec:"Aug 18, 2020",yrs:"6 months"}];
+  el.innerHTML=`<div class="sim"><div class="box"><p class="lbl">Pick a crash</p><div class="btnrow" id="d-pick">${CR.map(c=>`<button class="btn" data-k="${c.k}" aria-pressed="${c.k==="2000"}">${c.k}</button>`).join("")}</div>
+   <div class="ctl" style="margin-top:14px"><label for="d-amt">You invested at the peak <span class="num" id="dv-amt"></span></label><input type="range" id="d-amt" min="1000" max="50000" step="1000" value="10000"></div>
+   <div class="ctl"><label for="d-drop">Or try any drop <span class="num" id="dv-drop"></span></label><input type="range" id="d-drop" min="5" max="95" step="1" value="78"></div></div>
+   <div class="box w"><div id="d-info" class="note" style="margin:0 0 10px;font-size:15px"></div>
+   <div class="readouts three"><div class="ro bad"><span>Value at the bottom</span><b id="d-bot"></b></div><div class="ro"><span>Gain needed to get even</span><b id="d-need"></b></div><div class="ro"><span>Time to a new high</span><b id="d-time"></b></div></div>
+   <svg class="chart" id="d-svg" viewBox="0 0 560 200" style="margin-top:12px" role="img" aria-label="Peak, bottom and recovery"></svg>
+   <div class="callout" id="d-msg"></div></div></div>`;
+  let cur=CR[1],custom=false;const amt=$("#d-amt"),dr=$("#d-drop");
+  const draw=()=>{const A=+amt.value,d=custom?+dr.value:cur.d,bot=A*(1-d/100),need=d/(100-d)*100;
+   $("#dv-amt").textContent=money(A);$("#dv-drop").textContent=custom?"−"+d+"%":"(using "+cur.k+")";
+   $("#d-info").innerHTML=custom?`A made-up drop of ${d}%.`:`<b>${cur.k} · ${cur.n}:</b> ${cur.pk} → ${cur.bt}. Drop: <b>−${cur.d}%</b>.`;
+   $("#d-bot").textContent=money(bot,0);$("#d-need").textContent="+"+pct(need,0);$("#d-time").textContent=custom?"?":cur.yrs;
+   const ink=css("--ink"),c=css("--c"),ln=css("--line"),L=40,W=560,T=24,H=170,Y=v=>T+(1-v/A)*(H-T);
+   $("#d-svg").innerHTML=`<line x1="${L}" x2="${W-10}" y1="${Y(A)}" y2="${Y(A)}" stroke="${ln}" stroke-dasharray="4 4"/><text x="${W-10}" y="${Y(A)-6}" text-anchor="end">${money(A)} peak</text>
+     <path d="M${L} ${Y(A)} L${L+150} ${Y(bot)} L${W-60} ${Y(A)}" fill="none" stroke="${c}" stroke-width="3"/>
+     <circle cx="${L}" cy="${Y(A)}" r="5" fill="${ink}"/><circle cx="${L+150}" cy="${Y(bot)}" r="6" fill="${css("--loss")}"/><circle cx="${W-60}" cy="${Y(A)}" r="6" fill="${css("--gain")}"/>
+     <text x="${L+150}" y="${Math.min(H+18,Y(bot)+20)}" text-anchor="middle" class="lbl2">${money(bot,0)} (−${d}%)</text>
+     <text x="${(L+150+W-60)/2+20}" y="${(Y(bot)+Y(A))/2}" class="lbl2">needs +${pct(need,0)}</text>
+     <text x="${W-60}" y="${Y(A)-12}" text-anchor="middle">${custom?"back to even":cur.rec}</text>`;
+   $("#d-msg").innerHTML=`Selling at the bottom locks in <b class="num">${money(bot,0)}</b>, a loss of <b class="num">${money(A-bot,0)}</b>. Holding a broad fund ${custom?"waits for a recovery":`got back to ${money(A)} by ${cur.rec}`}. Notice the gain needed (+${pct(need,0)}) is much bigger than the drop (−${d}%).`};
+  $$("#d-pick .btn").forEach(b=>b.onclick=()=>{cur=CR.find(c=>c.k===b.dataset.k);custom=false;dr.value=cur.d;$$("#d-pick .btn").forEach(x=>x.setAttribute("aria-pressed",x===b));draw()});
+  amt.oninput=draw;dr.oninput=()=>{custom=true;$$("#d-pick .btn").forEach(x=>x.setAttribute("aria-pressed",false));draw()};draw();
+ }},
+/* ---------------- UNIT 3 ---------------- */
+{id:"costco",u:3,title:"Costco vs. Target",yrs:"2024",tg:"3.1–3.4",day:11,pdf:"/units/unit-3/case-study.pdf",
+ lede:"Same shoppers, different businesses. Costco sells memberships and big packs at tiny markups; Target wins with convenience and its own brands. Here are their real 10-K numbers.",
+ call:"Which is the better business to own, Costco or Target? Use at least two ratios you calculated as evidence.",
+ big:"Ratios let you compare companies of different sizes. Costco's membership fees are a huge share of its profit, which is a moat.",
+ src:"Each company's year-end earnings release (Costco: year ended Sept 1, 2024; Target: year ended Feb 1, 2025), in millions of dollars.",
+ render(el){
+  const D={c:{rev:254453,mem:4828,ni:7367,eps:16.56,as:69831,li:46209,eq:23622,ca:34246,cl:35464,cfo:11339,cap:4710},t:{rev:106566,mem:0,ni:4091,eps:8.86,as:57769,li:43103,eq:14666,ca:19454,cl:20799,cfo:7367,cap:2891}};
+  const M=[
+   {k:"pm",n:"Profit margin",f:x=>x.ni/x.rev*100,fmt:v=>pct(v,2),how:x=>`${x.ni.toLocaleString()} ÷ ${x.rev.toLocaleString()}`,formula:"net income ÷ revenue",lo:false,why:"Target keeps more of each sales dollar. Costco's low markups are the point: it earns its profit from membership fees and huge volume."},
+   {k:"eps",n:"EPS",f:x=>x.eps,fmt:v=>money(v,2),how:x=>"reported, diluted",formula:"net income ÷ shares",lo:false,why:"Costco earns more per share. EPS alone can't compare companies, since share counts differ; that's why we use P/E with price."},
+   {k:"de",n:"Debt-to-equity",f:x=>x.li/x.eq,fmt:v=>v.toFixed(2),how:x=>`${x.li.toLocaleString()} ÷ ${x.eq.toLocaleString()}`,formula:"liabilities ÷ equity",lo:true,why:"Target uses more borrowed money for each dollar of equity, which means more risk if sales slow."},
+   {k:"cr",n:"Current ratio",f:x=>x.ca/x.cl,fmt:v=>v.toFixed(2),how:x=>`${x.ca.toLocaleString()} ÷ ${x.cl.toLocaleString()}`,formula:"current assets ÷ current liabilities",lo:false,why:"Both are just under 1. For giant retailers that sell inventory before they pay suppliers, that's normal; it would worry you more at a small company."},
+   {k:"fcf",n:"Free cash flow",f:x=>x.cfo-x.cap,fmt:v=>"$"+Math.round(v).toLocaleString()+"M",how:x=>`${x.cfo.toLocaleString()} − ${x.cap.toLocaleString()}`,formula:"cash from operations − spending on property & equipment",lo:false,why:"Costco produces more spare cash after investing in stores, money it can use for dividends, buybacks or growth."},
+   {k:"mem",n:"Membership fees ÷ net income",f:x=>x.mem/x.ni*100,fmt:v=>pct(v,0),how:x=>x.mem?`${x.mem.toLocaleString()} ÷ ${x.ni.toLocaleString()}`:"no membership fees",formula:"membership fees ÷ net income",lo:false,why:"Costco's $4.8 billion in membership fees equal about two-thirds of its net income. That steady, prepaid money is a big part of its moat."}
+  ];
+  el.innerHTML=`<div class="sim one"><div class="box"><p class="lbl">1. Pick a measure</p><div class="btnrow" id="c-pick">${M.map((m,i)=>`<button class="btn" data-i="${i}" aria-pressed="${i===0}">${m.n}</button>`).join("")}</div>
+   <p class="lbl" style="margin-top:14px">2. Predict: which company is ${"<span id='c-dir'>higher</span>"}?</p><div class="predict" id="c-pred"><button class="btn" data-p="c">Costco</button><button class="btn" data-p="t">Target</button><button class="btn" id="c-skip">Just show me</button></div>
+   <div id="c-out" style="margin-top:12px"></div></div>
+   <details class="box w"><summary style="cursor:pointer;font-weight:700;min-height:40px;display:flex;align-items:center">See the full 10-K table</summary><div class="scroll"><table class="data"><thead><tr><th>Millions of dollars</th><th>Costco</th><th>Target</th></tr></thead><tbody>
+   ${[["Total revenue","rev"],["Membership fees","mem"],["Net income","ni"],["Diluted EPS","eps"],["Total assets","as"],["Total liabilities","li"],["Shareholders' equity","eq"],["Current assets","ca"],["Current liabilities","cl"],["Cash from operations","cfo"],["Spent on property & equipment","cap"]].map(([n,k])=>`<tr><td>${n}</td><td>${k==="eps"?"$"+D.c[k]:"$"+D.c[k].toLocaleString()}</td><td>${k==="mem"?"—":k==="eps"?"$"+D.t[k]:"$"+D.t[k].toLocaleString()}</td></tr>`).join("")}</tbody></table></div></details></div>`;
+  let mi=0;const done=store.get("costco",{});
+  const reveal=p=>{const m=M[mi],cv=m.f(D.c),tv=m.f(D.t),max=Math.max(cv,tv)*1.15,win=cv>tv?"c":"t";
+   const right=p?p===win:null;if(p){done[m.k]=right;store.set("costco",done)}
+   $("#c-out").innerHTML=`${right==null?"":`<div class="callout ${right?"good":"bad"}" style="margin-top:0"><b>${right?"You called it.":"Not this time."}</b> ${win==="c"?"Costco":"Target"} is higher.</div>`}
+    <div class="hbars" style="margin-top:12px">${bar("Costco",cv,max,"var(--c)",m.fmt(cv))}${bar("Target",tv,max,css("--loss"),m.fmt(tv))}</div>
+    <p class="note" style="font-size:15px"><b>${m.formula}</b> · Costco: ${m.how(D.c)} · Target: ${m.how(D.t)}</p>
+    <div class="callout">${m.why}${m.lo?" (Lower is safer here.)":""}</div>`};
+  const setM=i=>{mi=i;$$("#c-pick .btn").forEach((b,j)=>b.setAttribute("aria-pressed",j===i));$("#c-dir").textContent=M[i].lo?"higher (riskier)":"higher";$("#c-out").innerHTML=""};
+  $$("#c-pick .btn").forEach(b=>b.onclick=()=>setM(+b.dataset.i));$$("#c-pred [data-p]").forEach(b=>b.onclick=()=>reveal(b.dataset.p));$("#c-skip").onclick=()=>reveal(null);
+ }},
+/* ---------------- UNIT 4 ---------------- */
+{id:"fees",u:4,title:"Active vs. Index Funds",yrs:"2024",tg:"4.1 · 4.2",day:15,pdf:"/units/unit-4/case-study.pdf",
+ lede:"Every year, the SPIVA scorecard checks whether active managers beat their index. In 2024, 65% of active large-cap U.S. funds trailed the S&P 500. Then there are the fees.",
+ call:"Your uncle pays a 1% fee for an active fund that “beat the market last year.” Should he switch to an index fund? Use SPIVA and the fee math.",
+ big:"Most active funds trail the index, and a 1% fee compounds against you every single year.",
+ src:"S&P Dow Jones Indices, SPIVA U.S. Scorecard, Year-End 2024. Fee math: $10,000 × (1 + 0.07 − fee) raised to the number of years, as in the class case.",
+ render(el){
+  el.innerHTML=`<div class="sim"><div class="box">
+   <div class="ctl"><label for="f-a">Index fund fee <span class="num" id="fv-a"></span></label><input type="range" id="f-a" min="0" max="0.5" step="0.01" value="0.05"></div>
+   <div class="ctl"><label for="f-b">Active fund fee <span class="num" id="fv-b"></span></label><input type="range" id="f-b" min="0.25" max="2" step="0.05" value="1"></div>
+   <div class="ctl"><label for="f-y">Years <span class="num" id="fv-y"></span></label><input type="range" id="f-y" min="1" max="50" step="1" value="40"></div>
+   <p class="note">Both earn 7% a year before fees on $10,000 invested once.</p>
+   <p class="lbl" style="margin-top:14px">SPIVA: out of 100 active large-cap funds…</p>
+   <div class="btnrow" id="f-yr"><button class="btn" data-v="65" aria-pressed="true">2024</button><button class="btn" data-v="60">2023</button><button class="btn" data-v="64">24-yr average</button></div>
+   <div class="dots" id="f-dots" style="margin-top:10px" aria-label="Dot chart of funds that trailed"></div><p class="note" id="f-dl"></p></div>
+   <div class="box w"><div class="readouts three"><div class="ro"><span>Index fund</span><b id="f-va"></b></div><div class="ro"><span>Active fund</span><b id="f-vb"></b></div><div class="ro bad"><span>Lost to fees</span><b id="f-gap"></b></div></div>
+   <svg class="chart" id="f-svg" viewBox="0 0 560 230" style="margin-top:12px" role="img" aria-label="Growth of $10,000 with two fees"></svg>
+   <div class="callout" id="f-msg"></div></div></div>`;
+  const a=$("#f-a"),b=$("#f-b"),y=$("#f-y");
+  const draw=()=>{const fa=+a.value,fb=+b.value,n=+y.value,va=10000*Math.pow(1.07-fa/100,n),vb=10000*Math.pow(1.07-fb/100,n);
+   $("#fv-a").textContent=pct(fa,2);$("#fv-b").textContent=pct(fb,2);$("#fv-y").textContent=n;$("#f-va").textContent=money(va,0);$("#f-vb").textContent=money(vb,0);$("#f-gap").textContent=money(va-vb,0);
+   const W=560,H=230,L=56,R=10,T=10,B=28,mx=Math.max(va,20000)*1.08,X=t=>L+t/n*(W-L-R),Y=v=>T+(1-v/mx)*(H-T-B);
+   const path=f=>{let d="";for(let t=0;t<=n;t++)d+=(t?"L":"M")+X(t).toFixed(1)+" "+Y(10000*Math.pow(1.07-f/100,t)).toFixed(1);return d};
+   let g="";for(let i=0;i<=4;i++){const v=mx*i/4;g+=`<line x1="${L}" x2="${W-R}" y1="${Y(v)}" y2="${Y(v)}" stroke="${css("--line")}"/><text x="${L-6}" y="${Y(v)+4}" text-anchor="end">${v>=1000?"$"+Math.round(v/1000)+"k":"$0"}</text>`}
+   const st=n<=10?1:n<=25?5:10;for(let t=0;t<=n;t+=st)g+=`<text x="${X(t)}" y="${H-8}" text-anchor="middle">${t}</text>`;
+   g+=`<path d="${path(fa)}" fill="none" stroke="${css("--gain")}" stroke-width="3"/><path d="${path(fb)}" fill="none" stroke="${css("--loss")}" stroke-width="3" stroke-dasharray="7 4"/>`;
+   g+=`<text x="${X(n)-4}" y="${Y(va)-8}" text-anchor="end" class="lbl2">Index ${pct(fa,2)}</text><text x="${X(n)-4}" y="${Y(vb)+18}" text-anchor="end" class="lbl2">Active ${pct(fb,2)}</text>`;
+   $("#f-svg").innerHTML=g;
+   $("#f-msg").innerHTML=`After ${n} years the higher fee costs <b class="num">${money(va-vb,0)}</b>, which is <b>${pct((va-vb)/va*100,0)}</b> of what the index fund would have. ${n===40&&fa===0.05&&fb===1?"That matches the case: $146,971 vs. $102,857.":""}`};
+  const dots=v=>{$("#f-dots").innerHTML=Array.from({length:100},(_,i)=>`<i class="${i<v?"t":"b"}"></i>`).join("");$("#f-dl").innerHTML=`<b style="color:var(--loss)">${v} trailed</b> the S&P 500 · <b style="color:var(--gain)">${100-v} beat it</b>. And next year's winners are rarely the same funds.`};
+  [a,b,y].forEach(e=>e.oninput=draw);$$("#f-yr .btn").forEach(x=>x.onclick=()=>{$$("#f-yr .btn").forEach(z=>z.setAttribute("aria-pressed",z===x));dots(+x.dataset.v)});draw();dots(65);
+ }},
+/* ---------------- UNIT 5 ---------------- */
+{id:"svb",u:5,title:"Silicon Valley Bank",yrs:"2023",tg:"5.3 · 5.5",day:21,pdf:"/units/unit-5/case-study.pdf",
+ lede:"SVB put startup deposits into “safe” Treasuries and mortgage bonds at low rates. Then the Fed raised rates fast, and the bank collapsed in about 48 hours.",
+ call:"Was SVB's problem that its bonds were risky? Use the price-rate seesaw and the run numbers to explain what really went wrong.",
+ big:"Even Treasuries lose market value when rates rise. Held to maturity they pay back face value, but a bank run forced SVB to sell at a loss.",
+ src:"Federal Reserve, Review of the Federal Reserve's Supervision and Regulation of Silicon Valley Bank (April 2023); figures from SVB's 2022 reports and regulators, rounded, as in the class case.",
+ render(el){
+  const S=[["2020–21","Startups park huge amounts of cash at SVB. It buys about $117B of bonds, mostly at low rates.",0],["2022","The Fed raises rates fast. SVB's old bonds fall in value: more than $15B of unrealized losses.",0],["Mar 8, 2023","SVB says it sold over $21B of securities at a loss and needs to raise $2.25B.",0],["Thu, Mar 9","Customers withdraw about $42B in one day.",42],["Fri, Mar 10","About $100B more is requested. Regulators close the bank that morning.",142]];
+  el.innerHTML=`<div class="sim"><div class="box"><p class="lbl">Step through the run</p><div class="steps" id="s-steps">${S.map((s,i)=>`<div class="step" data-i="${i}"><span class="d">${s[0]}</span><span>${s[1]}</span></div>`).join("")}</div>
+   <div class="btnrow" style="margin-top:10px"><button class="btn" id="s-prev">Back</button><button class="btn primary" id="s-next">Next</button></div></div>
+   <div class="box w"><p class="lbl">Deposits vs. withdrawals</p><div class="hbars" id="s-bars"></div>
+   <p class="note">About 9 in 10 deposit dollars were above the FDIC's $250,000 insurance limit, so big customers had a reason to run first.</p>
+   <p class="lbl" style="margin-top:14px">What if SVB had to sell its bonds?</p>
+   <div class="ctl"><label for="s-sell">Bonds sold <span class="num" id="sv-sell"></span></label><input type="range" id="s-sell" min="0" max="117" step="1" value="21"></div>
+   <div class="readouts"><div class="ro bad"><span>Loss locked in</span><b id="s-loss"></b></div><div class="ro"><span>Loss rate</span><b>≈12.8%</b></div></div>
+   <p class="note">Loss rate = more than $15B of losses ÷ $117B of bonds ≈ 12.8% (a classroom average across the whole portfolio).</p>
+   <div class="callout" id="s-msg"></div></div></div>`;
+  let i=0;const sell=$("#s-sell");
+  const draw=()=>{$$("#s-steps .step").forEach((s,j)=>s.classList.toggle("on",j<=i));const w=S[i][2];
+   $("#s-bars").innerHTML=bar("Deposits",175.5,175.5,css("--muted"),bil(175.5))+bar("Withdrawn",w,175.5,css("--loss"),w?bil(w)+" ("+pct(w/175.5*100,0)+")":"$0");
+   const v=+sell.value,loss=v*15/117;$("#sv-sell").textContent=bil(v);$("#s-loss").textContent=bil(loss);
+   $("#s-msg").innerHTML=i<4?`Held to maturity, these bonds would still pay back face value. The losses only become real if SVB has to sell.`:`Requests reached about <b>${pct(142/175.5*100,0)}</b> of all deposits in two days. No bank keeps that much cash on hand, so SVB would have had to sell bonds at a loss, and it failed.`;
+   $("#s-prev").disabled=i===0;$("#s-next").disabled=i===S.length-1};
+  $("#s-next").onclick=()=>{i=Math.min(S.length-1,i+1);draw()};$("#s-prev").onclick=()=>{i=Math.max(0,i-1);draw()};sell.oninput=draw;draw();
+ }},
+/* ---------------- UNIT 6 ---------------- */
+{id:"enron",u:6,title:"Enron Employees and Their 401(k)s",yrs:"2001",tg:"6.2 · 6.3",day:24,pdf:"/units/unit-6/case-study.pdf",
+ lede:"At the end of 2000, 62% of everything in Enron's 401(k) plan was Enron stock. The stock fell from $90.75 to under $1, and employees lost their jobs and their savings at the same time.",
+ call:"How much of your retirement money should be in your own employer's stock? Make a claim and use the Enron numbers as evidence.",
+ big:"One company's collapse is unsystematic risk. Diversifying removes it; concentrating in your employer doubles it, because your paycheck is already tied to that company.",
+ src:"Congressional Research Service, The Enron Bankruptcy and Employer Stock in Retirement Plans (2002); U.S. Senate hearing, Retirement Insecurity: 401(k) Crisis at Enron (2002), as in the class case.",
+ render(el){
+  el.innerHTML=`<div class="sim"><div class="box">
+   <div class="ctl"><label for="e-bal">401(k) balance in Aug 2000 <span class="num" id="ev-bal"></span></label><input type="range" id="e-bal" min="20000" max="500000" step="10000" value="100000"></div>
+   <div class="ctl"><label for="e-pct">Share in Enron stock <span class="num" id="ev-pct"></span></label><input type="range" id="e-pct" min="0" max="100" step="1" value="62"></div>
+   <div class="btnrow"><button class="btn" id="e-plan">Plan average (62%)</button><button class="btn" id="e-div">Diversified (5%)</button></div>
+   <p class="note">Assumption: Enron stock goes from $90.75 to $1 (it was under $1), and the rest sits in a diversified fund that holds its value, so you can see the Enron effect alone.</p></div>
+   <div class="box w"><div class="readouts three"><div class="ro"><span>Before</span><b id="e-before"></b></div><div class="ro bad"><span>After</span><b id="e-after"></b></div><div class="ro bad"><span>Lost</span><b id="e-lost"></b></div></div>
+   <div class="hbars" style="margin-top:12px" id="e-bars"></div>
+   <div class="callout" id="e-msg"></div>
+   <div class="callout mid">Across the plan, losses were about <b>$1.3 billion</b> for about <b>15,000 employees</b>, roughly <b>$87,000</b> each on average. Many were also locked out of their accounts for at least two weeks as the stock fell.</div></div></div>`;
+  const b=$("#e-bal"),p=$("#e-pct");
+  const draw=()=>{const B=+b.value,P=+p.value/100,en=B*P,rest=B-en,after=rest+en*(1/90.75);
+   $("#ev-bal").textContent=money(B);$("#ev-pct").textContent=pct(P*100,0);$("#e-before").textContent=money(B,0);$("#e-after").textContent=money(after,0);$("#e-lost").textContent=money(B-after,0);
+   $("#e-bars").innerHTML=bar("Enron stock",en,B,"var(--c)",money(en,0)+" → "+money(en/90.75,0))+bar("Diversified",rest,B,css("--gain"),money(rest,0));
+   $("#e-msg").innerHTML=`With ${pct(P*100,0)} in Enron, this employee keeps only <b>${pct(after/B*100,0)}</b> of the account. ${P<=0.1?"A small slice means the collapse hurts, but it doesn't wipe out retirement.":"And the same company also paid their salary."}`};
+  b.oninput=p.oninput=draw;$("#e-plan").onclick=()=>{p.value=62;draw()};$("#e-div").onclick=()=>{p.value=5;draw()};draw();
+ }},
+/* ---------------- UNIT 7 ---------------- */
+{id:"southwest",u:7,title:"Southwest Airlines Fuel Hedging",yrs:"1998–2008",tg:"7.4 · 7.5",day:32,pdf:"/units/unit-7/case-study.pdf",
+ lede:"Southwest locked in fuel prices years ahead with futures, options and swaps. It saved about $3.5 billion as oil climbed to $147. Then oil crashed to $60, and the hedges turned into losses.",
+ call:"Was hedging a smart move for Southwest, even after the 2008 losses? Use one number from each side.",
+ big:"A hedge reduces risk in both directions. You give up the upside to protect against the downside, which is the opposite of speculating.",
+ src:"Southwest Airlines, “The Southwest Jet Fuel Hedge Strategy”; Knowledge at Wharton (Nov. 12, 2008); Aviation Strategy (April 2009), as in the class case. Per-barrel crude prices.",
+ render(el){
+  el.innerHTML=`<div class="sim"><div class="box">
+   <div class="btnrow" style="margin-bottom:12px"><button class="btn" id="w-peak">July 2008: oil $147</button><button class="btn" id="w-crash">Nov 2008: oil $60</button></div>
+   <div class="ctl"><label for="w-oil">Market price of oil <span class="num" id="wv-oil"></span></label><input type="range" id="w-oil" min="30" max="160" step="1" value="147"></div>
+   <div class="ctl"><label for="w-lock">Southwest's locked-in price <span class="num" id="wv-lock"></span></label><input type="range" id="w-lock" min="20" max="120" step="1" value="73"></div>
+   <div class="ctl"><label for="w-h">Share of fuel hedged <span class="num" id="wv-h"></span></label><input type="range" id="w-h" min="0" max="90" step="5" value="75"></div>
+   <p class="note">Typical: Southwest hedged 80–90% of its fuel; most rivals hedged 10% or less. For 2009 it had locked 75% at about $73. Costs shown per 1 million barrels.</p></div>
+   <div class="box w"><div class="readouts three"><div class="ro"><span>Southwest pays</span><b id="w-sw"></b></div><div class="ro"><span>Unhedged rival pays</span><b id="w-rv"></b></div><div class="ro" id="w-dbox"><span>Hedge result</span><b id="w-d"></b></div></div>
+   <div class="hbars" style="margin-top:12px" id="w-bars"></div>
+   <div class="callout" id="w-msg"></div></div></div>`;
+  const o=$("#w-oil"),l=$("#w-lock"),h=$("#w-h");
+  const draw=()=>{const O=+o.value,Lk=+l.value,H=+h.value/100,sw=(H*Lk+(1-H)*O)*1e6,rv=O*1e6,d=rv-sw;
+   $("#wv-oil").textContent="$"+O;$("#wv-lock").textContent="$"+Lk;$("#wv-h").textContent=pct(H*100,0);
+   $("#w-sw").textContent="$"+(sw/1e6).toFixed(1)+"M";$("#w-rv").textContent="$"+(rv/1e6).toFixed(1)+"M";$("#w-d").textContent=(d>=0?"saves ":"costs ")+"$"+Math.abs(d/1e6).toFixed(1)+"M";$("#w-dbox").className="ro "+(d>=0?"good":"bad");
+   const mx=Math.max(sw,rv)*1.1;$("#w-bars").innerHTML=bar("Southwest",sw,mx,"var(--c)","$"+(sw/1e6).toFixed(1)+"M")+bar("Rival",rv,mx,css("--muted"),"$"+(rv/1e6).toFixed(1)+"M");
+   $("#w-msg").innerHTML=d>=0?`Oil is above the locked price, so the hedge <b>saves</b> money. This is how Southwest saved about $3.5 billion from 1998 to mid-2008, about 83% of its profits in those years.`:`Oil fell below the locked price, so Southwest pays <b>more</b> than rivals. In late 2008 this led to its first quarterly losses in 17 years, and it cut its hedges to about 10%.`};
+  [o,l,h].forEach(e=>e.oninput=draw);$("#w-peak").onclick=()=>{o.value=147;l.value=73;h.value=75;draw()};$("#w-crash").onclick=()=>{o.value=60;l.value=73;h.value=75;draw()};draw();
+ }},
+/* ---------------- UNIT 8 ---------------- */
+{id:"ftx",u:8,title:"The FTX Collapse",yrs:"2022",tg:"8.2 · 8.3",day:36,pdf:"/units/unit-8/case-study.pdf",
+ lede:"FTX was one of the biggest crypto exchanges in the world. A leaked balance sheet showed its sister trading firm was propped up by a token FTX made itself. Nine days later, it was bankrupt.",
+ call:"Your friend keeps all of his crypto on an exchange because “it's a huge company.” Use the FTX case to give him advice.",
+ big:"An exchange holding your crypto is only as safe as the people running it. Watch for conflicts of interest, self-made tokens, and money you can't withdraw.",
+ src:"U.S. Attorney's Office, S.D.N.Y. (March 28, 2024); CoinDesk (Nov. 2, 2022), as reported in the class case.",
+ render(el){
+  const F=[["The founder controls both the exchange and its biggest trader, Alameda.",1,"A conflict of interest: the trader can be favored with customers' money."],["About 40% of Alameda's $14.6B in assets is FTT, a token FTX created itself.",1,"Value propped up by a token the company prints is fragile; it fell about 80% in a day."],["The exchange's code let Alameda withdraw almost unlimited amounts.",1,"Customer money was sent to Alameda. Prosecutors say over $8 billion was stolen."],["Famous athletes and celebrities promote the exchange.",1,"Celebrity ads prove nothing about safety. Treat them as a reason to check harder."],["You hold your crypto in your own wallet with your own private key.",0,"Not your keys, not your coins. Holding your own key means an exchange can't lose your coins."],["An outside auditor checks that customer funds are kept separate.",0,"Separate, audited customer funds are what FTX lacked; its new CEO called it a complete failure of controls."]];
+  el.innerHTML=`<div class="sim"><div class="box"><p class="lbl">Alameda's balance sheet</p>
+   <div class="ctl"><label for="x-drop">FTT price drop <span class="num" id="xv-drop"></span></label><input type="range" id="x-drop" min="0" max="100" step="1" value="0"></div>
+   <div class="btnrow"><button class="btn" id="x-binance">Binance says it will sell FTT (−80%)</button></div>
+   <div class="hbars" style="margin-top:12px" id="x-bars"></div>
+   <div class="readouts" style="margin-top:10px"><div class="ro"><span>Total assets</span><b id="x-tot"></b></div><div class="ro bad"><span>Wiped out</span><b id="x-lost"></b></div></div>
+   <p class="note">Then customers tried to pull about $6 billion out. FTX couldn't pay, and filed for bankruptcy on November 11, 2022.</p></div>
+   <div class="box w"><p class="lbl">Red flag or reassuring?</p><div class="flags" id="x-flags"></div><div class="callout" id="x-score">Sorted 0 of 6</div></div></div>`;
+  const dr=$("#x-drop");
+  const draw=()=>{const d=+dr.value/100,ftt=14.6*0.4*(1-d),oth=14.6*0.6;$("#xv-drop").textContent="−"+pct(d*100,0);
+   $("#x-bars").innerHTML=bar("FTT token",ftt,14.6,"var(--c)",bil(ftt))+bar("Everything else",oth,14.6,css("--muted"),bil(oth));
+   $("#x-tot").textContent=bil(ftt+oth);$("#x-lost").textContent=bil(14.6*0.4*d)};
+  dr.oninput=draw;$("#x-binance").onclick=()=>{dr.value=80;draw()};draw();
+  const ans=F.map(()=>null);
+  const rf=()=>{$("#x-flags").innerHTML=F.map((f,i)=>`<div class="flag ${ans[i]==null?"":ans[i]===f[1]?"right":"wrong"}"><span>${f[0]}</span>${ans[i]==null?`<span class="two"><button class="btn" data-i="${i}" data-a="1">🚩 Red flag</button><button class="btn" data-i="${i}" data-a="0">OK</button></span>`:`<b>${f[1]?"Red flag":"Reassuring"}</b>`}${ans[i]!=null?`<span class="why">${f[2]}</span>`:""}</div>`).join("");
+   $$("#x-flags [data-i]").forEach(b=>b.onclick=()=>{ans[+b.dataset.i]=+b.dataset.a;rf()});
+   const n=ans.filter(a=>a!=null).length,r=ans.filter((a,i)=>a===F[i][1]).length;$("#x-score").innerHTML=`Sorted <b>${n}</b> of 6 · correct <b>${r}</b>`};
+  rf();
+ }}
+];
+
+function open(id,scroll){
+  const c=CASES.find(x=>x.id===id)||CASES[0];
+  $$(".folder").forEach(f=>f.setAttribute("aria-current",f.dataset.id===c.id));
+  const el=$("#case");el.style.setProperty("--c",`var(--u${c.u})`);
+  el.innerHTML=`<div class="case-head"><div><div class="meta"><span class="tagc u">UNIT ${c.u}</span><span class="tagc">${c.yrs}</span><span class="tagc">Targets ${c.tg}</span><span class="tagc">Day ${c.day} case</span></div><h2 style="margin-top:8px">${c.title}</h2></div>
+    <div class="links"><a class="lk" href="${c.pdf}" target="_blank" rel="noopener">Case (PDF) ↗</a><a class="lk" href="/lessons/day-${c.day}/">Day ${c.day} lesson</a></div></div>
+    <p class="lede">${c.lede}</p><div id="sim"></div>
+    <div class="take"><div class="box"><p class="lbl">The big idea</p><p>${c.big}</p></div><div class="box"><p class="lbl">Your call (3 points)</p><p>${c.call}</p><p class="note">Claim → evidence (numbers from the case) → reasoning.</p></div></div>
+    <p class="src">Sources: ${c.src}</p>`;
+  c.render($("#sim"));
+  const seen=new Set(store.get("seen",[]));seen.add(c.id);store.set("seen",[...seen]);passport();
+  store.set("last",c.id);if(location.hash!=="#"+c.id)history.replaceState(null,"","#"+c.id);
+  if(scroll)el.scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"start"});
+}
+$("#folders").innerHTML=CASES.map(c=>`<button class="folder" data-id="${c.id}" style="--c:var(--u${c.u})"><span class="u">UNIT ${c.u} · ${c.yrs}</span><b>${c.title}</b><small>Targets ${c.tg}</small></button>`).join("");
+$$(".folder").forEach(f=>f.onclick=()=>open(f.dataset.id,true));
+window.addEventListener("hashchange",()=>open(location.hash.slice(1),false));
+open(location.hash.slice(1)||store.get("last","inflation"),false);
+})();
+</script>
+</body>
+</html>
