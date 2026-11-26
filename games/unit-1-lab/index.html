@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Money Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,500..800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Layout: passbook-style header, a tab strip of six iPad-sized labs, one visible at a time. Accent = the site's Unit 1 green. */
+:root{
+  --bg:#f3f6f3; --surface:#ffffff; --sunk:#e8eee9; --ink:#132018; --muted:#56665b; --line:#d5ded7;
+  --accent:#2F7D46; --accent-ink:#ffffff; --accent-soft:#dcefe2; --accent-2:#8cc79e;
+  --gain:#0f7a55; --gain-soft:#dcf3ea; --loss:#b8352a; --loss-soft:#fbe5e2; --gold:#9a6a08; --gold-soft:#fbf0d6; --cool:#2a5fa8; --cool-soft:#e2ebf8;
+  --display:"Archivo",system-ui,sans-serif; --body:"Source Sans 3",system-ui,sans-serif; --mono:"JetBrains Mono",ui-monospace,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0e1511; --surface:#16201a; --sunk:#1d2a22; --ink:#e6eee8; --muted:#9db0a3; --line:#2b3b31;
+  --accent:#6CCB8A; --accent-ink:#0e1511; --accent-soft:#1d3a27; --accent-2:#3e7a52;
+  --gain:#41cf97; --gain-soft:#12352a; --loss:#ff7b6e; --loss-soft:#3d1c1a; --gold:#f0be55; --gold-soft:#3a2e12; --cool:#8db4f0; --cool-soft:#1b2a40; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e1511; --surface:#16201a; --sunk:#1d2a22; --ink:#e6eee8; --muted:#9db0a3; --line:#2b3b31;
+  --accent:#6CCB8A; --accent-ink:#0e1511; --accent-soft:#1d3a27; --accent-2:#3e7a52;
+  --gain:#41cf97; --gain-soft:#12352a; --loss:#ff7b6e; --loss-soft:#3d1c1a; --gold:#f0be55; --gold-soft:#3a2e12; --cool:#8db4f0; --cool-soft:#1b2a40; color-scheme:dark}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.5}
+[hidden]{display:none!important}
+.wrap{max-width:1040px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.1}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.back{display:inline-block;margin-bottom:10px;font-weight:600;color:var(--accent);text-decoration:none}
+.back:hover{text-decoration:underline}
+.book{border:2px solid var(--ink);border-radius:4px;background:var(--surface);background-image:repeating-linear-gradient(0deg,transparent 0 27px,var(--sunk) 27px 28px);padding:18px 20px}
+.book-inner{display:flex;flex-wrap:wrap;gap:12px 24px;align-items:end;justify-content:space-between}
+.eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.book h1{font-size:clamp(34px,6vw,54px);font-stretch:120%;font-weight:800;letter-spacing:-.01em}
+.book p{margin:4px 0 0;color:var(--muted);max-width:54ch;background:var(--surface)}
+.stamp{border:2px solid var(--accent);color:var(--accent);border-radius:6px;padding:8px 12px;font:700 13px var(--mono);text-align:center;transform:rotate(-3deg);background:var(--surface)}
+.stamp b{display:block;font-size:22px}
+.tabs{display:flex;gap:6px;margin:20px 0 16px;overflow-x:auto;padding-bottom:4px}
+.tab{flex:0 0 auto;font:600 16px var(--body);padding:10px 16px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;min-height:44px}
+.tab[aria-selected="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.tab .t{font-family:var(--mono);font-size:12px;opacity:.7;margin-left:6px}
+.tab:focus-visible,button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.panel-head{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;align-items:baseline;margin-bottom:12px}
+.panel-head h2{font-size:28px;font-stretch:110%}
+.panel-head p{margin:2px 0 0;color:var(--muted);max-width:64ch}
+.grid{display:grid;grid-template-columns:minmax(0,330px) minmax(0,1fr);gap:16px}
+@media (max-width:760px){.grid{grid-template-columns:minmax(0,1fr)}}
+.box{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;min-width:0}
+.ctl{display:grid;gap:2px;margin-bottom:12px}
+.ctl label{display:flex;justify-content:space-between;gap:8px;font-weight:600}
+.ctl label .num{color:var(--accent)}
+input[type=range]{width:100%;accent-color:var(--accent);height:32px}
+.readouts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.readouts.three{grid-template-columns:repeat(3,minmax(0,1fr))}
+@media (max-width:520px){.readouts.three{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.ro{background:var(--sunk);border-radius:8px;padding:10px 12px;min-width:0}
+.ro span{display:block;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.ro b{font:700 21px var(--mono);font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.ro.hl{background:var(--accent-soft)} .ro.hl b{color:var(--accent)}
+.ro.bad b{color:var(--loss)}
+.btn{font:700 16px var(--body);min-height:44px;padding:10px 16px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn.sm{font-size:14px;min-height:38px;padding:6px 12px}
+.btnrow{display:flex;flex-wrap:wrap;gap:8px}
+.note{font-size:15px;color:var(--muted);margin:10px 0 0}
+.callout{margin-top:12px;padding:12px 14px;border-radius:8px;background:var(--sunk);font-size:16px}
+.callout.good{background:var(--gain-soft)} .callout.bad{background:var(--loss-soft)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:14px;color:var(--muted);margin-top:6px}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+svg text{font-family:var(--body);fill:var(--muted);font-size:12px}
+svg .lbl{fill:var(--ink);font-weight:700}
+.chart{width:100%;height:auto;display:block}
+.tags{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:10px}
+.tag{border:1px dashed var(--line);border-radius:8px;padding:10px;text-align:center}
+.tag span{display:block;font-size:13px;color:var(--muted)} .tag b{font:700 22px var(--mono)}
+/* dashboard */
+.tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+@media (max-width:640px){.tiles{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.tile{background:var(--sunk);border-radius:10px;padding:12px;min-width:0}
+.tile span{display:block;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.tile b{font:700 24px var(--mono);display:block;white-space:nowrap}
+.tiles{margin-bottom:14px}
+.tile small{display:block;color:var(--muted);font-size:13px;line-height:1.3}
+.up{color:var(--loss)} .dn{color:var(--gain)}
+/* quiz */
+.q{font-size:20px;font-weight:600;margin:6px 0 14px;max-width:62ch}
+.opts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+@media (max-width:560px){.opts{grid-template-columns:minmax(0,1fr)}}
+.opt{text-align:left;font:600 17px var(--body);padding:14px 16px;border-radius:10px;border:2px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;min-height:56px;display:flex;gap:10px;align-items:center}
+.opt .k{font:700 13px var(--mono);color:var(--muted);border:1px solid var(--line);border-radius:4px;padding:1px 6px}
+.opt:hover:not([disabled]){border-color:var(--accent)}
+.opt.right{border-color:var(--gain);background:var(--gain-soft)}
+.opt.wrong{border-color:var(--loss);background:var(--loss-soft)}
+.opt[disabled]{cursor:default}
+.progress{height:8px;background:var(--sunk);border-radius:99px;overflow:hidden;margin:4px 0 12px}
+.progress i{display:block;height:100%;background:var(--accent);transition:width .3s}
+.scoreline{display:flex;justify-content:space-between;font-weight:600;color:var(--muted);flex-wrap:wrap;gap:8px}
+.big{font:800 64px var(--display);font-stretch:120%}
+.miss{margin:8px 0 0;padding-left:20px} .miss li{margin-bottom:6px}
+.foot{margin-top:28px;color:var(--muted);font-size:14px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="/">← F&amp;I Arcade</a>
+  <header class="book">
+    <div class="book-inner">
+      <div>
+        <div class="eyebrow">Finance &amp; Investing · D214 · Unit 1</div>
+        <h1>Money Lab</h1>
+        <p>Six hands-on labs for Unit 1: watch compounding work, race an early saver against a late one, see inflation shrink your money, sort the financial system, read the economy, then test yourself.</p>
+      </div>
+      <div class="stamp">Rule of 72<b>72 ÷ rate</b>= years to double</div>
+    </div>
+  </header>
+
+  <nav class="tabs" role="tablist" aria-label="Unit 1 labs">
+    <button class="tab" role="tab" id="tab-grow" data-p="grow" aria-selected="true">Growth Machine<span class="t">1.2</span></button>
+    <button class="tab" role="tab" id="tab-race" data-p="race" aria-selected="false">Early vs. Late<span class="t">1.2</span></button>
+    <button class="tab" role="tab" id="tab-infl" data-p="infl" aria-selected="false">Inflation Eraser<span class="t">1.3</span></button>
+    <button class="tab" role="tab" id="tab-sort" data-p="sort" aria-selected="false">System Sort<span class="t">1.1 1.4</span></button>
+    <button class="tab" role="tab" id="tab-econ" data-p="econ" aria-selected="false">Economy Desk<span class="t">1.5</span></button>
+    <button class="tab" role="tab" id="tab-drill" data-p="drill" aria-selected="false">Unit 1 Drill<span class="t">1.1–1.5</span></button>
+  </nav>
+
+  <!-- 1 GROWTH MACHINE -->
+  <section class="panel" id="p-grow" role="tabpanel" aria-labelledby="tab-grow">
+    <div class="panel-head"><div><h2>Growth Machine</h2><p>Compound interest is interest on your interest. The bright band on the chart is money that only exists because earlier growth kept growing.</p></div></div>
+    <div class="grid">
+      <div class="box">
+        <div class="ctl"><label for="g-start">Starting amount <span class="num" id="gv-start"></span></label><input type="range" id="g-start" min="0" max="10000" step="100" value="1000"></div>
+        <div class="ctl"><label for="g-add">Added each year <span class="num" id="gv-add"></span></label><input type="range" id="g-add" min="0" max="6000" step="100" value="1200"></div>
+        <div class="ctl"><label for="g-rate">Yearly return <span class="num" id="gv-rate"></span></label><input type="range" id="g-rate" min="1" max="12" step="0.5" value="8"></div>
+        <div class="ctl"><label for="g-years">Years <span class="num" id="gv-years"></span></label><input type="range" id="g-years" min="1" max="50" step="1" value="40"></div>
+        <div class="callout" id="g-72"></div>
+      </div>
+      <div class="box">
+        <div class="readouts three">
+          <div class="ro hl"><span>Ending balance</span><b id="gr-bal"></b></div>
+          <div class="ro"><span>You put in</span><b id="gr-dep"></b></div>
+          <div class="ro"><span>Interest on interest</span><b id="gr-ioi"></b></div>
+        </div>
+        <svg class="chart" id="g-chart" viewBox="0 0 600 270" role="img" aria-label="Balance over time split into deposits, simple interest and interest on interest" style="margin-top:10px"></svg>
+        <div class="legend"><span><i style="background:var(--line)"></i>Money you put in</span><span><i style="background:var(--accent-2)"></i>Interest on deposits only (simple)</span><span><i style="background:var(--accent)"></i>Interest on interest (compounding)</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2 EARLY VS LATE -->
+  <section class="panel" id="p-race" role="tabpanel" aria-labelledby="tab-race" hidden>
+    <div class="panel-head"><div><h2>Early vs. Late</h2><p>Emma starts investing at 16 and stops. Leo waits, then invests every year until 65. Same yearly amount, same return. Who ends up with more?</p></div></div>
+    <div class="grid">
+      <div class="box">
+        <div class="ctl"><label for="r-amt">Each saver invests per year <span class="num" id="rv-amt"></span></label><input type="range" id="r-amt" min="500" max="6000" step="100" value="2000"></div>
+        <div class="ctl"><label for="r-rate">Yearly return <span class="num" id="rv-rate"></span></label><input type="range" id="r-rate" min="2" max="12" step="0.5" value="8"></div>
+        <div class="ctl"><label for="r-estop">Emma invests from 16 until age <span class="num" id="rv-estop"></span></label><input type="range" id="r-estop" min="17" max="40" step="1" value="25"></div>
+        <div class="ctl"><label for="r-lstart">Leo starts at age <span class="num" id="rv-lstart"></span></label><input type="range" id="r-lstart" min="18" max="50" step="1" value="26"></div>
+        <p class="note">Both keep their money invested until 65. Deposits happen once a year.</p>
+      </div>
+      <div class="box">
+        <div class="readouts">
+          <div class="ro"><span>Emma put in</span><b id="rr-ed"></b></div>
+          <div class="ro"><span>Leo put in</span><b id="rr-ld"></b></div>
+          <div class="ro hl" id="rr-ebox"><span>Emma at 65</span><b id="rr-e"></b></div>
+          <div class="ro" id="rr-lbox"><span>Leo at 65</span><b id="rr-l"></b></div>
+        </div>
+        <svg class="chart" id="r-chart" viewBox="0 0 600 260" role="img" aria-label="Balances of Emma and Leo by age" style="margin-top:10px"></svg>
+        <div class="legend"><span><i style="background:var(--accent)"></i>Emma (starts at 16)</span><span><i style="background:var(--cool)"></i>Leo</span></div>
+        <div class="callout" id="r-msg"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3 INFLATION -->
+  <section class="panel" id="p-infl" role="tabpanel" aria-labelledby="tab-infl" hidden>
+    <div class="panel-head"><div><h2>Inflation Eraser</h2><p>Your balance can grow while your buying power shrinks. Real return = your return − inflation. It can be negative.</p></div></div>
+    <div class="grid">
+      <div class="box">
+        <div class="btnrow" style="margin-bottom:12px">
+          <button class="btn sm" data-ip="0,3">Cash under the mattress</button>
+          <button class="btn sm" data-ip="4,3">Savings account</button>
+          <button class="btn sm" data-ip="1,8">Inflation spike</button>
+          <button class="btn sm" data-ip="10,3">Stock fund</button>
+        </div>
+        <div class="ctl"><label for="i-amt">Amount today <span class="num" id="iv-amt"></span></label><input type="range" id="i-amt" min="100" max="10000" step="100" value="1000"></div>
+        <div class="ctl"><label for="i-nom">Your yearly return <span class="num" id="iv-nom"></span></label><input type="range" id="i-nom" min="0" max="12" step="0.5" value="4"></div>
+        <div class="ctl"><label for="i-inf">Inflation per year <span class="num" id="iv-inf"></span></label><input type="range" id="i-inf" min="0" max="10" step="0.5" value="3"></div>
+        <div class="ctl"><label for="i-yrs">Years <span class="num" id="iv-yrs"></span></label><input type="range" id="i-yrs" min="1" max="40" step="1" value="20"></div>
+        <p class="note">Presets are classroom examples, not live rates.</p>
+      </div>
+      <div class="box">
+        <div class="readouts three">
+          <div class="ro" id="ir-realbox"><span>Real return</span><b id="ir-real"></b></div>
+          <div class="ro"><span>Balance (dollars)</span><b id="ir-nom"></b></div>
+          <div class="ro hl" id="ir-bpbox"><span>Buying power, today's $</span><b id="ir-bp"></b></div>
+        </div>
+        <svg class="chart" id="i-chart" viewBox="0 0 600 250" role="img" aria-label="Nominal balance and buying power over time" style="margin-top:10px"></svg>
+        <div class="legend"><span><i style="background:var(--muted)"></i>Dollars in the account</span><span><i style="background:var(--accent)"></i>What those dollars can buy, in today's money</span></div>
+        <div class="tags">
+          <div class="tag"><span>A $100 grocery cart today</span><b id="it-cart">$100</b><span id="it-cartl"></span></div>
+          <div class="tag"><span>A $20 movie ticket today</span><b id="it-movie">$20</b><span id="it-moviel"></span></div>
+        </div>
+        <div class="callout" id="i-msg"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4 SYSTEM SORT -->
+  <section class="panel" id="p-sort" role="tabpanel" aria-labelledby="tab-sort" hidden>
+    <div class="panel-head"><div><h2>System Sort</h2><p>Real or financial asset? Primary or secondary market? Which intermediary connects the saver and the borrower? Ten quick calls.</p></div><div class="scoreline"><span id="so-count"></span></div></div>
+    <div class="box"><div class="progress"><i id="so-bar"></i></div><div id="so-body"></div></div>
+  </section>
+
+  <!-- 5 ECONOMY DESK -->
+  <section class="panel" id="p-econ" role="tabpanel" aria-labelledby="tab-econ" hidden>
+    <div class="panel-head"><div><h2>Economy Desk</h2><p>Read the four indicators, place the economy in the business cycle, then predict the Fed's next move. Real data is messy, so pick the best fit.</p></div><div class="scoreline"><span id="ec-count"></span></div></div>
+    <div class="box">
+      <div class="progress"><i id="ec-bar"></i></div>
+      <div id="ec-body"></div>
+    </div>
+  </section>
+
+  <!-- 6 DRILL -->
+  <section class="panel" id="p-drill" role="tabpanel" aria-labelledby="tab-drill" hidden>
+    <div class="panel-head"><div><h2>Unit 1 Drill</h2><p>Ten questions with fresh numbers every round, matched to the Unit 1 Quiz. Wrong answers come from common mix-ups, so read the explanation when you miss.</p></div><div class="scoreline"><span id="dr-count"></span><span id="dr-streak"></span></div></div>
+    <div class="box"><div class="progress"><i id="dr-bar"></i></div><div id="dr-body"></div></div>
+  </section>
+
+  <p class="foot">Built for Finance &amp; Investing at Elk Grove High School (D214). Names are made up. Rates and indicator values are classroom examples, not live data. Keys 1–4 answer questions on a keyboard.</p>
+</div>
+
+<script>
+(function(){
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const ri=(a,b)=>Math.floor(Math.random()*(b-a+1))+a, pick=a=>a[Math.floor(Math.random()*a.length)];
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const money=(v,d)=>{const neg=v<0;v=Math.abs(v);const dec=d!=null?d:(Math.abs(v-Math.round(v))<1e-9?0:2);return (neg?"−":"")+"$"+v.toLocaleString("en-US",{minimumFractionDigits:dec,maximumFractionDigits:dec})};
+const short=v=>v>=1e6?"$"+(v/1e6).toFixed(v>=1e7?0:1)+"M":v>=1e3?"$"+Math.round(v/1e3)+"k":money(v,0);
+const pct=(v,d=2)=>{let s=(+v).toFixed(d);if(s.includes("."))s=s.replace(/\.?0+$/,"");return s.replace("-","−")+"%"};
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const store={get(k,d){try{const v=localStorage.getItem("moneylab-"+k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem("moneylab-"+k,JSON.stringify(v))}catch(e){}}};
+
+function show(p){$$(".tab").forEach(t=>t.setAttribute("aria-selected",t.dataset.p===p));$$(".panel").forEach(s=>s.hidden=s.id!=="p-"+p);store.set("tab",p);redraw()}
+$$(".tab").forEach(t=>t.addEventListener("click",()=>show(t.dataset.p)));
+
+/* generic axes helper */
+function axes(W,H,L,R,T,B,yMax,xTicks,xLab,yFmt){
+  const line=css("--line");let g="";const steps=4;
+  for(let i=0;i<=steps;i++){const v=yMax*i/steps,y=T+(1-i/steps)*(H-T-B);g+=`<line x1="${L}" x2="${W-R}" y1="${y}" y2="${y}" stroke="${line}"/><text x="${L-6}" y="${y+4}" text-anchor="end">${yFmt(v)}</text>`}
+  xTicks.forEach(([x,t])=>g+=`<text x="${x}" y="${H-B+18}" text-anchor="middle">${t}</text>`);
+  if(xLab)g+=`<text x="${(L+W-R)/2}" y="${H-3}" text-anchor="middle">${xLab}</text>`;
+  return g;
+}
+const niceMax=v=>{if(v<=0)return 100;const p=Math.pow(10,Math.floor(Math.log10(v)));for(const m of [1,1.5,2,2.5,3,4,5,6,8,10])if(m*p>=v)return m*p;return 10*p};
+
+/* ---------- 1 growth machine ---------- */
+const gS=$("#g-start"),gA=$("#g-add"),gR=$("#g-rate"),gY=$("#g-years");
+function drawGrow(){
+  const P=+gS.value,A=+gA.value,r=+gR.value/100,n=+gY.value;
+  $("#gv-start").textContent=money(P);$("#gv-add").textContent=money(A);$("#gv-rate").textContent=pct(r*100);$("#gv-years").textContent=n;
+  const bal=[P],dep=[P],simp=[P];let b=P;
+  for(let y=1;y<=n;y++){b=b*(1+r)+A;bal.push(b);dep.push(P+A*y);let s=P*(1+r*y);for(let k=1;k<=y;k++)s+=A*(1+r*(y-k));simp.push(s)}
+  const B=bal[n],D=dep[n],S=simp[n];
+  $("#gr-bal").textContent=money(B,0);$("#gr-dep").textContent=money(D,0);$("#gr-ioi").textContent=money(B-S,0);
+  const dbl=72/(r*100);
+  $("#g-72").innerHTML=`<b>Rule of 72:</b> at ${pct(r*100)}, money doubles about every <b class="num">${(+dbl.toFixed(1))}</b> years (72 ÷ ${+(r*100).toFixed(1)}).${P>0?` Your starting ${money(P)} alone would grow to <b class="num">${money(P*Math.pow(1+r,n),0)}</b>, about <b class="num">${(Math.pow(1+r,n)).toFixed(1)}×</b>.`:""}`;
+  const W=600,H=270,L=58,R=12,T=12,Bm=34,yM=niceMax(B);
+  const X=y=>L+y/n*(W-L-R),Y=v=>T+(1-v/yM)*(H-T-Bm);
+  const area=(top,bot)=>{let d="M"+X(0)+" "+Y(top[0]);for(let y=1;y<=n;y++)d+="L"+X(y)+" "+Y(top[y]);for(let y=n;y>=0;y--)d+="L"+X(y)+" "+Y(bot[y]);return d+"Z"};
+  const zero=bal.map(()=>0);const step=n<=10?1:n<=25?5:10;const ticks=[];for(let y=0;y<=n;y+=step)ticks.push([X(y),y]);
+  let g=axes(W,H,L,R,T,Bm,yM,ticks,"Years",short);
+  g+=`<path d="${area(dep,zero)}" fill="${css("--line")}"/><path d="${area(simp,dep)}" fill="${css("--accent-2")}"/><path d="${area(bal,simp)}" fill="${css("--accent")}"/>`;
+  if(dbl<=n&&P>0){for(let k=1;k*dbl<=n&&k<=6;k++){const x=X(k*dbl);g+=`<line x1="${x}" x2="${x}" y1="${T}" y2="${H-Bm}" stroke="${css("--ink")}" stroke-dasharray="2 4" opacity=".5"/><text x="${x+3}" y="${T+10}" style="font-size:11px">×${Math.pow(2,k)}</text>`}}
+  $("#g-chart").innerHTML=g;
+}
+[gS,gA,gR,gY].forEach(e=>e.addEventListener("input",drawGrow));
+
+/* ---------- 2 early vs late ---------- */
+const rA=$("#r-amt"),rR=$("#r-rate"),rE=$("#r-estop"),rL=$("#r-lstart");
+function drawRace(){
+  const A=+rA.value,r=+rR.value/100,es=+rE.value,ls=+rL.value;
+  $("#rv-amt").textContent=money(A);$("#rv-rate").textContent=pct(r*100);$("#rv-estop").textContent=es;$("#rv-lstart").textContent=ls;
+  const ages=[],e=[],l=[];let eb=0,lb=0,ed=0,ld=0;
+  for(let a=16;a<=65;a++){eb*=1+r;lb*=1+r;if(a<=es){eb+=A;ed+=A}if(a>=ls){lb+=A;ld+=A}ages.push(a);e.push(eb);l.push(lb)}
+  $("#rr-ed").textContent=money(ed);$("#rr-ld").textContent=money(ld);$("#rr-e").textContent=money(eb,0);$("#rr-l").textContent=money(lb,0);
+  const ew=eb>=lb;$("#rr-ebox").className="ro"+(ew?" hl":"");$("#rr-lbox").className="ro"+(ew?"":" hl");
+  const ey=es-16+1,ly=65-ls+1;
+  $("#r-msg").innerHTML=ew?`<b>Emma wins by ${money(eb-lb,0)}</b> even though she invested for only ${ey} years and Leo invested for ${ly}. Her money had more years to compound.`:`<b>Leo wins by ${money(lb-eb,0)}</b> this time. He put in ${money(ld-ed)} more than Emma. Try moving Leo's start later or Emma's stop age up and watch how fast time beats extra deposits.`;
+  const W=600,H=260,L=58,R=12,T=12,Bm=34,yM=niceMax(Math.max(eb,lb));
+  const X=a=>L+(a-16)/49*(W-L-R),Y=v=>T+(1-v/yM)*(H-T-Bm);
+  const path=arr=>arr.map((v,i)=>(i?"L":"M")+X(ages[i]).toFixed(1)+" "+Y(v).toFixed(1)).join("");
+  let g=axes(W,H,L,R,T,Bm,yM,[16,25,35,45,55,65].map(a=>[X(a),a]),"Age",short);
+  g+=`<rect x="${X(16)}" y="${T}" width="${X(es)-X(16)}" height="${H-T-Bm}" fill="${css("--accent")}" opacity=".08"/>`;
+  g+=`<path d="${path(e)}" fill="none" stroke="${css("--accent")}" stroke-width="3"/><path d="${path(l)}" fill="none" stroke="${css("--cool")}" stroke-width="3" stroke-dasharray="7 4"/>`;
+  g+=`<circle cx="${X(65)}" cy="${Y(eb)}" r="5" fill="${css("--accent")}"/><circle cx="${X(65)}" cy="${Y(lb)}" r="5" fill="${css("--cool")}"/>`;
+  $("#r-chart").innerHTML=g;
+}
+[rA,rR,rE,rL].forEach(e=>e.addEventListener("input",drawRace));
+
+/* ---------- 3 inflation ---------- */
+const iA=$("#i-amt"),iN=$("#i-nom"),iI=$("#i-inf"),iY=$("#i-yrs");
+$$("[data-ip]").forEach(b=>b.onclick=()=>{const [n,i]=b.dataset.ip.split(",");iN.value=n;iI.value=i;drawInfl()});
+function drawInfl(){
+  const P=+iA.value,n=+iN.value/100,i=+iI.value/100,y=+iY.value;
+  $("#iv-amt").textContent=money(P);$("#iv-nom").textContent=pct(n*100);$("#iv-inf").textContent=pct(i*100);$("#iv-yrs").textContent=y;
+  const nom=[],bp=[];for(let t=0;t<=y;t++){const v=P*Math.pow(1+n,t);nom.push(v);bp.push(v/Math.pow(1+i,t))}
+  const real=(n-i)*100;
+  $("#ir-real").textContent=(real>0?"+":"")+pct(real,1);$("#ir-realbox").className="ro"+(real<0?" bad":real>0?" hl":"");
+  $("#ir-nom").textContent=money(nom[y],0);$("#ir-bp").textContent=money(bp[y],0);$("#ir-bpbox").className="ro"+(bp[y]<P?" bad":" hl");
+  const f=Math.pow(1+i,y);$("#it-cart").textContent=money(100*f,0);$("#it-movie").textContent=money(20*f,0);$("#it-cartl").textContent=`in ${y} years`;$("#it-moviel").textContent=`in ${y} years`;
+  $("#i-msg").innerHTML=real<0?`<b>You're losing ground.</b> The account shows ${money(nom[y],0)}, but that only buys what ${money(bp[y],0)} buys today. Inflation (${pct(i*100)}) is beating your return (${pct(n*100)}).`:real===0?`<b>Treading water.</b> Your return matches inflation, so your buying power stays about the same.`:`<b>You're getting ahead.</b> Your ${money(P)} grows enough to buy about ${(bp[y]/P).toFixed(1)}× as much as it does today. Real return = ${pct(n*100)} − ${pct(i*100)} = ${pct(real,1)}.`;
+  const W=600,H=250,L=58,R=12,T=12,Bm=34,yM=niceMax(Math.max(...nom,P));
+  const X=t=>L+t/y*(W-L-R),Y=v=>T+(1-v/yM)*(H-T-Bm);
+  const path=arr=>arr.map((v,k)=>(k?"L":"M")+X(k).toFixed(1)+" "+Y(v).toFixed(1)).join("");
+  const step=y<=10?1:y<=25?5:10;const ticks=[];for(let t=0;t<=y;t+=step)ticks.push([X(t),t]);
+  let g=axes(W,H,L,R,T,Bm,yM,ticks,"Years",short);
+  g+=`<line x1="${L}" x2="${W-R}" y1="${Y(P)}" y2="${Y(P)}" stroke="${css("--ink")}" stroke-dasharray="2 4" opacity=".5"/><text x="${W-R}" y="${Y(P)-5}" text-anchor="end">today's ${money(P)}</text>`;
+  g+=`<path d="${path(nom)}" fill="none" stroke="${css("--muted")}" stroke-width="2.5" stroke-dasharray="6 4"/><path d="${path(bp)}" fill="none" stroke="${css("--accent")}" stroke-width="3"/>`;
+  $("#i-chart").innerHTML=g;
+}
+[iA,iN,iI,iY].forEach(e=>e.addEventListener("input",drawInfl));
+
+/* ---------- quiz engine ---------- */
+function quiz(o){
+  const st={qs:[],i:0,right:0,streak:0,missed:[],locked:false};
+  const body=$(o.body),bar=$(o.bar),count=$(o.count),stk=o.streak&&$(o.streak);
+  function start(qs){st.qs=qs||o.make();st.i=0;st.right=0;st.streak=0;st.missed=[];render()}
+  function hud(){bar.style.width=(st.i/st.qs.length*100)+"%";count.textContent=`Question ${Math.min(st.i+1,st.qs.length)} of ${st.qs.length} · ${st.right} right`;if(stk)stk.textContent=st.streak>1?`Streak ${st.streak}`:""}
+  function render(){
+    if(st.i>=st.qs.length)return end();
+    st.locked=false;const q=st.qs[st.i];q._order=q.fixed?q.opts.map((t,k)=>({t,k})):shuffle(q.opts.map((t,k)=>({t,k})));
+    body.innerHTML=`${q.pre||""}<div class="eyebrow">${q.tag||""}</div><div class="q">${q.prompt}</div><div class="opts">${q._order.map((x,j)=>`<button class="opt" data-j="${j}"><span class="k">${j+1}</span><span>${x.t}</span></button>`).join("")}</div><div id="${o.id}-fb"></div>`;
+    body.querySelectorAll(".opt").forEach(b=>b.onclick=()=>answer(+b.dataset.j));hud();
+  }
+  function answer(j){
+    if(st.locked)return;st.locked=true;const q=st.qs[st.i],ok=q._order[j].k===0;
+    body.querySelectorAll(".opt").forEach((b,jj)=>{b.disabled=true;if(q._order[jj].k===0)b.classList.add("right");else if(jj===j)b.classList.add("wrong")});
+    if(ok){st.right++;st.streak++}else{st.streak=0;st.missed.push(q)}
+    const nextLabel=st.i+1<st.qs.length?"Next":"See results";
+    $("#"+o.id+"-fb").innerHTML=`<div class="callout ${ok?"good":"bad"}"><b>${ok?pick(["Correct.","Nice work.","That's it.","Yes."]):pick(["Not quite.","Close, but no.","Check this one."])}</b> ${q.ex}</div>${q.post?q.post(ok):""}<div class="btnrow" style="margin-top:12px"><button class="btn primary" id="${o.id}-next">${nextLabel}</button></div>`;
+    $("#"+o.id+"-next").onclick=()=>{st.i++;render()};$("#"+o.id+"-next").focus({preventScroll:true});hud();
+  }
+  function end(){
+    bar.style.width="100%";count.textContent=`Done · ${st.right} of ${st.qs.length}`;if(stk)stk.textContent="";
+    if(o.passport){try{const P=JSON.parse(localStorage.getItem("fi-passport"))||{s:{}},e=P.s[o.passport]||{n:0,best:null,of:st.qs.length};e.n++;if(e.best==null||st.right>e.best){e.best=st.right;e.of=st.qs.length}e.t=Date.now();P.s[o.passport]=e;localStorage.setItem("fi-passport",JSON.stringify(P))}catch(e){}}
+    const best=store.get(o.id+"-best",0);if(st.right>best)store.set(o.id+"-best",st.right);
+    body.innerHTML=`<div class="big num">${st.right}/${st.qs.length}</div><p class="note">Best on this device: ${Math.max(best,st.right)}/${st.qs.length}</p>
+     ${st.missed.length?`<div class="callout"><b>Review these:</b><ul class="miss">${st.missed.map(q=>`<li>${q.prompt.replace(/<[^>]+>/g,"")}<br><span class="note">${q.ex}</span></li>`).join("")}</ul></div>`:`<div class="callout good"><b>Perfect round.</b> Go again for a new set.</div>`}
+     <div class="btnrow" style="margin-top:14px"><button class="btn primary" id="${o.id}-again">New round</button>${st.missed.length?`<button class="btn" id="${o.id}-retry">Retry the ${st.missed.length} I missed</button>`:""}</div>`;
+    $("#"+o.id+"-again").onclick=()=>start();const r=$("#"+o.id+"-retry");if(r){const m=st.missed.slice();r.onclick=()=>start(m)}
+  }
+  document.addEventListener("keydown",e=>{if($(o.panel).hidden)return;const n=+e.key;if(n>=1&&n<=4&&!st.locked&&st.i<st.qs.length){const b=body.querySelector(`.opt[data-j="${n-1}"]`);if(b)b.click()}else if(e.key==="Enter"&&st.locked){const nx=$("#"+o.id+"-next");if(nx&&document.activeElement!==nx)nx.click()}});
+  return {start};
+}
+const sQ=(tag,prompt,c,w,ex,extra)=>Object.assign({tag,prompt,opts:[c,...w],ex},extra||{});
+function numQ(tag,prompt,correct,wrongs,fmt,ex){
+  const seen=new Set([fmt(correct)]),opts=[fmt(correct)];
+  for(const w of wrongs){if(!isFinite(w))continue;const f=fmt(w);if(!seen.has(f)){seen.add(f);opts.push(f)}if(opts.length===4)break}
+  for(const m of [1.5,0.5,2,0.75,1.25,3]){if(opts.length===4)break;const f=fmt(correct*m);if(!seen.has(f)){seen.add(f);opts.push(f)}}
+  return {tag,prompt,opts,ex};
+}
+
+/* ---------- 4 system sort ---------- */
+const RF=[["Farmland in central Illinois","R","Land is a physical thing that produces crops."],["A share of Nike stock","F","A share is a claim on Nike's future profits, so it is a financial asset."],["A gold bar","R","Gold is a physical commodity, a real asset."],["A U.S. Treasury bond","F","A bond is a claim on future interest and repayment from the government."],["A delivery company's warehouse","R","A building that is used to produce something is a real asset."],["$500 in a checking account","F","A bank deposit is a claim on money the bank holds for you."],["A share of an S&P 500 index fund","F","A fund share is a claim on the stocks the fund owns."],["A rental house","R","A house is a physical thing that produces rent."],["A tractor on a family farm","R","Equipment that produces something is a real asset."],["A corporate bond from Ford","F","A bond is a financial claim: Ford owes you interest and your money back."]];
+const PS=[["Hyperloop Foods sells new shares to the public for the first time in an IPO.","P","An IPO is a primary-market sale. The company gets the money."],["You buy 3 shares of Apple from another investor on a trading app.","S","You're buying from another investor, so Apple gets nothing. That's the secondary market."],["The city of Elk Grove Village sells brand-new bonds to pay for a new bridge.","P","The issuer sells new securities and receives the money: primary market."],["Your aunt sells her Treasury bond to a stranger through her broker.","S","An existing bond changes hands between investors: secondary market."],["A pension fund buys Microsoft shares on the Nasdaq.","S","Exchanges like the Nasdaq and NYSE are secondary markets where investors trade with each other."],["A startup sells new stock to venture investors to raise money for its app.","P","New shares sold by the company itself are a primary-market sale."]];
+const IM=[["Maya deposits her paycheck. The bank lends that money to a family buying a house.","Bank","A bank takes deposits from savers and lends them to borrowers."],["Jordan uses an app to buy shares of Tesla from other investors.","Broker","A broker connects buyers and sellers of securities and carries out their trades."],["Thousands of people pool their money so a professional can buy 500 different stocks for them.","Mutual fund","A mutual fund pools many investors' money into one basket of investments."],["Families pay monthly premiums; the company invests the money and pays claims after accidents.","Insurance company","An insurer collects premiums, invests them, and pays out when something bad happens."],["A small business borrows $40,000 for a food truck using money other customers deposited.","Bank","Banks turn savers' deposits into loans for borrowers."],["A teacher's retirement money is spread across hundreds of bonds by a professional manager.","Mutual fund","A fund pools money and a manager picks the investments."]];
+const sorter=quiz({id:"so",panel:"#p-sort",body:"#so-body",bar:"#so-bar",count:"#so-count",make:()=>{
+  const a=shuffle(RF).slice(0,4).map(([t,k,ex])=>sQ("1.1 Real or financial?",`<b>${t}</b>: real asset or financial asset?`,k==="R"?"Real asset":"Financial asset",[k==="R"?"Financial asset":"Real asset"],ex));
+  const b=shuffle(PS).slice(0,3).map(([t,k,ex])=>sQ("1.4 Primary or secondary market?",t,k==="P"?"Primary market":"Secondary market",[k==="P"?"Secondary market":"Primary market"],ex));
+  const c=shuffle(IM).slice(0,3).map(([t,k,ex])=>sQ("1.4 Which intermediary?",t,k,["Bank","Broker","Mutual fund","Insurance company"].filter(x=>x!==k),ex));
+  return shuffle([...a,...b,...c]);
+}});
+
+/* ---------- 5 economy desk ---------- */
+const PH=["Expansion","Peak","Contraction","Trough"];
+const FED={Expansion:["Hold steady or raise slowly","Growth is healthy and inflation is close to the Fed's 2% goal, so the Fed watches and may raise a little if inflation creeps up."],Peak:["Raise rates","Inflation is running hot and jobs are plentiful. The Fed raises rates to cool borrowing and spending."],Contraction:["Cut rates","Output is shrinking and jobs are being lost. The Fed cuts rates to make borrowing cheaper and help the economy."],Trough:["Keep rates low","The economy has bottomed out. The Fed keeps rates low to support the recovery until growth returns."]};
+const r1=(a,b)=>+(a+Math.random()*(b-a)).toFixed(1);
+function scen(ph){
+  let g,gp,u,up,c,cp,f,ftxt;
+  if(ph==="Expansion"){gp=r1(1.5,2.5);g=r1(2.3,3.5);up=r1(4.6,5.2);u=+(up-r1(.2,.5)).toFixed(1);cp=r1(1.8,2.3);c=r1(2.1,2.8);f=r1(2.5,3.5);ftxt="unchanged"}
+  if(ph==="Peak"){gp=r1(3,3.8);g=r1(1.2,2);up=r1(3.5,3.9);u=+(up-r1(0,.1)).toFixed(1);cp=r1(3.5,4.5);c=r1(4.8,6.5);f=r1(4,5.25);ftxt="raised twice this year"}
+  if(ph==="Contraction"){gp=r1(-.5,.8);g=r1(-2.8,-1);up=r1(4,4.6);u=+(up+r1(.8,1.6)).toFixed(1);cp=r1(3,4);c=r1(1.8,2.6);f=r1(3,4.5);ftxt="being debated"}
+  if(ph==="Trough"){gp=r1(-2.5,-1.2);g=r1(-.4,.4);up=r1(7,8.5);u=+(up+r1(-.1,.2)).toFixed(1);cp=r1(1.2,1.8);c=r1(.8,1.5);f=r1(.25,1);ftxt="cut to near zero"}
+  return {ph,g,gp,u,up,c,cp,f,ftxt};
+}
+function arrow(now,prev,badUp){const d=now-prev;if(Math.abs(d)<.05)return '<span>→</span>';const up=d>0;return `<span class="${(up===badUp)?"up":"dn"}">${up?"▲":"▼"}</span>`}
+function tiles(s){return `<div class="tiles">
+  <div class="tile"><span>Real GDP growth</span><b>${s.g>0?"+":""}${pct(s.g,1)} ${arrow(s.g,s.gp,false)}</b><small>last quarter, yearly pace · was ${pct(s.gp,1)}</small></div>
+  <div class="tile"><span>Unemployment</span><b>${pct(s.u,1)} ${arrow(s.u,s.up,true)}</b><small>was ${pct(s.up,1)} six months ago</small></div>
+  <div class="tile"><span>CPI inflation</span><b>${pct(s.c,1)} ${arrow(s.c,s.cp,true)}</b><small>past 12 months · was ${pct(s.cp,1)}</small></div>
+  <div class="tile"><span>Fed funds rate</span><b>${pct(s.f,2)}</b><small>target, ${s.ftxt}</small></div></div>`}
+function cycleSVG(hl){
+  const W=560,H=150,ac=css("--accent"),mu=css("--muted"),ln=css("--line");
+  const pts=[];for(let x=0;x<=W;x+=8){pts.push([x,75-50*Math.sin((x/W)*2*Math.PI*1.25-Math.PI*.15)])}
+  const d=pts.map((p,i)=>(i?"L":"M")+p[0]+" "+p[1].toFixed(1)).join("");
+  const fy=x=>75-50*Math.sin((x/W)*2*Math.PI*1.25-Math.PI*.15);const pos={};[["Expansion",88],["Peak",146],["Contraction",258],["Trough",370]].forEach(([p,x])=>pos[p]=[x,fy(x)]);
+  let g=`<line x1="0" x2="${W}" y1="75" y2="75" stroke="${ln}" stroke-dasharray="3 5"/><path d="${d}" fill="none" stroke="${mu}" stroke-width="2.5"/>`;
+  PH.forEach(p=>{const [x,y]=pos[p],on=p===hl;g+=`<circle cx="${x}" cy="${y}" r="${on?9:5}" fill="${on?ac:mu}"/><text x="${p==="Expansion"?x-14:p==="Contraction"?x+16:x}" y="${p==="Peak"?y-14:p==="Trough"?y+22:y+4}" text-anchor="${p==="Expansion"?"end":p==="Contraction"?"start":"middle"}" ${on?'class="lbl"':""}>${p}</text>`});
+  return `<svg class="chart" viewBox="0 -14 ${W} ${H+14}" role="img" aria-label="Business cycle with ${hl} highlighted" style="max-width:560px;margin-top:10px">${g}</svg>`;
+}
+const econ=quiz({id:"ec",panel:"#p-econ",body:"#ec-body",bar:"#ec-bar",count:"#ec-count",make:()=>{
+  const phases=shuffle([...PH,...shuffle(PH).slice(0,2)]);const out=[];
+  phases.forEach(ph=>{const s=scen(ph);
+    const why={Expansion:"GDP is growing at a healthy pace, unemployment is falling, and inflation is near 2%.",Peak:"Growth is still positive but slowing, unemployment is very low, and inflation is high and rising. The economy is running too hot to keep going.",Contraction:"GDP is shrinking, unemployment is rising fast, and inflation is cooling as spending drops.",Trough:"GDP has stopped falling, unemployment is high but leveling off, and inflation is low. This is the bottom before recovery."}[ph];
+    out.push({tag:"1.5 Where are we in the business cycle?",pre:tiles(s),prompt:"Which phase of the business cycle fits these readings best?",opts:[ph,...PH.filter(p=>p!==ph)],fixed:false,ex:why,post:()=>cycleSVG(ph)});
+    const [mv,mex]=FED[ph];const allMv=["Raise rates","Cut rates","Hold steady or raise slowly","Keep rates low"];
+    out.push({tag:"1.5 Predict the Fed",pre:tiles(s),prompt:`The economy is in <b>${ph.toLowerCase()}</b>. What is the Fed most likely to do with the Fed funds rate?`,opts:[mv,...allMv.filter(x=>x!==mv)],ex:mex});
+  });
+  return out.slice(0,10);
+}});
+
+/* ---------- 6 drill ---------- */
+const GEN=[
+ ()=>{const r=pick([3,4,6,8,9,12]),y=72/r;return numQ("1.2 Rule of 72",`Using the Rule of 72, about how many years does it take money to double at ${r}% per year?`,y,[100/r,144/r,r*2],v=>(+v.toFixed(1))+" years",`Years to double ≈ 72 ÷ ${r} = ${+y.toFixed(1)} years. (144 ÷ ${r} would be the time to double twice, which is 4×.)`)},
+ ()=>{const y=pick([6,8,9,12,18,24]),r=72/y;return numQ("1.2 Rule of 72",`A savings plan claims your money will double in ${y} years. About what yearly return is that?`,r,[y/72*100,100/y,y],v=>pct(v,1),`Flip the rule: rate ≈ 72 ÷ years = 72 ÷ ${y} = ${pct(r,1)}.`)},
+ ()=>{const P=pick([1000,2000,5000]),r=pick([5,8,10]),t=pick([2,3]),v=P*Math.pow(1+r/100,t);return numQ("1.2 Compounding",`You invest ${money(P)} at ${r}% compounded once a year. What is it worth after ${t} years?`,v,[P*(1+r/100*t),P*r/100*t,v-P],x=>money(x,2),`Compound: ${money(P)} × (1.${String(r).padStart(2,"0")})<sup>${t}</sup> = ${money(v,2)}. ${money(P*(1+r/100*t),2)} would be simple interest, which forgets interest on interest.`)},
+ ()=>{const n=ri(4,11),i=ri(2,6),re=n-i;return numQ("1.3 Real return",`Your investment earned ${n}% this year. Inflation was ${i}%. What was your real return?`,re,[n+i,n,n/i],v=>(v>0?"+":"")+pct(v,1),`Real return = return − inflation = ${n}% − ${i}% = ${pct(re,1)}.`)},
+ ()=>{const n=pick([0,0.5,1,1.5]),i=pick([3,4,5,6,8]),re=n-i;return numQ("1.3 Real return",`Your savings account pays ${pct(n)} while inflation runs at ${i}%. What is your real return?`,re,[i-n,n+i,n],v=>(v>0?"+":"")+pct(v,1),`Real return = ${pct(n)} − ${i}% = ${pct(re,1)}. It's negative: your balance grows, but it buys less each year.`)},
+ ()=>{const a=pick([280,300,310,320]),r=pick([2,3,4,5,6]),b=+(a*(1+r/100)).toFixed(1);return numQ("1.5 CPI",`The CPI rose from ${a} to ${b} over the past year. What was the inflation rate?`,r,[b-a,(b-a)/b*100,b/a],v=>pct(v,1),`Inflation = (new − old) ÷ old = (${b} − ${a}) ÷ ${a} = ${pct(r,1)}.`)},
+ ()=>{const lf=pick([160,165,170]),u=pick([3.5,4,5,6,8]),un=+(lf*u/100).toFixed(1);return numQ("1.5 Unemployment",`${lf} million people are in the labor force (working or looking for work). ${un} million of them want a job but don't have one. What is the unemployment rate?`,u,[un,lf/un,100-u],v=>pct(v,1),`Unemployment rate = unemployed ÷ labor force = ${un} ÷ ${lf} = ${pct(u,1)}.`)},
+ ()=>sQ("1.1 Why invest","What is the main reason to invest money instead of keeping it all in cash?","To grow faster than inflation and reach long-term goals",["Investing has no risk","Cash loses value only during recessions","The government requires it after age 18"],"Cash usually earns less than inflation, so it loses buying power. Investing takes some risk in exchange for growth that can outpace inflation."),
+ ()=>{const [t,k,ex]=pick(RF);return sQ("1.1 Real or financial?",`Is <b>${t.toLowerCase()}</b> a real asset or a financial asset?`,k==="R"?"Real asset":"Financial asset",[k==="R"?"Financial asset":"Real asset","Neither; it's an asset class","Both"],ex)},
+ ()=>sQ("1.4 Asset classes","Rank these from least to most risky:","Cash → bonds → stocks → crypto",["Stocks → cash → bonds → crypto","Bonds → cash → crypto → stocks","Cash → stocks → bonds → crypto"],"Cash barely moves, bonds swing a little, stocks swing more, and crypto can rise or fall by huge amounts quickly. More risk usually comes with a higher expected return."),
+ ()=>{const [t,k,ex]=pick(IM);return sQ("1.4 Intermediaries",t+" Which intermediary is doing the work?",k,["Bank","Broker","Mutual fund","Insurance company"].filter(x=>x!==k),ex)},
+ ()=>{const [t,k,ex]=pick(PS);return sQ("1.4 Markets",t+" Which market is this?",k==="P"?"Primary market":"Secondary market",[k==="P"?"Secondary market":"Primary market","The Federal Reserve","A financial intermediary"],ex)},
+ ()=>sQ("1.5 Business cycle","GDP has shrunk for two quarters in a row and unemployment is climbing. Which phase is this?","Contraction",["Expansion","Peak","Trough"],"Falling output and rising unemployment mean the economy is contracting. Two shrinking quarters is a common rule of thumb for a recession."),
+ ()=>sQ("1.5 The Fed","Inflation is at 6% and rising. Why would the Fed raise the Fed funds rate?","Higher rates make borrowing cost more, which slows spending and cools inflation",["Higher rates make stocks rise, which lowers prices","Raising rates prints more money","Higher rates lower unemployment right away"],"When borrowing gets expensive, people and businesses spend less, which takes pressure off prices. The Volcker Shock is the extreme example."),
+ ()=>{const P=pick([1000,2000,5000]),r=pick([6,8,9,12]),k=pick([2,3]),d=72/r,y=d*k,v=P*Math.pow(2,k);return numQ("1.2 Rule of 72",`At ${r}% a year, about what will ${money(P)} grow to in ${y} years? Use the Rule of 72.`,v,[P*k,P*2,P*(1+r/100*y)],x=>money(x,0),`At ${r}%, money doubles about every 72 ÷ ${r} = ${d} years. In ${y} years it doubles ${k} times: ${money(P)} → ${money(v,0)}.`)}
+];
+const drill=quiz({id:"dr",panel:"#p-drill",body:"#dr-body",bar:"#dr-bar",count:"#dr-count",streak:"#dr-streak",passport:"unit-1-lab",make:()=>{
+  const calc=shuffle(GEN.slice(0,7)).slice(0,5),rest=shuffle(GEN.slice(7)).slice(0,5);return shuffle([...calc,...rest]).map(f=>f())}});
+
+/* ---------- boot ---------- */
+function redraw(){drawGrow();drawRace();drawInfl()}
+sorter.start();econ.start();drill.start();redraw();
+const t=store.get("tab","grow");if(t!=="grow"&&$("#p-"+t))show(t);
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change",redraw);
+new MutationObserver(redraw).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});
+})();
+</script>
+</body>
+</html>
