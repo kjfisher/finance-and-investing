@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Bond Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,500..800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+html{color-scheme:light}
+body{margin:0}
+[hidden]{display:none!important}
+img{max-width:100%}
+.back{display:inline-block;margin-bottom:10px;font-weight:600;color:var(--accent);text-decoration:none}
+.back:hover{text-decoration:underline}
+
+/* Layout: a bond-certificate header, then a tab strip of five iPad-sized labs, one visible at a time */
+:root{
+  --bg:#f3f5f9; --surface:#ffffff; --sunk:#e9edf5; --ink:#131a2c; --muted:#5a6480; --line:#d7dce8;
+  --accent:#1f4fd0; --accent-ink:#ffffff; --accent-soft:#e3eaff;
+  --gain:#0f7a55; --gain-soft:#dcf3ea; --loss:#b8352a; --loss-soft:#fbe5e2; --gold:#a8730a; --gold-soft:#fbf0d6;
+  --display:"Archivo",system-ui,sans-serif; --body:"Source Sans 3",system-ui,sans-serif; --mono:"JetBrains Mono",ui-monospace,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0d1120; --surface:#151b2e; --sunk:#1c2339; --ink:#e7eaf4; --muted:#9aa3bf; --line:#2a3250;
+  --accent:#7f98ff; --accent-ink:#0d1120; --accent-soft:#1f2a52;
+  --gain:#41cf97; --gain-soft:#12352a; --loss:#ff7b6e; --loss-soft:#3d1c1a; --gold:#f0be55; --gold-soft:#3a2e12; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0d1120; --surface:#151b2e; --sunk:#1c2339; --ink:#e7eaf4; --muted:#9aa3bf; --line:#2a3250;
+  --accent:#7f98ff; --accent-ink:#0d1120; --accent-soft:#1f2a52;
+  --gain:#41cf97; --gain-soft:#12352a; --loss:#ff7b6e; --loss-soft:#3d1c1a; --gold:#f0be55; --gold-soft:#3a2e12; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.5}
+.wrap{max-width:1040px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.1}
+.mono,.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+/* certificate header */
+.cert{border:2px solid var(--ink);border-radius:4px;padding:18px 20px;position:relative;background:var(--surface);
+  background-image:repeating-linear-gradient(45deg,transparent 0 10px,var(--sunk) 10px 11px);}
+.cert-inner{background:var(--surface);border:1px solid var(--line);padding:16px 18px;display:flex;flex-wrap:wrap;gap:12px 24px;align-items:end;justify-content:space-between}
+.eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.cert h1{font-size:clamp(34px,6vw,54px);font-stretch:120%;font-weight:800;letter-spacing:-.01em}
+.cert p{margin:4px 0 0;color:var(--muted);max-width:52ch}
+.face{text-align:right}
+.face .num{font-size:28px;font-weight:700}
+.face small{display:block;color:var(--muted);font-size:13px}
+/* tabs */
+.tabs{display:flex;gap:6px;margin:20px 0 16px;overflow-x:auto;padding-bottom:4px}
+.tab{flex:0 0 auto;font:600 16px var(--body);padding:10px 16px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;min-height:44px}
+.tab[aria-selected="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.tab .t{font-family:var(--mono);font-size:12px;opacity:.7;margin-left:6px}
+.tab:focus-visible,button:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.panel-head{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;align-items:baseline;margin-bottom:12px}
+.panel-head h2{font-size:28px;font-stretch:110%}
+.panel-head p{margin:2px 0 0;color:var(--muted);max-width:62ch}
+.target{font:700 12px var(--mono);background:var(--accent-soft);color:var(--accent);padding:4px 8px;border-radius:4px;white-space:nowrap}
+.grid{display:grid;grid-template-columns:minmax(0,340px) minmax(0,1fr);gap:16px}
+@media (max-width:760px){.grid{grid-template-columns:minmax(0,1fr)}}
+.box{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;min-width:0}
+.ctl{display:grid;gap:4px;margin-bottom:14px}
+.ctl label{display:flex;justify-content:space-between;font-weight:600}
+.ctl label .num{color:var(--accent)}
+input[type=range]{width:100%;accent-color:var(--accent);height:32px}
+.readouts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:6px}
+.ro{background:var(--sunk);border-radius:8px;padding:10px 12px}
+.ro span{display:block;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.ro b{font:700 22px var(--mono);font-variant-numeric:tabular-nums}
+.pill{display:inline-block;font:700 13px var(--body);letter-spacing:.06em;text-transform:uppercase;padding:4px 10px;border-radius:999px}
+.pill.prem{background:var(--gain-soft);color:var(--gain)}
+.pill.disc{background:var(--loss-soft);color:var(--loss)}
+.pill.par{background:var(--gold-soft);color:var(--gold)}
+.btn{font:700 16px var(--body);min-height:44px;padding:10px 16px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btnrow{display:flex;flex-wrap:wrap;gap:8px}
+.note{font-size:15px;color:var(--muted);margin:10px 0 0}
+.callout{margin-top:12px;padding:12px 14px;border-radius:8px;background:var(--sunk);font-size:16px}
+.callout.good{background:var(--gain-soft)} .callout.bad{background:var(--loss-soft)}
+svg text{font-family:var(--body);fill:var(--muted);font-size:12px}
+svg .lbl{fill:var(--ink);font-weight:700}
+.chart{width:100%;height:auto;display:block}
+/* yield curve sliders */
+.ycs{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px;margin-top:10px}
+.ycs .ctl{margin:0;text-align:center}
+.ycs label{justify-content:center;font-size:14px}
+.ycs .num{font-size:14px}
+/* rating sorter */
+.ladder{display:flex;flex-direction:column;gap:2px;font:700 14px var(--mono)}
+.rung{display:flex;justify-content:space-between;padding:6px 10px;border-radius:4px}
+.rung.ig{background:var(--gain-soft);color:var(--gain)} .rung.junk{background:var(--loss-soft);color:var(--loss)}
+.line-cut{border-top:3px dashed var(--ink);margin:4px 0;position:relative}
+.line-cut span{position:absolute;right:0;top:-11px;background:var(--surface);padding:0 6px;font:700 11px var(--body);letter-spacing:.08em;text-transform:uppercase}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+.bcard{border:1px solid var(--line);border-radius:10px;padding:12px;background:var(--surface);display:grid;gap:8px}
+.bcard h3{font-size:17px;font-stretch:100%}
+.bcard .meta{display:flex;justify-content:space-between;font-family:var(--mono);font-size:14px;color:var(--muted)}
+.bcard .meta b{color:var(--ink);font-size:18px}
+.bcard.right{border-color:var(--gain);background:var(--gain-soft)} .bcard.wrong{border-color:var(--loss);background:var(--loss-soft)}
+.bcard .two{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.bcard .two .btn{font-size:14px;padding:8px}
+/* picker + practice */
+.q{font-size:20px;font-weight:600;margin:6px 0 14px;max-width:60ch}
+.opts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+@media (max-width:560px){.opts{grid-template-columns:minmax(0,1fr)}}
+.opt{text-align:left;font:600 17px var(--body);padding:14px 16px;border-radius:10px;border:2px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;min-height:56px;display:flex;gap:10px;align-items:center}
+.opt .k{font:700 13px var(--mono);color:var(--muted);border:1px solid var(--line);border-radius:4px;padding:1px 6px}
+.opt:hover:not([disabled]){border-color:var(--accent)}
+.opt.right{border-color:var(--gain);background:var(--gain-soft)}
+.opt.wrong{border-color:var(--loss);background:var(--loss-soft)}
+.opt[disabled]{cursor:default}
+.progress{height:8px;background:var(--sunk);border-radius:99px;overflow:hidden;margin:4px 0 12px}
+.progress i{display:block;height:100%;background:var(--accent);transition:width .3s}
+.scoreline{display:flex;justify-content:space-between;font-weight:600;color:var(--muted);flex-wrap:wrap;gap:8px}
+.big{font:800 64px var(--display);font-stretch:120%}
+.miss{margin:8px 0 0;padding-left:20px} .miss li{margin-bottom:6px}
+.foot{margin-top:28px;color:var(--muted);font-size:14px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="/">← F&amp;I Arcade</a>
+  <header class="cert">
+    <div class="cert-inner">
+      <div>
+        <div class="eyebrow">Finance &amp; Investing · D214 · Unit 5</div>
+        <h1>Bond Lab</h1>
+        <p>Five hands-on labs for bonds: move rates and watch prices react, build a yield curve, sort credit ratings, match investors to bonds, then test yourself.</p>
+      </div>
+      <div class="face">
+        <small>Face value</small><span class="num">$1,000</span>
+        <small>Coupon = face × coupon rate</small>
+      </div>
+    </div>
+  </header>
+
+  <nav class="tabs" role="tablist" aria-label="Bond labs">
+    <button class="tab" role="tab" id="tab-seesaw" data-p="seesaw" aria-selected="true">Rate Seesaw<span class="t">5.1 5.3</span></button>
+    <button class="tab" role="tab" id="tab-curve" data-p="curve" aria-selected="false">Yield Curve<span class="t">5.4</span></button>
+    <button class="tab" role="tab" id="tab-ratings" data-p="ratings" aria-selected="false">Rating Sort<span class="t">5.4</span></button>
+    <button class="tab" role="tab" id="tab-picker" data-p="picker" aria-selected="false">Bond Matchmaker<span class="t">5.2 5.5</span></button>
+    <button class="tab" role="tab" id="tab-practice" data-p="practice" aria-selected="false">Bond Drill<span class="t">5.1–5.5</span></button>
+  </nav>
+
+  <!-- 1 SEESAW -->
+  <section class="panel" id="p-seesaw" role="tabpanel" aria-labelledby="tab-seesaw">
+    <div class="panel-head">
+      <div><h2>Rate Seesaw</h2><p>Your bond's coupon is locked in. When new bonds pay more, yours is worth less, and the reverse. Move the market rate and watch the price.</p></div>
+    </div>
+    <div class="grid">
+      <div class="box">
+        <div class="ctl"><label for="s-coupon">Your coupon rate <span class="num" id="v-coupon"></span></label><input type="range" id="s-coupon" min="1" max="10" step="0.5" value="5"></div>
+        <div class="ctl"><label for="s-market">Market rate on new bonds <span class="num" id="v-market"></span></label><input type="range" id="s-market" min="1" max="10" step="0.25" value="5"></div>
+        <div class="ctl"><label for="s-years">Years to maturity <span class="num" id="v-years"></span></label><input type="range" id="s-years" min="1" max="30" step="1" value="10"></div>
+        <div class="btnrow">
+          <button class="btn primary" id="shock-up">Rates +1%</button>
+          <button class="btn" id="shock-down">Rates −1%</button>
+          <button class="btn" id="reset-par">Reset to par</button>
+        </div>
+        <div class="callout" id="shock-msg" hidden></div>
+      </div>
+      <div class="box">
+        <svg class="chart" id="seesaw" viewBox="0 0 560 170" role="img" aria-label="Seesaw showing market rate against bond price"></svg>
+        <div class="readouts">
+          <div class="ro"><span>Yearly coupon</span><b id="r-coupon"></b></div>
+          <div class="ro"><span>Bond price</span><b id="r-price"></b></div>
+          <div class="ro"><span>Current yield</span><b id="r-cy"></b></div>
+          <div class="ro"><span>Trades at</span><b id="r-tag"></b></div>
+        </div>
+        <svg class="chart" id="pricechart" viewBox="0 0 560 240" role="img" aria-label="Bond price across market rates" style="margin-top:12px"></svg>
+        <p class="note">Solid line: your bond. Dashed line: the same coupon with only 2 years left. Longer bonds swing more when rates move. That is <b>interest-rate risk</b>.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2 YIELD CURVE -->
+  <section class="panel" id="p-curve" role="tabpanel" aria-labelledby="tab-curve" hidden>
+    <div class="panel-head">
+      <div><h2>Yield Curve Builder</h2><p>Set Treasury yields for each maturity. The lab reads the shape. Normal means long rates are higher; inverted means short rates are higher.</p></div>
+    </div>
+    <div class="box">
+      <div class="btnrow" style="margin-bottom:10px">
+        <button class="btn" data-preset="normal">Example: normal</button>
+        <button class="btn" data-preset="flat">Example: flat</button>
+        <button class="btn" data-preset="inverted">Example: inverted</button>
+        <button class="btn primary" id="curve-challenge">New challenge</button>
+      </div>
+      <div class="callout" id="curve-task" hidden></div>
+      <svg class="chart" id="curvechart" viewBox="0 0 640 260" role="img" aria-label="Yield curve chart"></svg>
+      <div class="ycs" id="ycs"></div>
+      <div class="callout" id="curve-read"></div>
+    </div>
+  </section>
+
+  <!-- 3 RATINGS -->
+  <section class="panel" id="p-ratings" role="tabpanel" aria-labelledby="tab-ratings" hidden>
+    <div class="panel-head">
+      <div><h2>Rating Sort</h2><p>Tap each bond as investment grade or junk. Then look at the yields: what do riskier issuers have to pay?</p></div>
+      <div class="btnrow"><button class="btn" id="rate-new">New set</button></div>
+    </div>
+    <div class="grid">
+      <div class="box">
+        <div class="eyebrow" style="margin-bottom:8px">Rating ladder (S&amp;P style)</div>
+        <div class="ladder" id="ladder"></div>
+        <p class="note">BBB or higher is investment grade. BB or lower is junk (high-yield).</p>
+        <div class="callout" id="rate-score">Sorted <b class="num">0</b> of 8</div>
+      </div>
+      <div class="box"><div class="cards" id="rcards"></div><div class="callout" id="rate-wrap" hidden></div></div>
+    </div>
+  </section>
+
+  <!-- 4 PICKER -->
+  <section class="panel" id="p-picker" role="tabpanel" aria-labelledby="tab-picker" hidden>
+    <div class="panel-head">
+      <div><h2>Bond Matchmaker</h2><p>Read what each investor needs. Pick the bond that fits best.</p></div>
+      <div class="scoreline"><span id="pk-count"></span></div>
+    </div>
+    <div class="box">
+      <div class="progress"><i id="pk-bar"></i></div>
+      <div id="pk-body"></div>
+    </div>
+  </section>
+
+  <!-- 5 PRACTICE -->
+  <section class="panel" id="p-practice" role="tabpanel" aria-labelledby="tab-practice" hidden>
+    <div class="panel-head">
+      <div><h2>Bond Drill</h2><p>Ten questions with fresh numbers each round. Wrong answers are built from common mix-ups, so read the explanation when you miss.</p></div>
+      <div class="scoreline"><span id="dr-count"></span><span id="dr-streak"></span></div>
+    </div>
+    <div class="box">
+      <div class="progress"><i id="dr-bar"></i></div>
+      <div id="dr-body"></div>
+    </div>
+  </section>
+
+  <p class="foot">Built for Finance &amp; Investing at Elk Grove High School (D214). Issuer names are made up. Yields shown are classroom examples, not live market data. Keys 1–4 answer questions on a keyboard.</p>
+</div>
+
+<script>
+(function(){
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const ri=(a,b)=>Math.floor(Math.random()*(b-a+1))+a, pick=a=>a[Math.floor(Math.random()*a.length)];
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const money=(v,d)=>{const neg=v<0;v=Math.abs(v);const dec=d!=null?d:(Math.abs(v-Math.round(v))<1e-9?0:2);return (neg?"−":"")+"$"+v.toLocaleString("en-US",{minimumFractionDigits:dec,maximumFractionDigits:dec})};
+const pct=(v,d=2)=>{let s=(+v).toFixed(d);s=s.replace(/\.?0+$/,"");return s+"%"};
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const store={get(k,d){try{const v=localStorage.getItem("bondlab-"+k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem("bondlab-"+k,JSON.stringify(v))}catch(e){}}};
+
+/* ---------- tabs ---------- */
+function show(p){$$(".tab").forEach(t=>t.setAttribute("aria-selected",t.dataset.p===p));$$(".panel").forEach(s=>s.hidden=s.id!=="p-"+p);store.set("tab",p);if(p==="curve")drawCurve();if(p==="seesaw")drawSeesaw()}
+$$(".tab").forEach(t=>t.addEventListener("click",()=>show(t.dataset.p)));
+
+/* ---------- 1 seesaw ---------- */
+function price(c,y,n){const C=10*c,r=y/100;if(r===0)return C*n+1000;return C*(1-Math.pow(1+r,-n))/r+1000*Math.pow(1+r,-n)}
+const sc=$("#s-coupon"),sm=$("#s-market"),sy=$("#s-years");
+function drawSeesaw(){
+  const c=+sc.value,y=+sm.value,n=+sy.value,P=price(c,y,n),C=10*c;
+  $("#v-coupon").textContent=pct(c);$("#v-market").textContent=pct(y);$("#v-years").textContent=n+(n===1?" yr":" yrs");
+  $("#r-coupon").textContent=money(C);$("#r-price").textContent=money(P,2);$("#r-cy").textContent=pct(C/P*100);
+  const diff=P-1000;
+  $("#r-tag").innerHTML=Math.abs(diff)<0.5?'<span class="pill par">Par</span>':diff>0?'<span class="pill prem">Premium</span>':'<span class="pill disc">Discount</span>';
+  // seesaw
+  const ang=Math.max(-16,Math.min(16,(y-c)*3.2));
+  const ink=css("--ink"),acc=css("--accent"),loss=css("--loss"),gain=css("--gain"),line=css("--line");
+  const up=y>c+0.001, down=y<c-0.001;
+  $("#seesaw").innerHTML=`
+   <polygon points="280,150 255,165 305,165" fill="${ink}"/>
+   <g transform="rotate(${ang} 280 150)">
+     <rect x="60" y="144" width="440" height="8" rx="4" fill="${ink}"/>
+     <rect x="60" y="96" width="120" height="48" rx="8" fill="${acc}"/>
+     <text x="120" y="117" text-anchor="middle" style="fill:${css("--accent-ink")};font-weight:700;font-size:13px">MARKET RATE</text>
+     <text x="120" y="136" text-anchor="middle" style="fill:${css("--accent-ink")};font-weight:700;font-size:16px;font-family:var(--mono)">${pct(y)}</text>
+     <rect x="380" y="96" width="120" height="48" rx="8" fill="${diff>=-0.5?(diff>0.5?gain:css("--gold")):loss}"/>
+     <text x="440" y="117" text-anchor="middle" style="fill:${css("--surface")};font-weight:700;font-size:13px">BOND PRICE</text>
+     <text x="440" y="136" text-anchor="middle" style="fill:${css("--surface")};font-weight:700;font-size:16px;font-family:var(--mono)">${money(P,0)}</text>
+   </g>
+   <text x="280" y="24" text-anchor="middle" class="lbl" style="font-size:15px">${up?"Market rate is above your coupon, so your bond sells for less than $1,000":down?"Market rate is below your coupon, so your bond sells for more than $1,000":"Market rate equals your coupon, so the bond sells at par"}</text>`;
+  drawPriceChart(c,y,n,P);
+}
+function drawPriceChart(c,y,n,P){
+  const W=560,H=240,L=58,R=16,T=14,B=36;
+  const rates=[];for(let r=1;r<=10.0001;r+=0.25)rates.push(+r.toFixed(2));
+  const a=rates.map(r=>price(c,r,n)),b=rates.map(r=>price(c,r,Math.min(2,n)));
+  let lo=Math.min(...a,...b),hi=Math.max(...a,...b);lo=Math.floor(lo/100)*100;hi=Math.ceil(hi/100)*100;if(hi-lo<200){hi+=100;lo-=100}
+  const X=r=>L+(r-1)/9*(W-L-R),Y=p=>T+(hi-p)/(hi-lo)*(H-T-B);
+  const path=arr=>arr.map((p,i)=>(i?"L":"M")+X(rates[i]).toFixed(1)+" "+Y(p).toFixed(1)).join("");
+  const line=css("--line"),muted=css("--muted"),acc=css("--accent"),ink=css("--ink");
+  let g="";const step=(hi-lo)/4;
+  for(let i=0;i<=4;i++){const v=lo+step*i;g+=`<line x1="${L}" x2="${W-R}" y1="${Y(v)}" y2="${Y(v)}" stroke="${line}"/><text x="${L-6}" y="${Y(v)+4}" text-anchor="end">${money(v,0)}</text>`}
+  for(let r=1;r<=10;r+=1){g+=`<text x="${X(r)}" y="${H-B+18}" text-anchor="middle">${r}%</text>`}
+  g+=`<text x="${(L+W-R)/2}" y="${H-4}" text-anchor="middle">Market rate</text>`;
+  if(1000>=lo&&1000<=hi)g+=`<line x1="${L}" x2="${W-R}" y1="${Y(1000)}" y2="${Y(1000)}" stroke="${muted}" stroke-dasharray="2 4"/><text x="${W-R}" y="${Y(1000)-5}" text-anchor="end">par $1,000</text>`;
+  g+=`<path d="${path(b)}" fill="none" stroke="${muted}" stroke-width="2" stroke-dasharray="6 5"/>`;
+  g+=`<path d="${path(a)}" fill="none" stroke="${acc}" stroke-width="3"/>`;
+  g+=`<circle cx="${X(y)}" cy="${Y(P)}" r="7" fill="${acc}" stroke="${css("--surface")}" stroke-width="3"/>`;
+  $("#pricechart").innerHTML=g;
+}
+[sc,sm,sy].forEach(e=>e.addEventListener("input",()=>{$("#shock-msg").hidden=true;drawSeesaw()}));
+function shock(d){const c=+sc.value,n=+sy.value,y0=+sm.value,y1=Math.max(1,Math.min(10,y0+d));if(y1===y0)return;
+  const p0=price(c,y0,n),p1=price(c,y1,n),p2a=price(c,y0,Math.min(2,n)),p2b=price(c,y1,Math.min(2,n));sm.value=y1;drawSeesaw();
+  const ch=(p1-p0)/p0*100,ch2=(p2b-p2a)/p2a*100,m=$("#shock-msg");m.hidden=false;m.className="callout "+(d>0?"bad":"good");
+  m.innerHTML=`Rates ${d>0?"rose":"fell"} from ${pct(y0)} to ${pct(y1)}. Your ${n}-year bond went from <b class="num">${money(p0,2)}</b> to <b class="num">${money(p1,2)}</b> (<b class="num">${ch>0?"+":""}${ch.toFixed(1)}%</b>). ${n>2?`A 2-year bond would move only <b class="num">${ch2>0?"+":""}${ch2.toFixed(1)}%</b>.`:""}`}
+$("#shock-up").onclick=()=>shock(1);$("#shock-down").onclick=()=>shock(-1);
+$("#reset-par").onclick=()=>{sm.value=sc.value;$("#shock-msg").hidden=true;drawSeesaw()};
+
+/* ---------- 2 yield curve ---------- */
+const MAT=[["3 mo",0.25],["2 yr",2],["5 yr",5],["10 yr",10],["20 yr",20],["30 yr",30]];
+const PRE={normal:[3.0,3.6,4.0,4.4,4.7,4.8],flat:[4.2,4.2,4.15,4.2,4.25,4.2],inverted:[5.4,4.9,4.4,4.1,4.2,4.1]};
+let curve=store.get("curve",PRE.normal.slice()),task=null;
+$("#ycs").innerHTML=MAT.map((m,i)=>`<div class="ctl"><label for="yc${i}">${m[0]}</label><input type="range" id="yc${i}" min="0" max="8" step="0.05" value="${curve[i]}" aria-label="${m[0]} yield"><span class="num" id="ycv${i}"></span></div>`).join("");
+MAT.forEach((m,i)=>$("#yc"+i).addEventListener("input",e=>{curve[i]=+e.target.value;store.set("curve",curve);drawCurve()}));
+$$("[data-preset]").forEach(b=>b.onclick=()=>{curve=PRE[b.dataset.preset].slice();MAT.forEach((m,i)=>$("#yc"+i).value=curve[i]);store.set("curve",curve);drawCurve()});
+function shape(){const d=curve[3]-curve[0];return d>0.5?"normal":d<-0.25?"inverted":"flat"}
+const TASKS=[["normal","Build a <b>normal</b> curve: investors want more yield for tying money up longer."],["inverted","Build an <b>inverted</b> curve: short-term Treasuries pay more than 10-year ones."],["flat","Build a <b>flat</b> curve: short and long yields are about the same (within half a percent)."]];
+$("#curve-challenge").onclick=()=>{let t;do{t=pick(TASKS)}while(task&&t[0]===task[0]&&Math.random()<.8);task=t;const el=$("#curve-task");el.hidden=false;drawCurve()};
+function drawCurve(){
+  const W=640,H=260,L=46,R=18,T=16,B=34,lo=0,hi=8;
+  const X=i=>L+i/(MAT.length-1)*(W-L-R),Y=v=>T+(hi-v)/(hi-lo)*(H-T-B);
+  const line=css("--line"),acc=css("--accent");let g="";
+  for(let v=0;v<=8;v+=2)g+=`<line x1="${L}" x2="${W-R}" y1="${Y(v)}" y2="${Y(v)}" stroke="${line}"/><text x="${L-6}" y="${Y(v)+4}" text-anchor="end">${v}%</text>`;
+  MAT.forEach((m,i)=>g+=`<text x="${X(i)}" y="${H-B+20}" text-anchor="middle">${m[0]}</text>`);
+  const sh=shape(),col=sh==="normal"?css("--gain"):sh==="inverted"?css("--loss"):css("--gold");
+  const d=curve.map((v,i)=>(i?"L":"M")+X(i)+" "+Y(v)).join("");
+  g+=`<path d="${d} L${X(5)} ${Y(0)} L${X(0)} ${Y(0)} Z" fill="${col}" opacity=".12"/><path d="${d}" fill="none" stroke="${col}" stroke-width="3"/>`;
+  curve.forEach((v,i)=>g+=`<circle cx="${X(i)}" cy="${Y(v)}" r="6" fill="${col}" stroke="${css("--surface")}" stroke-width="2"/><text x="${X(i)}" y="${Y(v)-12}" text-anchor="middle" class="lbl">${v.toFixed(2)}%</text>`);
+  $("#curvechart").innerHTML=g;
+  MAT.forEach((m,i)=>$("#ycv"+i).textContent=curve[i].toFixed(2)+"%");
+  const spread=(curve[3]-curve[0]);
+  const msg={normal:"<b>Normal curve.</b> Long-term bonds pay more than short-term ones, which is the usual reward for locking money up longer and taking more interest-rate risk.",
+    flat:"<b>Flat curve.</b> Short and long yields are close. Investors are unsure where the economy is headed; this often shows up during a shift between normal and inverted.",
+    inverted:"<b>Inverted curve.</b> Short-term yields are above long-term yields. Investors expect rates to fall, often because they expect a slowdown. Inversions have come before many past recessions, but not every time."}[sh];
+  $("#curve-read").innerHTML=`${msg}<br><span class="note">10-year minus 3-month spread: <b class="num">${spread>0?"+":""}${spread.toFixed(2)}%</b></span>`;
+  if(task){const el=$("#curve-task"),ok=sh===task[0];el.className="callout "+(ok?"good":"");el.innerHTML=(ok?"✓ Done. ":"")+task[1]}
+}
+
+/* ---------- 3 ratings ---------- */
+const RUNGS=["AAA","AA","A","BBB","BB","B","CCC","D"];
+$("#ladder").innerHTML=RUNGS.map(r=>`${r==="BB"?'<div class="line-cut"><span>junk line</span></div>':""}<div class="rung ${RUNGS.indexOf(r)<=3?"ig":"junk"}"><span>${r}</span><span>${RUNGS.indexOf(r)<=3?"Investment grade":r==="D"?"In default":"Junk"}</span></div>`).join("");
+const ISSUERS=["Northfield Water District","Cedar Ridge School District","Brightline Rail Co.","Harbor Light Utilities","Quickcart Delivery Inc.","Blue Mesa Airlines","Pinecrest Hospital System","Volt Avenue Motors","Lakeshore Telecom","Sunnyfield Foods","Riverbend City","Granite Peak Mining","Orbit Snacks Co.","Maple Hollow Resorts","Copperline Energy","U.S. Treasury"];
+const BASE={AAA:4.3,AA:4.6,A:5.0,BBB:5.6,BB:6.9,B:8.4,CCC:12.5};
+let rset=[];
+function newRatings(){
+  const pool=shuffle(ISSUERS.filter(x=>x!=="U.S. Treasury")).slice(0,8);
+  const rs=shuffle(["AAA","AA","A","BBB","BB","B","CCC",pick(["A","BBB","BB","B"])]);
+  rset=pool.map((n,i)=>({n,r:rs[i],y:+(BASE[rs[i]]+ri(-15,15)/100).toFixed(2),ans:null}));
+  $("#rate-wrap").hidden=true;renderRatings();
+}
+function renderRatings(){
+  $("#rcards").innerHTML=rset.map((b,i)=>{const ig=RUNGS.indexOf(b.r)<=3,cls=b.ans==null?"":(b.ans===ig?"right":"wrong");
+    return `<div class="bcard ${cls}"><h3>${b.n}</h3><div class="meta"><span>Rating <b>${b.r}</b></span><span>Yield <b>${b.ans==null?"?":pct(b.y)}</b></span></div>
+    ${b.ans==null?`<div class="two"><button class="btn" data-i="${i}" data-a="1">Investment grade</button><button class="btn" data-i="${i}" data-a="0">Junk</button></div>`:`<div style="font-weight:700;color:var(${b.ans===ig?"--gain":"--loss"})">${b.ans===ig?"✓ ":"✗ "}${ig?"Investment grade (BBB or higher)":"Junk (BB or lower)"}</div>`}</div>`}).join("");
+  $$("#rcards [data-i]").forEach(b=>b.onclick=()=>{rset[+b.dataset.i].ans=b.dataset.a==="1";renderRatings()});
+  const done=rset.filter(b=>b.ans!=null),right=done.filter(b=>b.ans===(RUNGS.indexOf(b.r)<=3)).length;
+  $("#rate-score").innerHTML=`Sorted <b class="num">${done.length}</b> of 8 · Correct <b class="num">${right}</b>`;
+  if(done.length===8){const hi=rset.reduce((a,b)=>b.y>a.y?b:a),lo=rset.reduce((a,b)=>b.y<a.y?b:a);const w=$("#rate-wrap");w.hidden=false;
+    w.innerHTML=`<b>Look at the yields.</b> ${hi.n} (${hi.r}) pays <b class="num">${pct(hi.y)}</b>, while ${lo.n} (${lo.r}) pays only <b class="num">${pct(lo.y)}</b>. The riskier the issuer, the more interest it must offer to get anyone to lend to it. That extra yield is pay for taking default risk.`}
+}
+$("#rate-new").onclick=newRatings;newRatings();
+
+/* ---------- shared quiz engine ---------- */
+function quiz(opts){
+  const st={qs:[],i:0,right:0,streak:0,best:0,missed:[],locked:false};
+  const body=$(opts.body),bar=$(opts.bar),count=$(opts.count),streakEl=opts.streak&&$(opts.streak);
+  function start(qs){st.qs=qs||opts.make();st.i=0;st.right=0;st.streak=0;st.missed=[];render()}
+  function hud(){bar.style.width=(st.i/st.qs.length*100)+"%";count.textContent=`Question ${Math.min(st.i+1,st.qs.length)} of ${st.qs.length} · ${st.right} right`;if(streakEl)streakEl.textContent=st.streak>1?`Streak ${st.streak}`:""}
+  function render(){
+    if(st.i>=st.qs.length)return end();
+    st.locked=false;const q=st.qs[st.i];
+    const order=shuffle(q.opts.map((t,k)=>({t,k})));q._order=order;
+    body.innerHTML=`<div class="eyebrow">${q.tag||""}</div><div class="q">${q.prompt}</div><div class="opts">${order.map((o,j)=>`<button class="opt" data-j="${j}"><span class="k">${j+1}</span><span>${o.t}</span></button>`).join("")}</div><div id="${opts.id}-fb"></div>`;
+    body.querySelectorAll(".opt").forEach(b=>b.onclick=()=>answer(+b.dataset.j));hud();
+  }
+  function answer(j){
+    if(st.locked)return;st.locked=true;const q=st.qs[st.i],o=q._order[j],ok=o.k===0;
+    body.querySelectorAll(".opt").forEach((b,jj)=>{b.disabled=true;if(q._order[jj].k===0)b.classList.add("right");else if(jj===j)b.classList.add("wrong")});
+    if(ok){st.right++;st.streak++}else{st.streak=0;st.missed.push(q)}
+    $("#"+opts.id+"-fb").innerHTML=`<div class="callout ${ok?"good":"bad"}"><b>${ok?pick(["Correct.","Nice work.","That's it.","Yes."]):pick(["Not quite.","Close, but no.","Check this one."])}</b> ${q.ex}</div><div class="btnrow" style="margin-top:12px"><button class="btn primary" id="${opts.id}-next">${st.i+1<st.qs.length?"Next question":"See results"}</button></div>`;
+    $("#"+opts.id+"-next").onclick=()=>{st.i++;render()};$("#"+opts.id+"-next").focus({preventScroll:true});hud();
+  }
+  function end(){
+    bar.style.width="100%";count.textContent=`Done · ${st.right} of ${st.qs.length}`;if(streakEl)streakEl.textContent="";
+    if(opts.id==="dr"){try{const P=JSON.parse(localStorage.getItem("fi-passport"))||{s:{}},e=P.s["bond-lab"]||{n:0,best:null,of:st.qs.length};e.n++;if(e.best==null||st.right>e.best){e.best=st.right;e.of=st.qs.length}e.t=Date.now();P.s["bond-lab"]=e;localStorage.setItem("fi-passport",JSON.stringify(P))}catch(e){}}
+    const best=store.get(opts.id+"-best",0);if(st.right>best)store.set(opts.id+"-best",st.right);
+    body.innerHTML=`<div class="big num">${st.right}/${st.qs.length}</div><p class="note">Best this device: ${Math.max(best,st.right)}/${st.qs.length}</p>
+     ${st.missed.length?`<div class="callout"><b>Review these:</b><ul class="miss">${st.missed.map(q=>`<li>${q.prompt.replace(/<[^>]+>/g,"")}<br><span class="note">${q.ex}</span></li>`).join("")}</ul></div>`:`<div class="callout good"><b>Perfect round.</b> Try another set; the numbers change every time.</div>`}
+     <div class="btnrow" style="margin-top:14px"><button class="btn primary" id="${opts.id}-again">New round</button>${st.missed.length?`<button class="btn" id="${opts.id}-retry">Retry the ${st.missed.length} I missed</button>`:""}</div>`;
+    $("#"+opts.id+"-again").onclick=()=>start();const r=$("#"+opts.id+"-retry");if(r){const m=st.missed.slice();r.onclick=()=>start(m)}
+  }
+  document.addEventListener("keydown",e=>{if($(opts.panel).hidden)return;const n=+e.key;if(n>=1&&n<=4&&!st.locked&&st.i<st.qs.length){const b=body.querySelector(`.opt[data-j="${n-1}"]`);if(b)b.click()}else if(e.key==="Enter"&&st.locked){const nx=$("#"+opts.id+"-next");if(nx&&document.activeElement!==nx)nx.click()}});
+  return {start};
+}
+
+/* ---------- 4 matchmaker ---------- */
+const TYPES={T:"Treasury bond",TIPS:"TIPS",M:"Municipal bond",C:"Corporate bond",F:"Bond fund or ETF"};
+const SCEN=[
+ ["Grandma Rosa wants the safest possible bond, backed by the U.S. government. She doesn't care about squeezing out extra yield.","T","Treasuries are backed by the U.S. government, the safest bond issuer there is. The trade-off is a lower yield."],
+ ["Dev is worried prices will rise fast over the next 10 years and wants a government bond whose value keeps up with inflation.","TIPS","TIPS are Treasuries whose principal adjusts with inflation (CPI), so his buying power is protected."],
+ ["Dr. Okafor earns a high salary and pays a lot in taxes. She wants bond interest that is usually free from federal income tax.","M","Municipal bonds are issued by states and cities, and their interest is usually free from federal income tax. That matters most to people in high tax brackets."],
+ ["Jamal wants a higher yield than Treasuries pay and is fine taking some risk that a company might struggle.","C","Corporate bonds pay more than Treasuries because a company can default. The extra yield is payment for that risk."],
+ ["Maya has $200 and wants to own a little piece of hundreds of different bonds at once, and sell any day.","F","A bond fund or ETF pools money into many bonds, spreading out default risk, and lets a small investor buy in. ETFs trade all day."],
+ ["The Riverbend school board needs money to build a new high school and will pay it back from local taxes.","M","Cities, counties and school districts borrow by issuing municipal bonds. Here the school district is the issuer."],
+ ["Acme Robotics needs $50 million to build a factory but doesn't want to give up ownership by selling stock.","C","A company that borrows by selling bonds issues corporate bonds. Bondholders are lenders, not owners."],
+ ["Leo is saving for a car he'll buy in exactly 2 years. He wants to know exactly what he'll get back, with almost no default risk.","T","A 2-year Treasury pays a known coupon and returns face value at maturity with almost no default risk. A bond fund has no maturity date, so its value at any moment isn't locked in."],
+ ["Priya doesn't want to research individual issuers. She wants a professional to hold a mix of government and corporate bonds for her.","F","A bond fund lets a manager choose and hold many bonds. She trades the control of single bonds for convenience and diversification."],
+ ["During a stretch of high inflation, a retiree living on fixed payments wants Treasury-level safety plus inflation protection.","TIPS","TIPS combine U.S. government backing with principal that grows with inflation."]
+];
+const picker=quiz({id:"pk",panel:"#p-picker",body:"#pk-body",bar:"#pk-bar",count:"#pk-count",make:()=>{
+  return shuffle(SCEN).slice(0,8).map(s=>{const keys=["T","TIPS","M","C","F"].filter(k=>k!==s[1]);const wr=shuffle(keys).slice(0,3);
+    return {tag:"Which bond fits?",prompt:s[0],opts:[TYPES[s[1]],...wr.map(k=>TYPES[k])],ex:s[2]}})}});
+picker.start();
+
+/* ---------- 5 drill ---------- */
+function numQ(tag,prompt,correct,wrongs,fmt,ex){
+  const seen=new Set([fmt(correct)]),opts=[fmt(correct)];
+  for(const w of wrongs){const f=fmt(w);if(!seen.has(f)&&isFinite(w)){seen.add(f);opts.push(f)}if(opts.length===4)break}
+  for(const m of [1.5,0.5,2,0.75,1.25,3]){if(opts.length===4)break;const f=fmt(correct*m);if(!seen.has(f)){seen.add(f);opts.push(f)}}
+  return {tag,prompt,opts,ex};
+}
+const sQ=(tag,prompt,c,w,ex)=>({tag,prompt,opts:[c,...w],ex});
+const GEN=[
+ ()=>{const r=pick([2,2.5,3,4,4.5,5,6,7.5]),C=10*r;return numQ("5.1 Coupon payments",`A bond has a $1,000 face value and a ${pct(r)} coupon rate. How much interest does it pay each year?`,C,[r,C*10,1000+C],v=>money(v),`Coupon = face × coupon rate = $1,000 × ${pct(r)} = ${money(C)} per year.`)},
+ ()=>{const r=pick([4,5,6,8]),C=10*r,h=C/2;return numQ("5.1 Coupon payments",`A $1,000 bond with a ${pct(r)} coupon pays interest twice a year. How much is each payment?`,h,[C,r/2,C*2],v=>money(v),`Yearly coupon = $1,000 × ${pct(r)} = ${money(C)}. Split into two payments: ${money(C)} ÷ 2 = ${money(h)}.`)},
+ ()=>{const r=pick([4,5,6,7]),C=10*r,y=pick([3,5,8,10]),tot=C*y+1000;return numQ("5.1 Coupon payments",`You buy a new $1,000 bond with a ${pct(r)} coupon and ${y} years to maturity, and hold it to the end. How much do you receive in total (all coupons plus face value)?`,tot,[C*y,1000,C*y+1000*y/10],v=>money(v),`Coupons: ${money(C)} × ${y} years = ${money(C*y)}. At maturity you also get the $1,000 face value back. Total = ${money(tot)}.`)},
+ ()=>{const r=pick([4,5,6,7]),C=10*r,p=pick([880,920,950,980,1020,1050,1080,1100]),cy=C/p*100;return numQ("5.3 Current yield",`A bond pays ${money(C)} a year in interest and currently sells for ${money(p)}. What is its current yield?`,cy,[r,p/C,C/(p+1000)*100],v=>pct(v,2),`Current yield = yearly interest ÷ price = ${money(C)} ÷ ${money(p)} = ${pct(cy,2)}. ${p<1000?"The price is below $1,000, so current yield is above the coupon rate.":"The price is above $1,000, so current yield is below the coupon rate."}`)},
+ ()=>{const c=pick([3,4,5,6]),m=c+pick([-2,-1.5,-1,1,1.5,2]);const prem=m<c;return sQ("5.3 Price and rates",`Your bond pays a ${pct(c)} coupon. New bonds like it now pay ${pct(m)}. What happens to your bond's price?`,prem?"It rises above $1,000 (premium)":"It falls below $1,000 (discount)",[prem?"It falls below $1,000 (discount)":"It rises above $1,000 (premium)","It stays at $1,000 because the coupon is fixed","The coupon changes to match new bonds"],`Rates and prices move in opposite directions. ${prem?"Your coupon beats what new bonds pay, so buyers will pay more than $1,000 for it.":"New bonds pay more than yours, so buyers will only take yours at a discount."} The coupon itself never changes.`)},
+ ()=>{const n1=pick([2,3]),n2=pick([20,25,30]);return sQ("5.3 Interest-rate risk",`Rates jump 1%. Which bond's price drops the most: a ${n1}-year Treasury or a ${n2}-year Treasury?`,`The ${n2}-year Treasury`,[`The ${n1}-year Treasury`,"They drop by the same amount","Neither; Treasuries can't lose value"],`Longer bonds lock in the old, lower coupon for more years, so their prices swing more when rates change. That's interest-rate risk. (Treasuries have almost no default risk, but they do have interest-rate risk.)`)},
+ ()=>{const r=pick(["BB","B","CCC","BBB","A","AA"]);const ig=["BBB","A","AA"].includes(r);return sQ("5.4 Credit ratings",`A company's bonds are rated ${r}. How are they classified?`,ig?"Investment grade":"Junk (high-yield)",[ig?"Junk (high-yield)":"Investment grade","In default","Government-backed"],`BBB or higher is investment grade; BB or lower is junk. ${r} is ${ig?"BBB or higher":"BB or lower"}.`)},
+ ()=>sQ("5.4 Credit ratings","Two companies issue 10-year bonds on the same day. One is rated AA, the other B. Which most likely pays the higher coupon, and why?","The B-rated bond, to pay investors for more default risk",["The AA-rated bond, because it is safer","Both pay the same; coupon depends only on maturity","The B-rated bond, because junk bonds are backed by the government"],"Lower-rated issuers are more likely to default, so they must offer higher yields to attract lenders."),
+ ()=>{const s=pick([0.3,0.5,0.8]),l=+(s+pick([1.1,1.4,1.8])).toFixed(2),inv=Math.random()<.5;const a=inv?l:s,b=inv?s:l;return sQ("5.4 Yield curve",`The 3-month Treasury yields ${pct(a+3)} and the 10-year Treasury yields ${pct(b+3)}. What is the shape of the yield curve?`,inv?"Inverted":"Normal",[inv?"Normal":"Inverted","Flat","You can't tell without the 30-year yield"],inv?"Short-term yields are higher than long-term yields, so the curve is inverted. Investors often read this as a sign they expect rates to fall and the economy to slow.":"Long-term yields are higher than short-term yields, so the curve is normal: extra pay for lending longer.")},
+ ()=>sQ("5.2 Bond types","Which bond's principal adjusts with inflation?","TIPS",["Municipal bond","Corporate bond","Junk bond"],"TIPS (Treasury Inflation-Protected Securities) adjust their principal with CPI."),
+ ()=>sQ("5.2 Bond types","Interest from which bond is usually free from federal income tax?","Municipal bond",["Corporate bond","Treasury bond","Junk bond"],"Munis are issued by states and local governments; their interest is usually exempt from federal income tax."),
+ ()=>sQ("5.2 Bond types","Rank from safest to riskiest:","Treasury → AA corporate → B corporate",["B corporate → AA corporate → Treasury","AA corporate → Treasury → B corporate","Treasury → B corporate → AA corporate"],"U.S. government backing is safest, then high-rated companies, then junk-rated companies."),
+ ()=>sQ("5.5 Bond funds","Which is true of a bond fund compared with owning one bond?","It spreads risk across many bonds but has no single maturity date",["It always returns exactly $1,000 at maturity","It cannot lose value when rates rise","It pays a fixed coupon that never changes"],"A fund holds many bonds, so one default hurts less. But it keeps buying new bonds, so there is no maturity date when you're guaranteed your money back, and its price still falls when rates rise."),
+ ()=>sQ("5.5 Stock/bond mix","Why might a 60-year-old hold more bonds than a 17-year-old?","Bonds swing less, and she has less time to recover from a stock crash",["Bonds always earn more than stocks","Bonds have no risk at all","Younger investors aren't allowed to buy bonds"],"Bonds usually move less than stocks. With less time before she needs the money, a big stock drop is harder to wait out, so a larger bond share lowers the swings."),
+ ()=>sQ("5.3 Price and rates","In 2022 the Fed raised rates quickly. What happened to the value of bonds that banks already owned?","It fell, because older bonds paid less than new ones",["It rose, because higher rates help all bonds","It didn't change, because bonds pay a fixed coupon","It rose for long bonds and fell for short bonds"],"Rising rates push existing bond prices down. Silicon Valley Bank held many long-term bonds that lost value; when depositors rushed to withdraw (a bank run), it had to sell them at a loss.")
+];
+const drill=quiz({id:"dr",panel:"#p-practice",body:"#dr-body",bar:"#dr-bar",count:"#dr-count",streak:"#dr-streak",make:()=>{
+  const g=shuffle(GEN);const calc=g.filter((f,i)=>GEN.indexOf(f)<5).slice(0,4),rest=g.filter(f=>!calc.includes(f)).slice(0,6);return shuffle([...calc,...rest]).map(f=>f())}});
+drill.start();
+
+/* ---------- boot ---------- */
+drawSeesaw();drawCurve();
+const t=store.get("tab","seesaw");if(t!=="seesaw")show(t);
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change",()=>{drawSeesaw();drawCurve()});
+new MutationObserver(()=>{drawSeesaw();drawCurve()}).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});
+})();
+</script>
+
+</body>
+</html>
