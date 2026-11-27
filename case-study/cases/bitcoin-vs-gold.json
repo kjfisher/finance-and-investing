@@ -1,0 +1,111 @@
+{
+ "id": "bitcoin-vs-gold",
+ "unit": 8,
+ "title": "Bitcoin vs. Gold: Saylor vs. Schiff",
+ "years": "2020–2026",
+ "targets": "8.1 · 8.3 · 8.5",
+ "minutes": 25,
+ "pdf": "/units/unit-8/cases/bitcoin-vs-gold.pdf",
+ "pdfSupported": "/units/unit-8/cases/bitcoin-vs-gold-supported.pdf",
+ "asOf": "Prices are rounded and dated late November 2026. They change every day.",
+ "marks": [
+  {"key": "g", "label": "Saylor's argument", "color": "green"},
+  {"key": "y", "label": "Schiff's argument", "color": "yellow"},
+  {"key": "b", "label": "Prices and numbers", "color": "blue"}
+ ],
+ "markGoal": "Mark at least 2 sentences for each color.",
+ "paras": [
+  {"h": "Two famous voices.", "s": [
+   "Michael Saylor is the executive chairman of Strategy (called MicroStrategy until 2025), a software company that turned itself into the largest company owner of bitcoin.",
+   "Peter Schiff is an investment manager who has promoted gold for decades and has called bitcoin a bubble for years.",
+   "In 2026, both of their favorite investments had a hard year."]},
+  {"h": "Saylor's bet: bitcoin.", "s": [
+   "In August 2020, Strategy spent $250 million on 21,454 bitcoin.",
+   "It never stopped buying.",
+   "By November 2026 it owned about 850,000 bitcoin, about 4% of the 21 million that will ever exist.",
+   "To pay for them, it sold new shares of its own stock and borrowed billions of dollars.",
+   "Saylor calls bitcoin “digital gold”: scarce, easy to move anywhere in the world, and likely to rise in value over time."]},
+  {"h": "Schiff's bet: gold.", "s": [
+   "Schiff argues that gold has thousands of years of history as money, while bitcoin is only computer code that people value because others do.",
+   "In October 2026 he posted: “SELL your Bitcoin before the bottom drops out of the market and buy gold.”"]},
+  {"h": "What happened.", "s": [
+   "Bitcoin hit a record $126,080 on October 6, 2025, then fell to about $61,500 by late November 2026.",
+   "Gold hit a record $5,602 an ounce on January 29, 2026, then fell to about $3,664.",
+   "Strategy reported an $8.2 billion loss for the second quarter of 2026, mostly because its bitcoin lost value.",
+   "By late November, the whole company was worth less on the stock market than the bitcoin it owned."]},
+  {"h": "The long view.", "s": [
+   "Measured from Strategy's first purchase in August 2020, both bitcoin and gold are still higher, and bitcoin is up far more.",
+   "But neither one pays interest, dividends or rent.",
+   "Their prices rise only when buyers are willing to pay more, and fall when they aren't."]},
+  {"h": "A small slice, the easy way.", "s": [
+   "Until 2024, owning bitcoin usually meant using a crypto exchange (like FTX) or a digital wallet.",
+   "On January 10, 2024, the SEC approved the first spot bitcoin ETFs, and they began trading the next day.",
+   "Now anyone with a regular brokerage account can buy a fund that holds bitcoin, the same way gold ETFs have let investors own gold since 2004.",
+   "Fees still matter: some bitcoin and gold ETFs charge far more than others."]}
+ ],
+ "tableTitle": "Bitcoin vs. gold by the numbers",
+ "table": [
+  ["Strategy's first bitcoin purchase (Aug 11, 2020)", "21,454 bitcoin for $250 million"],
+  ["Bitcoin · gold prices, August 2020 (about)", "$11,650 · $2,067 an ounce"],
+  ["Strategy's bitcoin (SEC filing, Nov 8, 2026)", "850,364 bitcoin · average cost about $75,456 each"],
+  ["Bitcoin record high (Oct 6, 2025) → late Nov 2026", "$126,080 → about $61,500"],
+  ["Gold record high (Jan 29, 2026) → late Nov 2026", "$5,602 → about $3,664 an ounce"],
+  ["Strategy's net loss, April–June 2026", "$8.22 billion (mostly an unrealized bitcoin loss)"],
+  ["Spot bitcoin ETFs: SEC approval · first trading day", "Jan 10, 2024 · Jan 11, 2024"],
+  ["Bitcoin ETF fees per year (2026)", "iShares Bitcoin Trust 0.25% · Grayscale Bitcoin Trust 1.50%"],
+  ["Gold ETF fees per year (2026)", "SPDR Gold Shares 0.40% · SPDR Gold MiniShares 0.10%"],
+  ["Interest, dividends or rent paid by bitcoin or gold", "$0"]
+ ],
+ "sources": "The Block (Nov 9 and Nov 26, 2026); Bitbo, Strategy purchase table; 24/7 Wall St. (Oct 17 and Oct 25, 2026); Bullion Trading LLC (gold record, Jan 29, 2026); BigGo Finance (prices, Nov 27, 2026); LBMA gold price (Aug 6, 2020); cryptoetf.today bitcoin ETF fee table (10-Q filings, June 30, 2026); Spark gold ETF fee comparison (2026). Numbers are rounded.",
+ "math": [
+  {"id": "q1", "q": "From August 2020 to late November 2026, about what percent did <b>bitcoin</b> rise? About what percent did <b>gold</b> rise?",
+   "formula": "Percent change = (new − old) ÷ old × 100",
+   "hint": "Bitcoin: ($61,500 − $11,650) ÷ $11,650 × 100. Gold: ($3,664 − $2,067) ÷ $2,067 × 100.",
+   "parts": [
+    {"label": "Bitcoin rose", "post": "%", "answer": 428, "tol": 3,
+     "errors": [[528, 4, "That's the new price as a percent of the old one. Subtract the old price first: (new − old) ÷ old."], [81, 2, "You divided by the new price. Percent change always divides by the old price."]]},
+    {"label": "Gold rose", "post": "%", "answer": 77.3, "tol": 1.5,
+     "errors": [[177, 3, "That's the new price as a percent of the old one. Subtract first: (new − old) ÷ old."], [43.6, 1.5, "You divided by the new price. Divide by the old price, $2,067."]]}],
+   "steps": ["Bitcoin: $61,500 − $11,650 = $49,850 → $49,850 ÷ $11,650 = 4.28 → about <b>428%</b>", "Gold: $3,664 − $2,067 = $1,597 → $1,597 ÷ $2,067 = 0.773 → about <b>77%</b>"]},
+  {"id": "q2", "q": "Strategy paid an average of $75,456 for each of its 850,364 bitcoin. At $61,500 each, about how much were its bitcoin worth, and how much was it down on paper? Answer in billions.",
+   "formula": "Value = bitcoin × price. Paper loss = what it paid − value.",
+   "hint": "850,364 × $61,500 = value. 850,364 × $75,456 = what it paid. Subtract, then divide by 1,000,000,000.",
+   "parts": [
+    {"label": "Worth about $", "post": "billion", "answer": 52.3, "tol": 0.4,
+     "errors": [[64.2, 0.4, "That's what Strategy paid. Use today's price, $61,500, to find what the bitcoin are worth."]]},
+    {"label": "Down about $", "post": "billion", "answer": 11.9, "tol": 0.3,
+     "errors": [[13956, 30, "That's the loss on ONE bitcoin ($75,456 − $61,500). Multiply by 850,364 bitcoin."], [0.014, 0.01, "That's the loss on one bitcoin in billions. Multiply by 850,364 bitcoin."]]}],
+   "steps": ["Value: 850,364 × $61,500 = $52,297,386,000 → about <b>$52.3 billion</b>", "Paid: 850,364 × $75,456 ≈ $64.2 billion", "Down: $64.2B − $52.3B ≈ <b>$11.9 billion</b> on paper"]},
+  {"id": "q3", "q": "You put $1,000 in a bitcoin ETF. How much would you pay in fees each year at <b>0.25%</b>? At <b>1.50%</b>?",
+   "formula": "Fee = amount × expense ratio (as a decimal)",
+   "hint": "0.25% = 0.0025 and 1.50% = 0.015. Multiply each by $1,000. (Unit 4)",
+   "parts": [
+    {"label": "At 0.25%: $", "post": "per year", "answer": 2.5, "tol": 0.01,
+     "errors": [[250, 0.5, "0.25% isn't 0.25. Move the decimal two places: 0.25% = 0.0025."], [25, 0.1, "Check the decimal: 0.25% = 0.0025, so $1,000 × 0.0025."]]},
+    {"label": "At 1.50%: $", "post": "per year", "answer": 15, "tol": 0.01,
+     "errors": [[1500, 1, "1.50% isn't 1.5. Move the decimal two places: 1.50% = 0.015."], [150, 0.5, "Check the decimal: 1.50% = 0.015, so $1,000 × 0.015."]]}],
+   "steps": ["$1,000 × 0.0025 = <b>$2.50</b> a year", "$1,000 × 0.015 = <b>$15.00</b> a year: six times as much for the same bitcoin"]}
+ ],
+ "short": [
+  {"id": "q4", "q": "Bitcoin fell about 51% from its record and gold about 35%. Which is more <b>volatile</b>? And since neither pays interest, dividends or rent, where does any return come from?",
+   "hint": "Bigger drops = more volatile (Unit 6). Who has to pay you more later? Compare with a company's profits or a bond's coupon (Units 3 and 5).",
+   "frame": "___ is more volatile because ___. Any return comes from ___, unlike a stock or bond, which ___.",
+   "lookFors": ["Names bitcoin as more volatile", "Uses the numbers (51% vs. 35%)", "Explains that the only return is someone paying a higher price later", "Compares with a stock's profits/dividends or a bond's coupon"],
+   "min": 25}
+ ],
+ "cer": {
+  "quote": "Saylor says: buy bitcoin and never sell. Schiff says: sell bitcoin and buy gold.",
+  "ask": "You're 17 and investing for retirement. How much of your money, if any, should go into bitcoin or gold, and how would you hold it? Use the case.",
+  "words": ["volatility", "diversification", "allocation", "speculation", "ETF", "expense ratio", "time horizon"],
+  "claim": {"prompt": "How much, if any, and how would you hold it? One sentence.", "frame": "I would put about ___% in bitcoin and ___% in gold, held in ___, because ___."},
+  "evidence": {"prompt": "Two facts or numbers from the case.", "frame": "In the case, ___ fell ___% from its record. Since 2020, ___ rose ___%."},
+  "reasoning": {"prompt": "Why your evidence supports your claim. Use 2 word-bank words.", "frame": "This matters because ___. With a long time horizon, ___."}
+ },
+ "rubric": {
+  "q4": {"1": "Says bitcoin is more volatile using the 51% vs. 35% drops AND explains that return comes only from a higher future price (no income), compared with a stock or bond.", "0.5": "Gets one half right (volatility OR where the return comes from), or answers without using the numbers.", "0": "Missing, off-topic or incorrect."},
+  "claim": {"1": "Takes a clear position: how much (a % or none) and how it would be held, in one sentence.", "0.5": "Gives a position but it's vague (\"some,\" \"not too much\") or leaves out how it would be held.", "0": "No position, or doesn't answer the question."},
+  "evidence": {"1": "Two accurate, specific facts or numbers from the case that relate to the claim.", "0.5": "Only one accurate fact or number, or the facts are vague or slightly wrong.", "0": "No evidence from the case."},
+  "reasoning": {"1": "Explains WHY the evidence supports the claim and uses at least 2 word-bank words correctly.", "0.5": "Explains only partly, or uses fewer than 2 word-bank words correctly.", "0": "Missing, or just repeats the evidence."}
+ },
+ "teacherNotes": "Strong claims can land anywhere from 0% to a small slice (about 5%) if the reasoning is sound. A claim of 50%+ in bitcoin can still earn the claim point if it's clear, but the reasoning must deal with volatility and time horizon to earn full reasoning credit."
+}

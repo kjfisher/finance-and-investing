@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Case Study · F&amp;I</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,500..800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Layout: case header, a 6-step stepper (Preview → Read → Calculate → Explain → Your Call → Submit), one step visible at a time. */
+:root{
+  --bg:#f4f4f2; --surface:#ffffff; --sunk:#ebebe7; --ink:#191a17; --muted:#5e605a; --line:#dadad4;
+  --accent:#23407e; --accent-ink:#fff; --accent-soft:#e1e7f5;
+  --gain:#0f7a55; --gain-soft:#dcf3ea; --loss:#b8352a; --loss-soft:#fbe5e2; --mid:#9a6a08; --mid-soft:#fbf0d6;
+  --hl-green:#c9efd6; --hl-yellow:#fff1a8; --hl-blue:#cfe3ff;
+  --u1:#2F7D46; --u2:#0E7490; --u3:#5A6A1E; --u4:#6B2E5E; --u5:#A64B24; --u6:#6B4FB0; --u7:#9C3420; --u8:#2E6B5E;
+  --display:"Archivo",system-ui,sans-serif; --body:"Source Sans 3",system-ui,sans-serif; --mono:"JetBrains Mono",ui-monospace,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#111210; --surface:#1a1b19; --sunk:#232521; --ink:#ecece6; --muted:#a3a59c; --line:#33352f;
+  --accent:#A9B9DD; --accent-ink:#111210; --accent-soft:#232c45;
+  --gain:#41cf97; --gain-soft:#12352a; --loss:#ff7b6e; --loss-soft:#3d1c1a; --mid:#f0be55; --mid-soft:#3a2e12;
+  --hl-green:#1f4a2e; --hl-yellow:#4a4114; --hl-blue:#1d3557;
+  --u1:#6CCB8A; --u2:#5FC6DE; --u3:#C2D27A; --u4:#D98BC9; --u5:#F09A72; --u6:#B9A2F0; --u7:#F08A73; --u8:#7FD1BD; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#111210; --surface:#1a1b19; --sunk:#232521; --ink:#ecece6; --muted:#a3a59c; --line:#33352f;
+  --accent:#A9B9DD; --accent-ink:#111210; --accent-soft:#232c45;
+  --gain:#41cf97; --gain-soft:#12352a; --loss:#ff7b6e; --loss-soft:#3d1c1a; --mid:#f0be55; --mid-soft:#3a2e12;
+  --hl-green:#1f4a2e; --hl-yellow:#4a4114; --hl-blue:#1d3557;
+  --u1:#6CCB8A; --u2:#5FC6DE; --u3:#C2D27A; --u4:#D98BC9; --u5:#F09A72; --u6:#B9A2F0; --u7:#F08A73; --u8:#7FD1BD; color-scheme:dark}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:18px;line-height:1.55}
+[hidden]{display:none!important}
+.wrap{max-width:960px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:16px 60px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.12}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+a{color:var(--accent)}
+.top{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;align-items:center;margin-bottom:10px}
+.top a{font-weight:600;text-decoration:none}
+.tools{display:flex;gap:6px;flex-wrap:wrap}
+.btn{font:700 16px var(--body);min-height:44px;padding:9px 16px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+.btn.primary{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.btn.sm{font-size:14px;min-height:38px;padding:6px 12px}
+.btn[aria-pressed="true"]{border:2px solid var(--c);padding:8px 15px}
+.btn.sm[aria-pressed="true"]{padding:5px 11px}
+.btn:disabled{opacity:.45;cursor:default}
+button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible,.sent:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.head{background:var(--surface);border:1px solid var(--line);border-top:6px solid var(--c);border-radius:12px;padding:16px 18px}
+.meta{display:flex;flex-wrap:wrap;gap:6px}
+.tagc{font:700 12px var(--mono);padding:3px 8px;border-radius:4px;background:var(--sunk);color:var(--muted)}
+.tagc.u{color:var(--c)}
+.head h1{font-size:clamp(26px,4.4vw,38px);font-stretch:110%;margin-top:8px}
+.steps{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:4px;margin:14px 0}
+.stp{font:700 13px var(--body);border:0;background:var(--surface);border-radius:8px;padding:8px 4px;color:var(--muted);cursor:pointer;min-height:56px;display:grid;justify-items:center;gap:2px;border-bottom:4px solid var(--line)}
+.stp b{font:700 12px var(--mono)}
+.stp[aria-current="step"]{color:var(--ink);border-bottom-color:var(--c);background:var(--surface)}
+.stp.done{color:var(--gain);border-bottom-color:var(--gain)}
+@media (max-width:620px){.stp span{display:none}.stp{min-height:44px}}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px}
+.panel h2{font-size:26px;font-stretch:108%}
+.why{background:var(--accent-soft);border-radius:10px;padding:12px 14px;margin:10px 0 14px;font-size:16.5px}
+.why b:first-child{display:block;font-size:12px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:2px}
+.lbl{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:700;margin:14px 0 6px}
+.nav{display:flex;justify-content:space-between;gap:8px;margin-top:18px;flex-wrap:wrap}
+.note{font-size:15px;color:var(--muted);margin:8px 0 0}
+.callout{margin-top:12px;padding:12px 14px;border-radius:8px;background:var(--sunk);font-size:16.5px}
+.callout.good{background:var(--gain-soft)} .callout.bad{background:var(--loss-soft)} .callout.mid{background:var(--mid-soft)}
+/* how-to */
+.moves{display:grid;gap:10px;margin-top:10px;counter-reset:m}
+.move{display:grid;grid-template-columns:44px 1fr;gap:12px;padding:12px;border-radius:10px;background:var(--sunk);align-items:start}
+.move::before{counter-increment:m;content:counter(m);font:800 22px var(--display);background:var(--surface);border-radius:50%;width:40px;height:40px;display:grid;place-items:center;color:var(--c)}
+.move p{margin:2px 0 0;font-size:16px}
+/* reading */
+.toolbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:4;background:var(--surface);padding:8px 0;display:flex;flex-wrap:wrap;gap:6px;align-items:center;border-bottom:1px solid var(--line);margin-bottom:10px}
+.sw{width:16px;height:16px;border-radius:4px;display:inline-block;border:1px solid var(--line)}
+.reading p{margin:0 0 12px;max-width:70ch}
+.sent{cursor:pointer;border-radius:3px;padding:1px 0;transition:background .15s}
+.sent:hover{text-decoration:underline dotted;text-underline-offset:3px}
+.sent.g{background:var(--hl-green)} .sent.y{background:var(--hl-yellow)} .sent.b{background:var(--hl-blue)}
+.sent.speaking{outline:2px solid var(--c)}
+table.data{width:100%;border-collapse:collapse;font-size:15.5px;margin-top:6px}
+table.data th,table.data td{padding:7px 8px;border-top:1px solid var(--line);text-align:left;vertical-align:top}
+table.data th{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);border-top:0}
+table.data td:last-child{font-family:var(--mono);font-size:14px}
+.scroll{overflow-x:auto}
+.src{font-size:13px;color:var(--muted);margin-top:10px}
+.counts{display:flex;gap:10px;flex-wrap:wrap;font-size:14px;color:var(--muted)}
+/* math */
+.mq{border-top:1px solid var(--line);padding:16px 0}
+.mq:first-of-type{border-top:0}
+.mq .q{font-weight:600;margin:0 0 4px;max-width:66ch}
+.formula{font:500 14px var(--mono);color:var(--muted);margin:2px 0 10px}
+.part{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:8px 0}
+.part label{font-weight:600}
+.part input{font:700 18px var(--mono);width:140px;min-height:46px;padding:8px 10px;border-radius:8px;border:2px solid var(--line);background:var(--surface);color:var(--ink)}
+.part input.ok{border-color:var(--gain);background:var(--gain-soft)}
+.part input.no{border-color:var(--loss);background:var(--loss-soft)}
+.pts{font:700 13px var(--mono);padding:3px 8px;border-radius:999px;background:var(--sunk)}
+.pts.ok{background:var(--gain-soft);color:var(--gain)}
+.stepsbox{background:var(--sunk);border-radius:8px;padding:10px 12px;margin-top:8px;font-size:16px}
+.stepsbox div{padding:2px 0}
+.hint{font-size:15px;color:var(--muted);font-style:italic;margin:4px 0}
+.hint b{font-style:normal;color:var(--ink)}
+/* writing */
+textarea{width:100%;min-height:120px;font:17px/1.5 var(--body);padding:10px 12px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink);resize:vertical}
+.wc{font:600 13px var(--mono);color:var(--muted);text-align:right;margin-top:2px}
+.checks{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.chk{font:600 13.5px var(--body);padding:4px 10px;border-radius:999px;background:var(--sunk);color:var(--muted)}
+.chk.on{background:var(--gain-soft);color:var(--gain)}
+.chk.on::before{content:"✓ "}
+.lookfor{margin:8px 0 0;padding:0;list-style:none;display:grid;gap:6px}
+.lookfor label{display:flex;gap:8px;align-items:flex-start;font-size:16px}
+.lookfor input{width:22px;height:22px;accent-color:var(--c);flex:0 0 auto;margin-top:2px}
+.prompt{border-left:4px solid var(--c);padding:6px 12px;background:var(--sunk);border-radius:0 8px 8px 0;font-weight:600}
+.wb{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.wbw{font:600 14px var(--body);padding:4px 10px;border-radius:999px;border:1px solid var(--line);background:var(--surface)}
+.wbw.used{background:var(--gain-soft);border-color:var(--gain);color:var(--gain)}
+.cerbox{margin-top:14px}
+.cerbox h3{font-size:19px;display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+.cerbox h3 small{font:600 13px var(--body);color:var(--muted)}
+.frame{font-size:15px;color:var(--muted);margin:2px 0 6px}
+.tray{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0}
+.chip{font:500 14px var(--body);text-align:left;padding:6px 10px;border-radius:8px;border:1px solid var(--line);cursor:pointer;color:var(--ink);max-width:100%}
+.chip.g{background:var(--hl-green)} .chip.y{background:var(--hl-yellow)} .chip.b{background:var(--hl-blue)}
+.rub{width:100%;border-collapse:collapse;font-size:15px}
+.rub th,.rub td{border:1px solid var(--line);padding:7px 8px;vertical-align:top;text-align:left}
+.rub th{background:var(--sunk);font-size:13px}
+.rub td:first-child{font-weight:700;white-space:nowrap}
+details.ex{margin-top:10px;background:var(--sunk);border-radius:10px;padding:0 12px}
+details.ex summary{cursor:pointer;font-weight:700;min-height:44px;display:flex;align-items:center}
+.exrow{display:grid;grid-template-columns:52px 1fr;gap:10px;padding:8px 0;border-top:1px solid var(--line);font-size:15.5px}
+.exrow b.s{font:700 14px var(--mono);text-align:center;border-radius:6px;padding:4px 0;background:var(--surface)}
+.exrow .w{color:var(--muted);font-size:14px;display:block}
+/* grade-it */
+.gi{background:var(--sunk);border-radius:10px;padding:12px;margin-top:10px}
+.gi .ans{background:var(--surface);border-radius:8px;padding:10px;margin:6px 0;font-size:16px}
+.gi .opts{display:flex;gap:6px;flex-wrap:wrap}
+/* submit */
+.sum{display:grid;gap:8px}
+.sumrow{display:grid;grid-template-columns:120px 1fr;gap:10px;padding:8px 0;border-top:1px solid var(--line);font-size:16px}
+.sumrow:first-child{border-top:0}
+.sumrow b{font-size:14px}
+.sumrow .empty{color:var(--loss);font-weight:600}
+.self{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;padding:6px 0}
+.self .opts{display:flex;gap:4px}
+select{font:600 16px var(--body);min-height:44px;padding:6px 10px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink)}
+.scorebig{font:800 44px var(--display);font-stretch:115%}
+.foot{margin-top:24px;color:var(--muted);font-size:13px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"><p>Loading case…</p></div>
+<script src="/case-study/config.js"></script>
+<script>
+(function(){
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const strip=s=>String(s).replace(/<[^>]+>/g,"");
+const words=t=>(String(t).trim().match(/\S+/g)||[]).length;
+const id=(location.hash.slice(1)||new URLSearchParams(location.search).get("case")||"bitcoin-vs-gold").replace(/[^a-z0-9-]/g,"");
+const KEY="fi-case-"+id;
+const load=()=>{try{return JSON.parse(localStorage.getItem(KEY))||{}}catch(e){return {}}};
+let S=load();
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+S.marks=S.marks||{};S.math=S.math||{};S.short=S.short||{};S.cer=S.cer||{};S.self=S.self||{};S.look=S.look||{};S.gi=S.gi||{};
+const STEPS=[["Preview","How it works"],["Read","Read & mark"],["Calculate","Calculate"],["Explain","Explain"],["Your Call","Your Call"],["Submit","Check & submit"]];
+
+/* shared teaching example for writing a Your Call (a different scenario, so nobody copies it) */
+const EX={prompt:"Your cousin wants to put 30% of her savings into one hot tech stock. Good idea?",
+ claim:[["1","No. She should keep any single stock to about 5% and put the rest in a low-cost index fund.","Clear position that answers the question."],["0.5","It's kind of risky.","Leans one way, but never says what she should do."],["0","Tech is the future.","Doesn't answer the question."]],
+ evidence:[["1","Enron employees had 62% of their 401(k) plan in company stock, and it fell from $90.75 to under $1. In 2024, 65% of professional fund managers trailed the S&P 500.","Two specific, accurate facts with numbers."],["0.5","Some stocks crash a lot.","True, but vague: no case, no number."],["0","I think tech stocks will keep going up.","An opinion, not evidence."]],
+ reasoning:[["1","One company can collapse, which is unsystematic risk. Diversification across hundreds of companies in an index fund removes that risk while keeping the market's long-run return, so 30% in one stock is too much.","Explains WHY the evidence supports the claim and uses 2 word-bank words."],["0.5","So she should diversify.","Right idea, but doesn't explain why."],["0","Because Enron went down.","Just repeats the evidence."]]};
+const GRADEIT=[
+ {box:"Evidence",a:"Bitcoin is really volatile and lots of people lost money.",s:"0.5",why:"It's true, but it's vague: no number or specific fact from the case."},
+ {box:"Claim",a:"I would put about 3% in bitcoin, held in a low-fee bitcoin ETF, and none in gold, because my main money should be in index funds.",s:"1",why:"Clear amount, clear way to hold it, one sentence."},
+ {box:"Reasoning",a:"Bitcoin fell from $126,080 to $61,500.",s:"0",why:"That's evidence, not reasoning. Reasoning explains why it matters for the claim, using word-bank words."}];
+
+function shell(C){
+  document.title=C.title+" · F&I Case Study";
+  document.documentElement.style.setProperty("--c",`var(--u${C.unit})`);
+  $("#app").innerHTML=`
+   <div class="top"><a href="/cases/">← Case Studies</a><div class="tools">
+     <button class="btn sm" id="t-sup" aria-pressed="${!!S.sup}">Supported: ${S.sup?"on":"off"}</button>
+     <a class="btn sm" href="${C.pdf}" target="_blank" rel="noopener">PDF ↗</a></div></div>
+   <header class="head"><div class="meta"><span class="tagc u">UNIT ${C.unit}</span><span class="tagc">${C.years}</span><span class="tagc">Targets ${C.targets}</span><span class="tagc">About ${C.minutes} min</span></div>
+     <h1>${C.title}</h1></header>
+   <nav class="steps" aria-label="Case study steps">${STEPS.map((s,i)=>`<button class="stp" data-i="${i}"><b>${i+1}</b><span>${s[0]}</span></button>`).join("")}</nav>
+   <section class="panel" id="panel"></section>
+   <p class="foot">Your work saves on this iPad as you go. ${C.asOf}</p>`;
+  $$(".stp").forEach(b=>b.onclick=()=>go(+b.dataset.i));
+  $("#t-sup").onclick=()=>{S.sup=!S.sup;save();shell(C);go(S.step||0)};
+}
+
+let C=null;
+function go(i){S.step=i;save();$$(".stp").forEach((b,j)=>{b.setAttribute("aria-current",j===i?"step":"false");b.classList.toggle("done",isDone(j))});
+  const p=$("#panel");[preview,read,calc,explain,yourcall,submit][i](p);
+  const nav=document.createElement("div");nav.className="nav";
+  nav.innerHTML=`${i>0?`<button class="btn" id="n-back">← ${STEPS[i-1][0]}</button>`:"<span></span>"}${i<5?`<button class="btn primary" id="n-next">Next: ${STEPS[i+1][1]} →</button>`:""}`;
+  p.appendChild(nav);const b=$("#n-back"),n=$("#n-next");if(b)b.onclick=()=>{go(i-1);scrollTo({top:0})};if(n)n.onclick=()=>{go(i+1);scrollTo({top:0})};
+}
+function isDone(j){
+  if(j===0)return !!S.previewed;
+  if(j===1)return Object.keys(S.marks).length>=4;
+  if(j===2)return C.math.every(q=>q.parts.every((_,k)=>(S.math[q.id+"-"+k]||{}).done));
+  if(j===3)return C.short.every(q=>words(S.short[q.id]||"")>=q.min);
+  if(j===4)return ["claim","evidence","reasoning"].every(k=>words(S.cer[k]||"")>=6);
+  return !!S.submitted;
+}
+
+/* ---------- 1. PREVIEW + HOW IT WORKS ---------- */
+function preview(p){
+  S.previewed=true;save();
+  p.innerHTML=`<h2>How a case study works</h2>
+   <div class="why"><b>Why case studies?</b>Investors read real stories, pull out the facts that matter, do the math, and make a decision they can defend. That's exactly what you'll practice here, and what the Your Call on every quiz, the midterm and the final asks you to do.</div>
+   <div class="moves">
+    <div class="move"><div><b>Preview the questions first.</b><p>Know what you're hunting for before you read. Good readers read with a purpose.</p></div></div>
+    <div class="move"><div><b>Read and mark.</b><p>Tap sentences to highlight them. Marking the arguments and the numbers now saves you time later, and your highlights become your evidence.</p></div></div>
+    <div class="move"><div><b>Calculate and show your steps.</b><p>Write the formula, plug in numbers from the case, then check that your answer makes sense.</p></div></div>
+    <div class="move"><div><b>Explain in full sentences.</b><p>Answer every part of the question and use the case's numbers.</p></div></div>
+    <div class="move"><div><b>Make your call (CER).</b><p><b>Claim</b> a clear position, back it with <b>Evidence</b> (facts and numbers from the case), and explain your <b>Reasoning</b> using course vocabulary.</p></div></div>
+   </div>
+   <p class="lbl">This case's questions, so you know what to look for</p>
+   <ol style="margin:0;padding-left:22px;font-size:16.5px">${C.math.map(q=>`<li>${q.q}</li>`).join("")}${C.short.map(q=>`<li>${q.q}</li>`).join("")}<li><b>Your Call:</b> ${C.cer.ask}</li></ol>
+   <div class="callout mid"><b>Before you read:</b> Question 1 needs prices from 2020 and 2026. Question 2 needs Strategy's numbers. The Your Call needs both people's arguments. Watch for them.</div>`;
+}
+
+/* ---------- 2. READ & MARK ---------- */
+let curMark=null,speaking=false;
+function read(p){
+  curMark=curMark||C.marks[0].key;
+  let n=0;
+  const paras=C.paras.map((pa,pi)=>`<p><b>${pa.h}</b> ${pa.s.map((s,si)=>{const k=pi+"-"+si;return `<span class="sent ${S.marks[k]||""}" data-k="${k}" tabindex="0" role="button" aria-pressed="${!!S.marks[k]}">${esc(s)}</span>`}).join(" ")}</p>`).join("");
+  p.innerHTML=`<h2>Read and mark</h2>
+   <div class="why"><b>Best practice</b>Pick a color, then tap a sentence to mark it. Tap again to clear it. ${C.markGoal}</div>
+   <div class="toolbar" role="toolbar" aria-label="Highlighter">${C.marks.map(m=>`<button class="btn sm" data-m="${m.key}" aria-pressed="${curMark===m.key}"><span class="sw" style="background:var(--hl-${m.color})"></span>${m.label}</button>`).join("")}
+     <button class="btn sm" id="r-aloud">${speaking?"Stop reading":"Read aloud"}</button><span class="counts" id="r-counts"></span></div>
+   <div class="reading">${paras}</div>
+   <p class="lbl">${C.tableTitle}</p><div class="scroll"><table class="data"><thead><tr><th>Fact</th><th>Number</th></tr></thead><tbody>${C.table.map(r=>`<tr><td>${esc(r[0])}</td><td>${esc(r[1])}</td></tr>`).join("")}</tbody></table></div>
+   <p class="src"><b>Sources:</b> ${esc(C.sources)}</p>`;
+  $$("[data-m]").forEach(b=>b.onclick=()=>{curMark=b.dataset.m;$$("[data-m]").forEach(x=>x.setAttribute("aria-pressed",x===b))});
+  const tog=el=>{const k=el.dataset.k;if(S.marks[k]===curMark)delete S.marks[k];else S.marks[k]=curMark;el.className="sent "+(S.marks[k]||"");el.setAttribute("aria-pressed",!!S.marks[k]);save();counts()};
+  $$(".sent").forEach(el=>{el.onclick=()=>tog(el);el.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();tog(el)}}});
+  const counts=()=>{const c={};Object.values(S.marks).forEach(v=>c[v]=(c[v]||0)+1);$("#r-counts").innerHTML=C.marks.map(m=>`<span><span class="sw" style="background:var(--hl-${m.color});vertical-align:-2px"></span> ${c[m.key]||0}</span>`).join("")};counts();
+  $("#r-aloud").onclick=()=>{if(!("speechSynthesis" in window)){alertBox("Read aloud isn't available in this browser.");return}
+    if(speaking){speechSynthesis.cancel();speaking=false;$("#r-aloud").textContent="Read aloud";return}
+    const els=$$(".sent");let i=0;speaking=true;$("#r-aloud").textContent="Stop reading";
+    const next=()=>{$$(".sent.speaking").forEach(x=>x.classList.remove("speaking"));if(!speaking||i>=els.length){speaking=false;const b=$("#r-aloud");if(b)b.textContent="Read aloud";return}
+      const el=els[i++];el.classList.add("speaking");const u=new SpeechSynthesisUtterance(el.textContent);u.rate=.95;u.onend=next;speechSynthesis.speak(u)};next()};
+}
+function alertBox(t){const d=document.createElement("div");d.className="callout mid";d.textContent=t;$("#panel").prepend(d);setTimeout(()=>d.remove(),4000)}
+
+/* ---------- 3. CALCULATE ---------- */
+function calc(p){
+  p.innerHTML=`<h2>Calculate</h2>
+   <div class="why"><b>Best practice</b>Write the formula, plug in numbers from the case, then ask: does this answer make sense? You get two tries on each answer. Round sensibly; you don't need every decimal.</div>
+   ${C.math.map((q,qi)=>`<div class="mq" id="mq-${q.id}"><p class="q">${qi+1}. ${q.q}</p><p class="formula">${q.formula}</p>${S.sup?`<p class="hint"><b>Hint:</b> ${q.hint}</p>`:""}
+     ${q.parts.map((pt,k)=>{const st=S.math[q.id+"-"+k]||{};return `<div class="part"><label for="in-${q.id}-${k}">${pt.label}</label><input id="in-${q.id}-${k}" inputmode="decimal" autocomplete="off" value="${esc(st.v??"")}" class="${st.done?(st.pts>0?"ok":"no"):""}" ${st.done?"disabled":""}><span>${pt.post}</span><button class="btn sm" data-q="${q.id}" data-k="${k}" ${st.done?"disabled":""}>Check</button><span class="pts ${st.pts>0?"ok":""}" id="pts-${q.id}-${k}">${st.done?st.pts+" pt":""}</span></div><div id="fb-${q.id}-${k}">${st.fb||""}</div>`}).join("")}
+     <div id="steps-${q.id}">${q.parts.every((_,k)=>(S.math[q.id+"-"+k]||{}).done)?`<div class="stepsbox"><b>Worked steps</b>${q.steps.map(s=>`<div>${s}</div>`).join("")}</div>`:""}</div></div>`).join("")}`;
+  $$("[data-q]").forEach(b=>b.onclick=()=>check(b.dataset.q,+b.dataset.k));
+  $$(".part input").forEach(inp=>inp.onkeydown=e=>{if(e.key==="Enter")inp.parentNode.querySelector("button").click()});
+}
+function parseNum(v){const t=String(v).replace(/[$,%\s]/g,"").replace(/billion|bn|b$/i,"").replace("−","-");return t===""?NaN:Number(t)}
+function check(qid,k){
+  const q=C.math.find(x=>x.id===qid),pt=q.parts[k],key=qid+"-"+k,st=S.math[key]||{tries:0};
+  const inp=$(`#in-${qid}-${k}`),v=parseNum(inp.value);st.v=inp.value;
+  if(isNaN(v)){$(`#fb-${qid}-${k}`).innerHTML=`<p class="hint">Type a number, like ${pt.answer}.</p>`;return}
+  const ok=Math.abs(Math.abs(v)-pt.answer)<=pt.tol;st.tries++;
+  let fb;
+  if(ok){st.done=true;st.pts=st.tries===1?1:0.5;fb=`<div class="callout good"><b>${st.tries===1?"Correct on the first try.":"Correct."}</b></div>`}
+  else{const e=(pt.errors||[]).find(e=>Math.abs(Math.abs(v)-e[0])<=e[1]);
+    if(st.tries>=2){st.done=true;st.pts=0;fb=`<div class="callout bad"><b>Not quite.</b> The answer is about ${pt.answer} ${pt.post}. ${e?e[2]:"Look at the worked steps below and find where yours went differently."}</div>`}
+    else fb=`<div class="callout bad"><b>Not yet. One more try.</b> ${e?e[2]:"Check which numbers you used and redo the formula step by step."}${!S.sup?` <i>Hint:</i> ${q.hint}`:""}</div>`}
+  st.fb=fb;S.math[key]=st;save();go(2);
+  const el=$(`#mq-${qid}`);if(el)el.scrollIntoView({block:"center"});
+}
+
+/* ---------- 4. EXPLAIN ---------- */
+function explain(p){
+  p.innerHTML=`<h2>Explain</h2>
+   <div class="why"><b>Best practice</b>Answer every part of the question in full sentences, and use at least one number from the case. Then check your answer against the list.</div>
+   ${C.short.map((q,qi)=>`<p class="q" style="font-weight:600">${C.math.length+qi+1}. ${q.q}</p>${S.sup?`<p class="hint"><b>Hint:</b> ${q.hint}</p><p class="frame">Frame: “${q.frame}”</p>`:""}
+     <label class="lbl" for="sa-${q.id}">Your answer</label><textarea id="sa-${q.id}" placeholder="Write 2–4 sentences.">${esc(S.short[q.id]||"")}</textarea><div class="wc" id="wc-${q.id}"></div>
+     <p class="lbl">Check your answer: does it…</p><ul class="lookfor">${q.lookFors.map((l,j)=>`<li><label><input type="checkbox" data-l="${q.id}-${j}" ${S.look[q.id+"-"+j]?"checked":""}> ${l}</label></li>`).join("")}</ul>`).join("")}`;
+  C.short.forEach(q=>{const t=$("#sa-"+q.id),wc=()=>{const n=words(t.value);$("#wc-"+q.id).textContent=n+" words"+(n<q.min?` · aim for ${q.min}+`:" ✓")};wc();t.oninput=()=>{S.short[q.id]=t.value;save();wc()}});
+  $$("[data-l]").forEach(c=>c.onchange=()=>{S.look[c.dataset.l]=c.checked;save()});
+}
+
+/* ---------- 5. YOUR CALL ---------- */
+function marked(){return Object.entries(S.marks).map(([k,v])=>{const [pi,si]=k.split("-").map(Number);return {k,v,t:C.paras[pi].s[si]}}).sort((a,b)=>a.k.localeCompare(b.k,undefined,{numeric:true}))}
+function yourcall(p){
+  const R=C.rubric,c=C.cer;
+  p.innerHTML=`<h2>Your Call: claim, evidence, reasoning</h2>
+   <div class="why"><b>How you'll be scored (3 points)</b>Each part is worth 0, 0.5 or 1. The same CER shows up on every quiz (3 points), the midterm (4) and the final (5).</div>
+   <div class="scroll"><table class="rub"><thead><tr><th></th><th>1 point</th><th>0.5 point</th><th>0 points</th></tr></thead><tbody>
+    ${["claim","evidence","reasoning"].map(k=>`<tr><td>${k[0].toUpperCase()+k.slice(1)}</td><td>${R[k]["1"]}</td><td>${R[k]["0.5"]}</td><td>${R[k]["0"]}</td></tr>`).join("")}</tbody></table></div>
+   <details class="ex"><summary>See an example scored by the teacher (a different question)</summary>
+    <p style="margin:4px 0 8px"><b>Practice question:</b> ${EX.prompt}</p>
+    ${["claim","evidence","reasoning"].map(k=>`<p class="lbl" style="margin-top:8px">${k}</p>${EX[k].map(r=>`<div class="exrow"><b class="s">${r[0]}</b><div>${esc(r[1])}<span class="w">${r[2]}</span></div></div>`).join("")}`).join("")}
+   </details>
+   <details class="ex"><summary>Practice: grade 3 answers like the teacher</summary><div id="gi"></div></details>
+   <p class="lbl">The question</p><div class="prompt">“${esc(c.quote)}”</div><p style="margin:8px 0 0">${c.ask}</p>
+   <p class="lbl">Word bank (use at least 2 in your reasoning)</p><div class="wb" id="wb">${c.words.map(w=>`<span class="wbw" data-w="${esc(w)}">${esc(w)}</span>`).join("")}</div>
+   ${["claim","evidence","reasoning"].map(k=>`<div class="cerbox"><h3><label for="cer-${k}">${k[0].toUpperCase()+k.slice(1)}</label><small>${c[k].prompt}</small></h3>
+     ${S.sup?`<p class="frame">Frame: “${esc(c[k].frame)}”</p>`:""}
+     ${k==="evidence"?`<div class="tray" id="tray">${marked().length?marked().map(m=>`<button class="chip ${m.v}" data-t="${esc(m.t)}">+ ${esc(m.t.length>90?m.t.slice(0,88)+"…":m.t)}</button>`).join(""):`<span class="note" style="margin:0">Your highlighted sentences show up here. Tap one to add it, then put it in your own words.</span>`}</div>`:""}
+     <textarea id="cer-${k}" style="min-height:${k==="claim"?80:120}px">${esc(S.cer[k]||"")}</textarea><div class="checks" id="ck-${k}"></div></div>`).join("")}`;
+  ["claim","evidence","reasoning"].forEach(k=>{const t=$("#cer-"+k);t.oninput=()=>{S.cer[k]=t.value;save();live()}});
+  $$("#tray .chip").forEach(b=>b.onclick=()=>{const t=$("#cer-evidence");t.value=(t.value.trim()?t.value.trim()+" ":"")+"In the case, "+b.dataset.t.charAt(0).toLowerCase()+b.dataset.t.slice(1);S.cer.evidence=t.value;save();live();t.focus()});
+  live();gradeIt();
+}
+function live(){
+  const cl=S.cer.claim||"",ev=S.cer.evidence||"",re=S.cer.reasoning||"";
+  const used=C.cer.words.filter(w=>new RegExp("\\b"+w.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+"s?\\b","i").test(re));
+  $$("#wb .wbw").forEach(x=>x.classList.toggle("used",used.includes(x.dataset.w)));
+  const nums=(ev.match(/\$?\d[\d,.]*\s?%?/g)||[]).length;
+  const set=(k,list)=>{$("#ck-"+k).innerHTML=list.map(([t,on])=>`<span class="chk ${on?"on":""}">${t}</span>`).join("")};
+  set("claim",[["Takes a position",/\d|\bnone\b|\bno\b|\bnothing\b|\b0\b|\bzero\b/i.test(cl)],["Says how you'd hold it",/etf|fund|wallet|exchange|account|none|no\b|nothing/i.test(cl)],["One sentence",(cl.match(/[.!?](\s|$)/g)||[]).length<=1&&words(cl)>=6]]);
+  set("evidence",[["Uses numbers from the case",nums>=2],["2 facts",(ev.match(/[.!?](\s|$)/g)||[]).length>=2||nums>=3],["Put in your own words",!marked().some(m=>ev.includes(m.t))]]);
+  set("reasoning",[[`Word-bank words: ${used.length}/2`,used.length>=2],["Explains why (because, so, this means)",/because|so |this means|which means|therefore|since/i.test(re)],["At least 2 sentences",(re.match(/[.!?](\s|$)/g)||[]).length>=2]]);
+}
+function gradeIt(){
+  const el=$("#gi");if(!el)return;
+  el.innerHTML=GRADEIT.map((g,i)=>`<div class="gi"><b>${g.box}:</b><div class="ans">“${esc(g.a)}”</div><div class="opts">${["1","0.5","0"].map(s=>`<button class="btn sm" data-gi="${i}" data-s="${s}" aria-pressed="${S.gi[i]===s}">${s}</button>`).join("")}</div><div id="gif-${i}">${S.gi[i]!=null?fbGi(i):""}</div></div>`).join("");
+  $$("[data-gi]").forEach(b=>b.onclick=()=>{S.gi[b.dataset.gi]=b.dataset.s;save();gradeIt()});
+}
+function fbGi(i){const g=GRADEIT[i],ok=S.gi[i]===g.s;return `<div class="callout ${ok?"good":"bad"}"><b>${ok?"You matched the teacher.":"The teacher gave "+g.s+"."}</b> ${g.why}</div>`}
+
+/* ---------- 6. CHECK & SUBMIT ---------- */
+function mathScore(){let got=0,tot=0;C.math.forEach(q=>q.parts.forEach((_,k)=>{tot+=1;got+=(S.math[q.id+"-"+k]||{}).pts||0}));return {got,tot}}
+function answersText(){
+  const m=C.math.map((q,i)=>`${i+1}. `+q.parts.map((pt,k)=>{const st=S.math[q.id+"-"+k]||{};return `${pt.label.replace(/\$$/,"")} ${st.v||"(blank)"} ${pt.post} [${st.done?st.pts+" pt":"not checked"}]`}).join("; "));
+  return {m,q4:S.short.q4||"",claim:S.cer.claim||"",evidence:S.cer.evidence||"",reasoning:S.cer.reasoning||""};
+}
+function submit(p){
+  const ms=mathScore(),A=answersText(),cfg=window.CASE_CONFIG||{},ready=cfg.formUrl&&cfg.entries&&cfg.entries.case;
+  const missing=[];C.math.forEach((q,i)=>q.parts.forEach((_,k)=>{if(!(S.math[q.id+"-"+k]||{}).done)missing.push("Question "+(i+1))}));
+  C.short.forEach((q,i)=>{if(words(S.short[q.id]||"")<5)missing.push("Question "+(C.math.length+i+1))});
+  ["claim","evidence","reasoning"].forEach(k=>{if(words(S.cer[k]||"")<4)missing.push(k[0].toUpperCase()+k.slice(1))});
+  const uniq=[...new Set(missing)];
+  p.innerHTML=`<h2>Check and submit</h2>
+   <div class="why"><b>Best practice</b>Reread your answers once before you submit. Score your own Your Call honestly; comparing your score with your teacher's is one of the fastest ways to get better.</div>
+   <div style="display:flex;gap:18px;flex-wrap:wrap;align-items:end"><div><p class="lbl" style="margin-top:0">Math (checked)</p><div class="scorebig num">${ms.got}/${ms.tot}</div></div>
+    <div><label class="lbl" for="blk" style="display:block;margin-top:0">Block</label><select id="blk">${["","1","3","5","7"].map(b=>`<option value="${b}" ${S.block===b?"selected":""}>${b?"Block "+b:"Choose…"}</option>`).join("")}</select></div></div>
+   ${uniq.length?`<div class="callout mid"><b>Not finished yet:</b> ${uniq.join(", ")}. You can still submit, but finish these first if you can.</div>`:`<div class="callout good"><b>Everything is answered.</b></div>`}
+   <p class="lbl">Your answers</p><div class="sum">
+    ${A.m.map(x=>`<div class="sumrow"><b>Math</b><div>${esc(x)}</div></div>`).join("")}
+    <div class="sumrow"><b>Question ${C.math.length+1}</b><div>${A.q4?esc(A.q4):'<span class="empty">blank</span>'}</div></div>
+    ${["claim","evidence","reasoning"].map(k=>`<div class="sumrow"><b>${k[0].toUpperCase()+k.slice(1)}</b><div>${A[k]?esc(A[k]):'<span class="empty">blank</span>'}</div></div>`).join("")}
+   </div>
+   <p class="lbl">Score your own Your Call</p>
+   ${["claim","evidence","reasoning"].map(k=>`<div class="self"><span><b>${k[0].toUpperCase()+k.slice(1)}:</b> ${C.rubric[k]["1"]}</span><span class="opts">${["1","0.5","0"].map(s=>`<button class="btn sm" data-self="${k}" data-s="${s}" aria-pressed="${S.self[k]===s}">${s}</button>`).join("")}</span></div>`).join("")}
+   <div class="btnrow" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:16px">
+    ${ready?`<button class="btn primary" id="go-submit">Submit to my teacher</button>`:""}
+    <button class="btn ${ready?"":"primary"}" id="go-copy">Copy my answers</button></div>
+   <div id="sub-msg">${ready?`<p class="note">Submit opens a Google Form with your answers filled in. Sign in with your D214 account if asked, then tap <b>Submit</b> at the bottom of the form.</p>`:`<p class="note">Copy your answers, then paste them into the Schoology assignment for this case.</p>`}${S.submitted?`<div class="callout good">You opened the submit form on ${new Date(S.submitted).toLocaleString()}. Make sure you tapped Submit in the form.</div>`:""}</div>`;
+  $("#blk").onchange=e=>{S.block=e.target.value;save()};
+  $$("[data-self]").forEach(b=>b.onclick=()=>{S.self[b.dataset.self]=b.dataset.s;save();submit(p);addNav(5)});
+  const text=()=>`F&I Case: ${C.title}\nBlock: ${S.block||"?"}\nMath (auto-checked): ${ms.got}/${ms.tot}\n\n${A.m.join("\n")}\n\n${C.math.length+1}. ${A.q4}\n\nCLAIM: ${A.claim}\nEVIDENCE: ${A.evidence}\nREASONING: ${A.reasoning}\n\nSelf-score: claim ${S.self.claim||"-"}, evidence ${S.self.evidence||"-"}, reasoning ${S.self.reasoning||"-"}`;
+  $("#go-copy").onclick=async()=>{const t=text();try{await navigator.clipboard.writeText(t);$("#sub-msg").innerHTML=`<div class="callout good"><b>Copied.</b> Paste it into the Schoology assignment.</div>`}catch(e){$("#sub-msg").innerHTML=`<p class="note">Select all of this, copy it, then paste into Schoology:</p><textarea readonly style="min-height:220px">${esc(t)}</textarea>`}};
+  if(ready)$("#go-submit").onclick=()=>{
+    if(!S.block){$("#sub-msg").innerHTML=`<div class="callout bad">Choose your block first.</div>`;return}
+    const e=cfg.entries,u=new URL(cfg.formUrl);u.searchParams.set("usp","pp_url");
+    const put=(k,v)=>{if(e[k])u.searchParams.set(e[k],v)};
+    put("case",C.id);put("block",S.block);A.m.forEach((x,i)=>put("q"+(i+1),x));put("q"+(C.math.length+1),A.q4);
+    put("claim",A.claim);put("evidence",A.evidence);put("reasoning",A.reasoning);put("math",ms.got+"/"+ms.tot);
+    put("self",`${S.self.claim||"-"} / ${S.self.evidence||"-"} / ${S.self.reasoning||"-"}`);
+    S.submitted=Date.now();save();window.open(u.toString(),"_blank","noopener");submit(p);addNav(5);
+    try{const P=JSON.parse(localStorage.getItem("fi-passport"))||{s:{}};P.s["case-"+C.id]={n:1,best:ms.got,of:ms.tot,t:Date.now()};localStorage.setItem("fi-passport",JSON.stringify(P))}catch(_){}
+  };
+}
+function addNav(i){const p=$("#panel");const nav=document.createElement("div");nav.className="nav";nav.innerHTML=`<button class="btn" id="n-back">← ${STEPS[i-1][0]}</button>`;p.appendChild(nav);$("#n-back").onclick=()=>{go(i-1);scrollTo({top:0})}}
+
+fetch(`/case-study/cases/${id}.json`).then(r=>{if(!r.ok)throw 0;return r.json()}).then(c=>{C=c;shell(C);go(S.step||0)})
+ .catch(()=>{$("#app").innerHTML=`<p>That case couldn't be found. <a href="/cases/">Back to Case Studies</a></p>`});
+})();
+</script>
+</body>
+</html>
